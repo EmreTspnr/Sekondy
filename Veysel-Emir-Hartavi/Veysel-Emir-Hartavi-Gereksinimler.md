@@ -1,4 +1,4 @@
-### 5. Kişi (Yönetim Paneli ve Sistem Denetimi)
+# Yönetim Paneli ve Sistem Denetimi
 
 1. **İlan Şikayet Etme**
     - **API Metodu:** `POST /listings/{listingId}/reports`
