@@ -16,7 +16,7 @@
 
 ## Proje Ekibi
 
-**Grup Adı:** > 2. el kralları
+**Grup Adı:** > 2. El Kralları
 
 **Ekip Üyeleri:** 
 - Emre Taşpınar
