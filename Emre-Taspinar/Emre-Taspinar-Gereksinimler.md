@@ -2,7 +2,7 @@
 
 1. **Yeni İlan Ekleme**
    - **API Metodu:** `POST /listings`
-   - **Açıklama:** Kullanıcının Sivas merkezde kiralık daire gibi satmak veya kiralamak istediği bir mülk için sistemde yeni bir ilan kaydı oluşturmasını sağlar. İlanın temel başlık, fiyat ve detay bilgileri bu aşamada sisteme iletilir. Güvenlik için giriş yapmış olmak gerekir.
+   - **Açıklama:** Kullanıcının daire gibi satmak veya kiralamak istediği bir mülk için sistemde yeni bir ilan kaydı oluşturmasını sağlar. İlanın temel başlık, fiyat ve detay bilgileri bu aşamada sisteme iletilir. Güvenlik için giriş yapmış olmak gerekir.
 
 2. **İlana Fotoğraf Yükleme**
    - **API Metodu:** `POST /listings/{listingId}/photos`
