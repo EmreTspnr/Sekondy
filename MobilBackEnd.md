@@ -8,7 +8,7 @@ Bu dokümanda, mobil uygulamanın REST API ile iletişimini sağlayan backend en
 
 ## Grup Üyelerinin Mobil Backend Görevleri
 
-1. [Emre Taşpınar'ın Mobil Backend Görevleri](Emre-Taspinar\Emre-Taşpınar-Mobil-Backend-Gorevleri.md)
+1. [Emre Taşpınar'ın Mobil Backend Görevleri](Emre-Taspinar\Emre-Taspinar-Mobil-Backend-Gorevleri.md)
 2. [Furkan Sarıbaş'ın Mobil Backend Görevleri](Grup-Uyesi-2/Grup-Uyesi-2-Mobil-Backend-Gorevleri.md)
 3. [Veysel Emir Hartavi'nin Mobil Backend Görevleri](Grup-Uyesi-3/Grup-Uyesi-3-Mobil-Backend-Gorevleri.md)
 4. [Sinan Ece'nin Mobil Backend Görevleri](Grup-Uyesi-4/Grup-Uyesi-4-Mobil-Backend-Gorevleri.md)
