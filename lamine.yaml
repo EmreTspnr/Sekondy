@@ -1,619 +1,851 @@
 openapi: 3.0.3
 info:
-  title: Mekan ve Yorum Yönetim API'si
+  title: Sekondy
   version: 1.0.0
   description: >
-    Bu API, mekanların ve bu mekanlara ait kullanıcı yorumlarının yönetilmesi için
-    tasarlanmış bir RESTful servistir. Temel CRUD (Create, Read, Update, Delete) işlemlerini
-    destekler. Mekanlar coğrafi koordinatlara göre sorgulanabilir ve her mekana kullanıcılar
-    tarafından yorum bırakılabilir. API, JWT tabanlı kimlik doğrulama ile korunmaktadır.
-  contact:
-    name: Asım Sinan Yüksel
-    email: asimyuksel@sdu.edu.tr
-
+    Bu API, ikinci el eşya/mülk alım satım platformunun temel gereksinimlerini karşılamak üzere tasarlanmıştır.
+    Kullanıcı yönetimi, ilan işlemleri, mesajlaşma, favoriler, arama kayıtları ve admin moderasyon süreçlerini içerir.
 servers:
-  - url: https://api.vercel.com
-    description: Üretim sunucusu (Production)
-  - url: https://staging-api.vercel.com
-    description: Test sunucusu (Staging)
-  - url: https://localhost:3000
-    description: Yerel geliştirme sunucusu (Development)
+  - url: https://api.ikincielprojesi.com/v1
+    description: Üretim Sunucusu (Production) (Örnektir)
 
 tags:
-  - name: Mekanlar
-    description: Mekan oluşturma, listeleme, güncelleme ve silme işlemleri
-  - name: Yorumlar
-    description: Mekanlara ait yorum oluşturma, görüntüleme, güncelleme ve silme işlemleri
+  - name: Auth
+    description: Kimlik doğrulama ve kayıt işlemleri
+  - name: Profile
+    description: Kullanıcı profili yönetimi
+  - name: Ads
+    description: İlan oluşturma, güncelleme ve listeleme
+  - name: Users
+    description: Kullanıcı etkileşimleri (Takip vb.)
+  - name: Saved Searches
+    description: Kayıtlı aramalar ve bildirimler
+  - name: Messages
+    description: Kullanıcılar arası mesajlaşma
+  - name: Favorites
+    description: Favori ilan yönetimi
+  - name: Reports
+    description: Şikayet yönetimi
+  - name: Admin
+    description: Sistem yöneticisi işlemleri
 
 security:
   - BearerAuth: []
 
 paths:
-  /api/venues:
+  /auth/register:
     post:
-      tags:
-        - Mekanlar
-      summary: Mekan Ekle
-      operationId: addVenue
+      tags: [Auth]
+      summary: Kullanıcı Kayıt Olma
+      security: []
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/VenueInput'
+              $ref: '#/components/schemas/RegisterInput'
       responses:
         "201":
-          description: Mekan başarıyla oluşturuldu
+          description: Başarılı kayıt
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Venue'
+                $ref: '#/components/schemas/AuthResponse'
         "400":
-          description: Geçersiz istek verisi
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        "401":
-          description: Kimlik doğrulama başarısız (token eksik veya geçersiz)
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        "403":
-          description: Bu işlem için yetkiniz bulunmuyor
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-    get:
-      tags:
-        - Mekanlar
-      summary: Yakındaki Mekanları Listele
-      operationId: listNearbyVenues
-      parameters:
-        - name: lat
-          in: query
-          required: true
-          description: Enlem değeri (latitude)
-          schema:
-            type: number
-            format: float
-          example: 37.7749
-        - name: long
-          in: query
-          required: true
-          description: Boylam değeri (longitude)
-          schema:
-            type: number
-            format: float
-          example: 35.3213
-        - name: page
-          in: query
-          required: false
-          description: Sayfa numarası (varsayılan 1)
-          schema:
-            type: integer
-            minimum: 1
-            default: 1
-          example: 1
-        - name: limit
-          in: query
-          required: false
-          description: Sayfa başına sonuç sayısı (varsayılan 10, maksimum 50)
-          schema:
-            type: integer
-            minimum: 1
-            maximum: 50
-            default: 10
-          example: 10
+          $ref: '#/components/responses/BadRequest'
+
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: Sisteme Giriş Yapma (2)
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginInput'
       responses:
         "200":
-          description: Yakındaki mekanlar başarıyla listelendi
+          description: Başarılı giriş
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+
+  /auth/history:
+    get:
+      tags: [Auth]
+      summary: Giriş Geçmişini Listeleme (6)
+      responses:
+        "200":
+          description: Başarılı
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Venue'
-        "400":
-          description: Geçersiz koordinatlar
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+                  $ref: '#/components/schemas/LoginHistory'
         "401":
-          description: Kimlik doğrulama başarısız (token eksik veya geçersiz)
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/Unauthorized'
 
-  /api/venues/{venueid}:
-    parameters:
-      - name: venueid
-        in: path
-        required: true
-        description: Mekanın benzersiz kimlik numarası
-        schema:
-          type: string
-        example: "abc123"
-
+  /profile:
     get:
-      tags:
-        - Mekanlar
-      summary: Mekan Getir
-      operationId: getVenue
+      tags: [Profile]
+      summary: Kullanıcı Profilini Görüntüleme (4)
       responses:
         "200":
-          description: Mekan başarıyla getirildi
+          description: Profil bilgileri
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Venue'
+                $ref: '#/components/schemas/User'
         "401":
-          description: Kimlik doğrulama başarısız (token eksik veya geçersiz)
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        "404":
-          description: Mekan bulunamadı
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-
+          $ref: '#/components/responses/Unauthorized'
     put:
-      tags:
-        - Mekanlar
-      summary: Mekan Güncelle
-      operationId: updateVenue
+      tags: [Profile]
+      summary: Profil Bilgilerini Güncelleme (3)
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/VenueInput'
+              $ref: '#/components/schemas/ProfileUpdateInput'
       responses:
         "200":
-          description: Mekan başarıyla güncellendi
+          description: Başarılı güncelleme
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Venue'
+                $ref: '#/components/schemas/User'
         "400":
-          description: Geçersiz istek verisi
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/BadRequest'
         "401":
-          description: Kimlik doğrulama başarısız (token eksik veya geçersiz)
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        "403":
-          description: Bu işlem için yetkiniz bulunmuyor
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        "404":
-          description: Mekan bulunamadı
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-
+          $ref: '#/components/responses/Unauthorized'
     delete:
-      tags:
-        - Mekanlar
-      summary: Mekan Sil
-      operationId: deleteVenue
+      tags: [Profile]
+      summary: Kullanıcı Hesabını Silme (5)
       responses:
         "204":
-          description: Mekan başarıyla silindi
+          description: Hesap başarıyla silindi
         "401":
-          description: Kimlik doğrulama başarısız (token eksik veya geçersiz)
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        "403":
-          description: Bu işlem için yetkiniz bulunmuyor
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        "404":
-          description: Mekan bulunamadı
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/Unauthorized'
 
-  /api/venues/{venueid}/comments:
-    parameters:
-      - name: venueid
-        in: path
+  /ads:
+    post:
+      tags: [Ads]
+      summary: Yeni İlan Ekleme (7)
+      requestBody:
         required: true
-        description: Yorumun ait olduğu mekanın kimlik numarası
-        schema:
-          type: string
-        example: "abc123"
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdInput'
+      responses:
+        "201":
+          description: İlan oluşturuldu
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ad'
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "401":
+          $ref: '#/components/responses/Unauthorized'
 
+  /ads/{adId}:
+    parameters:
+      - $ref: '#/components/parameters/adIdParam'
     get:
-      tags:
-        - Yorumlar
-      summary: Yorumları Listele
-      operationId: listComments
-      parameters:
-        - name: page
-          in: query
-          required: false
-          description: Sayfa numarası (varsayılan 1)
-          schema:
-            type: integer
-            minimum: 1
-            default: 1
-          example: 1
-        - name: limit
-          in: query
-          required: false
-          description: Sayfa başına sonuç sayısı (varsayılan 10, maksimum 50)
-          schema:
-            type: integer
-            minimum: 1
-            maximum: 50
-            default: 10
-          example: 10
+      tags: [Ads]
+      summary: İlan Detaylarını Görüntüleme (10)
+      security: []
       responses:
         "200":
-          description: Yorumlar başarıyla listelendi
+          description: İlan detayları
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ad'
+        "404":
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [Ads]
+      summary: İlan Bilgilerini Güncelleme (9)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdInput'
+      responses:
+        "200":
+          description: Başarılı güncelleme
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "403":
+          $ref: '#/components/responses/Forbidden'
+        "404":
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags: [Ads]
+      summary: İlanı Silme (11)
+      responses:
+        "204":
+          description: İlan silindi
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "403":
+          $ref: '#/components/responses/Forbidden'
+        "404":
+          $ref: '#/components/responses/NotFound'
+
+  /ads/{adId}/photos:
+    post:
+      tags: [Ads]
+      summary: İlana Fotoğraf Yükleme (8)
+      parameters:
+        - $ref: '#/components/parameters/adIdParam'
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        "200":
+          description: Fotoğraf başarıyla yüklendi
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Fotoğraf başarıyla eklendi."
+                  photoUrl:
+                    type: string
+                    format: uri
+                    example: "https://api.ikincielprojesi.com/uploads/ads/photo1.jpg"
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "403":
+          $ref: '#/components/responses/Forbidden'
+
+  /my-ads:
+    get:
+      tags: [Ads]
+      summary: Kendi İlanlarını Listeleme (12)
+      parameters:
+        - $ref: '#/components/parameters/pageParam'
+        - $ref: '#/components/parameters/limitParam'
+      responses:
+        "200":
+          description: Kullanıcının ilanları
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Comment'
+                  $ref: '#/components/schemas/Ad'
         "401":
-          description: Kimlik doğrulama başarısız (token eksik veya geçersiz)
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        "404":
-          description: Mekan bulunamadı
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/Unauthorized'
 
+  /ads/category/{categoryId}:
+    get:
+      tags: [Ads]
+      summary: Kategoriye Göre İlan Listeleme (17)
+      security: []
+      parameters:
+        - name: categoryId
+          in: path
+          required: true
+          schema:
+            type: string
+        - $ref: '#/components/parameters/pageParam'
+        - $ref: '#/components/parameters/limitParam'
+      responses:
+        "200":
+          description: Kategoriye ait ilanlar
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Ad'
+
+  /ads/showcase:
+    get:
+      tags: [Ads]
+      summary: Vitrin İlanlarını Görüntüleme (18)
+      parameters:
+        - $ref: '#/components/parameters/pageParam'
+        - $ref: '#/components/parameters/limitParam'
+      security: []
+      responses:
+        "200":
+          description: Vitrin ilanları
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Ad'
+
+  /users/{userId}/follow:
     post:
-      tags:
-        - Yorumlar
-      summary: Yorum Ekle
-      operationId: addComment
+      tags: [Users]
+      summary: Satıcıyı Takip Etme (13)
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Takip işlemi başarılı
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "404":
+          $ref: '#/components/responses/NotFound'
+
+  /saved-searches:
+    post:
+      tags: [Saved Searches]
+      summary: Arama Kriterlerini Kaydetme (14)
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CommentInput'
+              $ref: '#/components/schemas/SavedSearchInput'
       responses:
         "201":
-          description: Yorum başarıyla oluşturuldu
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Comment'
-        "400":
-          description: Geçersiz istek verisi
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          description: Arama kaydedildi
         "401":
-          description: Kimlik doğrulama başarısız (token eksik veya geçersiz)
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        "404":
-          description: Mekan bulunamadı
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/Unauthorized'
 
-  /api/venues/{venueid}/comments/{commentid}:
-    parameters:
-      - name: venueid
-        in: path
-        required: true
-        description: Yorumun ait olduğu mekanın kimlik numarası
-        schema:
-          type: string
-        example: "abc123"
-      - name: commentid
-        in: path
-        required: true
-        description: Yorumun benzersiz kimlik numarası
-        schema:
-          type: string
-        example: "cmt456"
-
-    get:
-      tags:
-        - Yorumlar
-      summary: Yorum Getir
-      operationId: getComment
+  /saved-searches/{searchId}:
+    delete:
+      tags: [Saved Searches]
+      summary: Kayıtlı Aramayı Silme (16)
+      parameters:
+        - $ref: '#/components/parameters/searchIdParam'
       responses:
-        "200":
-          description: Yorum başarıyla getirildi
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Comment'
+        "204":
+          description: Başarıyla silindi
         "401":
-          description: Kimlik doğrulama başarısız (token eksik veya geçersiz)
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/Unauthorized'
         "404":
-          description: Yorum bulunamadı
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/NotFound'
 
+  /saved-searches/{searchId}/notifications:
     put:
-      tags:
-        - Yorumlar
-      summary: Yorum Güncelle
-      operationId: updateComment
+      tags: [Saved Searches]
+      summary: Arama Bildirimlerini Açma/Kapatma (15)
+      parameters:
+        - $ref: '#/components/parameters/searchIdParam'
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CommentInput'
+              type: object
+              properties:
+                enabled:
+                  type: boolean
       responses:
         "200":
-          description: Yorum başarıyla güncellendi
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Comment'
-        "400":
-          description: Geçersiz istek verisi
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          description: Bildirim tercihi güncellendi
         "401":
-          description: Kimlik doğrulama başarısız (token eksik veya geçersiz)
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        "403":
-          description: Bu işlem için yetkiniz bulunmuyor
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/Unauthorized'
         "404":
-          description: Yorum bulunamadı
+          $ref: '#/components/responses/NotFound'
+
+  /messages:
+    get:
+      tags: [Messages]
+      summary: Gelen Mesajları Listeleme (23)
+      parameters:
+        - $ref: '#/components/parameters/pageParam'
+        - $ref: '#/components/parameters/limitParam'
+      responses:
+        "200":
+          description: Mesaj listesi
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                type: array
+                items:
+                  $ref: '#/components/schemas/Message'
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      tags: [Messages]
+      summary: Satıcıya Mesaj Gönderme (19)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MessageInput'
+      responses:
+        "201":
+          description: Mesaj gönderildi
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "401":
+          $ref: '#/components/responses/Unauthorized'
 
+  /messages/{messageId}:
     delete:
-      tags:
-        - Yorumlar
-      summary: Yorum Sil
-      operationId: deleteComment
+      tags: [Messages]
+      summary: Gelen Mesajı Silme (22)
+      parameters:
+        - $ref: '#/components/parameters/messageIdParam'
       responses:
         "204":
-          description: Yorum başarıyla silindi
+          description: Mesaj silindi
         "401":
-          description: Kimlik doğrulama başarısız (token eksik veya geçersiz)
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        "403":
-          description: Bu işlem için yetkiniz bulunmuyor
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/Unauthorized'
         "404":
-          description: Yorum bulunamadı
+          $ref: '#/components/responses/NotFound'
+
+  /messages/{messageId}/read:
+    put:
+      tags: [Messages]
+      summary: Mesajı Okundu İşaretleme (21)
+      parameters:
+        - $ref: '#/components/parameters/messageIdParam'
+      responses:
+        "200":
+          description: Okundu olarak işaretlendi
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "404":
+          $ref: '#/components/responses/NotFound'
+
+  /favorites:
+    get:
+      tags: [Favorites]
+      summary: Favori İlanları Listeleme (24)
+      parameters:
+        - $ref: '#/components/parameters/pageParam'
+        - $ref: '#/components/parameters/limitParam'
+      responses:
+        "200":
+          description: Favoriler listesi
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                type: array
+                items:
+                  $ref: '#/components/schemas/Ad'
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      tags: [Favorites]
+      summary: İlanı Favorilere Ekleme (20)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                adId:
+                  type: string
+      responses:
+        "201":
+          description: Favorilere eklendi
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "İlan favorilerinize eklendi."
+                  adId:
+                    type: string
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "404":
+          $ref: '#/components/responses/NotFound'
+
+  /reports:
+    post:
+      tags: [Reports]
+      summary: İlan Şikayet Etme
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReportInput'
+      responses:
+        "201":
+          description: Şikayet alındı
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+
+  /admin/ads/pending:
+    get:
+      tags: [Admin]
+      summary: Onay Bekleyen İlanları Listeleme
+      parameters:
+        - $ref: '#/components/parameters/pageParam'
+        - $ref: '#/components/parameters/limitParam'
+      responses:
+        "200":
+          description: Onay bekleyen ilanlar
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Ad'
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "403":
+          $ref: '#/components/responses/Forbidden'
+
+  /admin/reports:
+    get:
+      tags: [Admin]
+      summary: Şikayet Edilen İlanları Listeleme
+      parameters:
+        - $ref: '#/components/parameters/pageParam'
+        - $ref: '#/components/parameters/limitParam'
+      responses:
+        "200":
+          description: Şikayet listesi
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Report'
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "403":
+          $ref: '#/components/responses/Forbidden'
+
+  /admin/ads/{adId}/approve:
+    put:
+      tags: [Admin]
+      summary: İlan Durumunu Onaylama (26)
+      parameters:
+        - $ref: '#/components/parameters/adIdParam'
+      responses:
+        "200":
+          description: İlan onaylandı
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "403":
+          $ref: '#/components/responses/Forbidden'
+        "404":
+          $ref: '#/components/responses/NotFound'
+
+  /admin/ads/{adId}:
+    delete:
+      tags: [Admin]
+      summary: Uygunsuz İlanı Silme (28)
+      parameters:
+        - $ref: '#/components/parameters/adIdParam'
+      responses:
+        "204":
+          description: İlan sistemden silindi
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "403":
+          $ref: '#/components/responses/Forbidden'
+        "404":
+          $ref: '#/components/responses/NotFound'
+
+  /admin/users/{userId}/suspend:
+    put:
+      tags: [Admin]
+      summary: Kullanıcı Hesabını Askıya Alma (27)
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Kullanıcı askıya alındı
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "403":
+          $ref: '#/components/responses/Forbidden'
+        "404":
+          $ref: '#/components/responses/NotFound'
 
 components:
   securitySchemes:
     BearerAuth:
-      type: apiKey
-      in: header
-      name: Authorization
-      description: 'JWT tabanlı kimlik doğrulama. İstek başlığına "Authorization: Bearer <token>" eklenmeli.'
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    pageParam:
+      name: page
+      in: query
+      description: Sayfa numarası
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    limitParam:
+      name: limit
+      in: query
+      description: Sayfa başına gösterilecek sonuç sayısı
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 50
+        default: 10
+    adIdParam:
+      name: adId
+      in: path
+      required: true
+      description: İlanın benzersiz kimliği
+      schema:
+        type: string
+    searchIdParam:
+      name: searchId
+      in: path
+      required: true
+      description: Kayıtlı aramanın benzersiz kimliği
+      schema:
+        type: string
+    messageIdParam:
+      name: messageId
+      in: path
+      required: true
+      description: Mesajın benzersiz kimliği
+      schema:
+        type: string
+
+  responses:
+    BadRequest:
+      description: Geçersiz istek verisi
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Kimlik doğrulama başarısız (Eksik veya geçersiz token)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Forbidden:
+      description: Bu işlem için yetkiniz yok (Örneğin admin değilsiniz veya başkasının ilanı)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: Kayıt bulunamadı
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
 
   schemas:
-    Venue:
-      type: object
-      description: Mekan bilgilerini temsil eden model
-      properties:
-        _id:
-          type: string
-          description: Mekanın benzersiz kimlik numarası (otomatik atanır)
-          example: "abc123"
-        name:
-          type: string
-          description: Mekan adı
-          example: "Kafe Mavi"
-        address:
-          type: string
-          description: Mekanın açık adresi
-          example: "Atatürk Cad. No:12, Ankara"
-        rating:
-          type: integer
-          description: Mekan puanı (1-5 arası)
-          minimum: 1
-          maximum: 5
-          example: 4
-        facilities:
-          type: array
-          description: Mekanda sunulan olanaklar
-          items:
-            type: string
-          example: ["Wi-Fi", "Otopark", "Canlı Müzik"]
-        coords:
-          type: object
-          description: Mekanın coğrafi koordinatları
-          properties:
-            lat:
-              type: number
-              format: float
-              description: Enlem değeri
-              example: 37.7749
-            long:
-              type: number
-              format: float
-              description: Boylam değeri
-              example: 35.3213
-          required:
-            - lat
-            - long
-      required:
-        - name
-        - address
-        - coords
-
-    VenueInput:
-      type: object
-      description: Mekan oluşturma veya güncelleme isteği için gönderilecek veri
-      properties:
-        name:
-          type: string
-          description: Mekan adı
-          minLength: 2
-          maxLength: 100
-          example: "Kafe Mavi"
-        address:
-          type: string
-          description: Mekanın açık adresi
-          minLength: 5
-          example: "Atatürk Cad. No:12, Ankara"
-        rating:
-          type: integer
-          description: Mekan puanı (1-5 arası)
-          minimum: 1
-          maximum: 5
-          example: 4
-        facilities:
-          type: array
-          description: Mekanda sunulan olanaklar
-          items:
-            type: string
-          example: ["Wi-Fi", "Otopark"]
-        coords:
-          type: object
-          description: Mekanın coğrafi koordinatları
-          properties:
-            lat:
-              type: number
-              format: float
-              description: Enlem değeri
-              example: 37.7749
-            long:
-              type: number
-              format: float
-              description: Boylam değeri
-              example: 35.3213
-          required:
-            - lat
-            - long
-      required:
-        - name
-        - address
-        - coords
-
-    Comment:
-      type: object
-      description: Yorum bilgilerini temsil eden model
-      properties:
-        _id:
-          type: string
-          description: Yorumun benzersiz kimlik numarası (otomatik atanır)
-          example: "cmt456"
-        author:
-          type: string
-          description: Yorumu yazan kullanıcının adı
-          example: "Ahmet Yılmaz"
-        rating:
-          type: integer
-          description: Kullanıcının verdiği puan (1-5 arası)
-          minimum: 1
-          maximum: 5
-          example: 5
-        text:
-          type: string
-          description: Yorum metni
-          example: "Harika bir mekan, kesinlikle tavsiye ederim!"
-        createdOn:
-          type: string
-          format: date-time
-          description: Yorumun oluşturulma tarihi (ISO 8601 formatında)
-          example: "2026-02-20T14:30:00Z"
-      required:
-        - author
-        - rating
-        - text
-
-    CommentInput:
-      type: object
-      description: Yorum oluşturma veya güncelleme isteği için gönderilecek veri
-      properties:
-        author:
-          type: string
-          description: Yorumu yazan kullanıcının adı
-          minLength: 2
-          maxLength: 50
-          example: "Ahmet Yılmaz"
-        rating:
-          type: integer
-          description: Kullanıcının verdiği puan (1-5 arası)
-          minimum: 1
-          maximum: 5
-          example: 5
-        text:
-          type: string
-          description: Yorum metni
-          minLength: 5
-          maxLength: 500
-          example: "Harika bir mekan, kesinlikle tavsiye ederim!"
-      required:
-        - author
-        - rating
-        - text
-
     Error:
       type: object
-      description: Hata durumlarında döndürülen standart hata yanıtı
       properties:
         message:
           type: string
-          description: Hatayı açıklayan mesaj
-          example: "Mekan bulunamadı"
-      required:
-        - message
+          example: "Bir hata oluştu."
+
+    AuthResponse:
+      type: object
+      properties:
+        token:
+          type: string
+        user:
+          $ref: '#/components/schemas/User'
+
+    RegisterInput:
+      type: object
+      required: [firstName, lastName, email, password]
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+        phone:
+          type: string
+
+    LoginInput:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        address:
+          type: string
+        status:
+          type: string
+          enum: [ACTIVE, SUSPENDED]
+
+    ProfileUpdateInput:
+      type: object
+      properties:
+        phone:
+          type: string
+        address:
+          type: string
+
+    LoginHistory:
+      type: object
+      properties:
+        ipAddress:
+          type: string
+        device:
+          type: string
+        loginTime:
+          type: string
+          format: date-time
+
+    Ad:
+      type: object
+      properties:
+        id:
+          type: string
+        sellerId:
+          type: string
+        categoryId:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+        status:
+          type: string
+          enum: [PENDING, ACTIVE, SOLD, REMOVED]
+        photos:
+          type: array
+          items:
+            type: string
+            format: uri
+
+    AdInput:
+      type: object
+      required: [title, description, price, categoryId]
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+        categoryId:
+          type: string
+
+    SavedSearchInput:
+      type: object
+      required: [query]
+      properties:
+        query:
+          type: string
+        categoryId:
+          type: string
+        minPrice:
+          type: number
+        maxPrice:
+          type: number
+
+    Message:
+      type: object
+      properties:
+        id:
+          type: string
+        senderId:
+          type: string
+        receiverId:
+          type: string
+        adId:
+          type: string
+        content:
+          type: string
+        isRead:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+
+    MessageInput:
+      type: object
+      required: [receiverId, adId, content]
+      properties:
+        receiverId:
+          type: string
+        adId:
+          type: string
+        content:
+          type: string
+
+    Report:
+      type: object
+      properties:
+        id:
+          type: string
+        adId:
+          type: string
+        reporterId:
+          type: string
+        reason:
+          type: string
+        status:
+          type: string
+          enum: [OPEN, RESOLVED]
+
+    ReportInput:
+      type: object
+      required: [adId, reason]
+      properties:
+        adId:
+          type: string
+        reason:
+          type: string
