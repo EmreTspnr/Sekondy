@@ -66,7 +66,7 @@ paths:
   /auth/login:
     post:
       tags: [Auth]
-      summary: Sisteme Giriş Yapma (2)
+      summary: Sisteme Giriş Yapma 
       security: []
       requestBody:
         required: true
@@ -87,7 +87,7 @@ paths:
   /auth/history:
     get:
       tags: [Auth]
-      summary: Giriş Geçmişini Listeleme (6)
+      summary: Giriş Geçmişini Listeleme 
       responses:
         "200":
           description: Başarılı
@@ -103,7 +103,7 @@ paths:
   /profile:
     get:
       tags: [Profile]
-      summary: Kullanıcı Profilini Görüntüleme (4)
+      summary: Kullanıcı Profilini Görüntüleme 
       responses:
         "200":
           description: Profil bilgileri
@@ -115,7 +115,7 @@ paths:
           $ref: '#/components/responses/Unauthorized'
     put:
       tags: [Profile]
-      summary: Profil Bilgilerini Güncelleme (3)
+      summary: Profil Bilgilerini Güncelleme 
       requestBody:
         required: true
         content:
@@ -135,7 +135,7 @@ paths:
           $ref: '#/components/responses/Unauthorized'
     delete:
       tags: [Profile]
-      summary: Kullanıcı Hesabını Silme (5)
+      summary: Kullanıcı Hesabını Silme 
       responses:
         "204":
           description: Hesap başarıyla silindi
@@ -145,7 +145,7 @@ paths:
   /ads:
     post:
       tags: [Ads]
-      summary: Yeni İlan Ekleme (7)
+      summary: Yeni İlan Ekleme 
       requestBody:
         required: true
         content:
@@ -169,7 +169,7 @@ paths:
       - $ref: '#/components/parameters/adIdParam'
     get:
       tags: [Ads]
-      summary: İlan Detaylarını Görüntüleme (10)
+      summary: İlan Detaylarını Görüntüleme 
       security: []
       responses:
         "200":
@@ -182,7 +182,7 @@ paths:
           $ref: '#/components/responses/NotFound'
     put:
       tags: [Ads]
-      summary: İlan Bilgilerini Güncelleme (9)
+      summary: İlan Bilgilerini Güncelleme 
       requestBody:
         required: true
         content:
@@ -200,7 +200,7 @@ paths:
           $ref: '#/components/responses/NotFound'
     delete:
       tags: [Ads]
-      summary: İlanı Silme (11)
+      summary: İlanı Silme 
       responses:
         "204":
           description: İlan silindi
@@ -214,7 +214,7 @@ paths:
   /ads/{adId}/photos:
     post:
       tags: [Ads]
-      summary: İlana Fotoğraf Yükleme (8)
+      summary: İlana Fotoğraf Yükleme 
       parameters:
         - $ref: '#/components/parameters/adIdParam'
       requestBody:
@@ -251,7 +251,7 @@ paths:
   /my-ads:
     get:
       tags: [Ads]
-      summary: Kendi İlanlarını Listeleme (12)
+      summary: Kendi İlanlarını Listeleme 
       parameters:
         - $ref: '#/components/parameters/pageParam'
         - $ref: '#/components/parameters/limitParam'
@@ -270,7 +270,7 @@ paths:
   /ads/category/{categoryId}:
     get:
       tags: [Ads]
-      summary: Kategoriye Göre İlan Listeleme (17)
+      summary: Kategoriye Göre İlan Listeleme 
       security: []
       parameters:
         - name: categoryId
@@ -293,7 +293,7 @@ paths:
   /ads/showcase:
     get:
       tags: [Ads]
-      summary: Vitrin İlanlarını Görüntüleme (18)
+      summary: Vitrin İlanlarını Görüntüleme 
       parameters:
         - $ref: '#/components/parameters/pageParam'
         - $ref: '#/components/parameters/limitParam'
@@ -311,7 +311,7 @@ paths:
   /users/{userId}/follow:
     post:
       tags: [Users]
-      summary: Satıcıyı Takip Etme (13)
+      summary: Satıcıyı Takip Etme 
       parameters:
         - name: userId
           in: path
@@ -329,7 +329,7 @@ paths:
   /saved-searches:
     post:
       tags: [Saved Searches]
-      summary: Arama Kriterlerini Kaydetme (14)
+      summary: Arama Kriterlerini Kaydetme 
       requestBody:
         required: true
         content:
@@ -345,7 +345,7 @@ paths:
   /saved-searches/{searchId}:
     delete:
       tags: [Saved Searches]
-      summary: Kayıtlı Aramayı Silme (16)
+      summary: Kayıtlı Aramayı Silme 
       parameters:
         - $ref: '#/components/parameters/searchIdParam'
       responses:
@@ -359,7 +359,7 @@ paths:
   /saved-searches/{searchId}/notifications:
     put:
       tags: [Saved Searches]
-      summary: Arama Bildirimlerini Açma/Kapatma (15)
+      summary: Arama Bildirimlerini Açma/Kapatma 
       parameters:
         - $ref: '#/components/parameters/searchIdParam'
       requestBody:
@@ -382,7 +382,7 @@ paths:
   /messages:
     get:
       tags: [Messages]
-      summary: Gelen Mesajları Listeleme (23)
+      summary: Gelen Mesajları Listeleme 
       parameters:
         - $ref: '#/components/parameters/pageParam'
         - $ref: '#/components/parameters/limitParam'
@@ -399,7 +399,7 @@ paths:
           $ref: '#/components/responses/Unauthorized'
     post:
       tags: [Messages]
-      summary: Satıcıya Mesaj Gönderme (19)
+      summary: Satıcıya Mesaj Gönderme 
       requestBody:
         required: true
         content:
@@ -417,7 +417,7 @@ paths:
   /messages/{messageId}:
     delete:
       tags: [Messages]
-      summary: Gelen Mesajı Silme (22)
+      summary: Gelen Mesajı Silme 
       parameters:
         - $ref: '#/components/parameters/messageIdParam'
       responses:
@@ -431,7 +431,7 @@ paths:
   /messages/{messageId}/read:
     put:
       tags: [Messages]
-      summary: Mesajı Okundu İşaretleme (21)
+      summary: Mesajı Okundu İşaretleme 
       parameters:
         - $ref: '#/components/parameters/messageIdParam'
       responses:
@@ -445,7 +445,7 @@ paths:
   /favorites:
     get:
       tags: [Favorites]
-      summary: Favori İlanları Listeleme (24)
+      summary: Favori İlanları Listeleme 
       parameters:
         - $ref: '#/components/parameters/pageParam'
         - $ref: '#/components/parameters/limitParam'
@@ -462,7 +462,7 @@ paths:
           $ref: '#/components/responses/Unauthorized'
     post:
       tags: [Favorites]
-      summary: İlanı Favorilere Ekleme (20)
+      summary: İlanı Favorilere Ekleme 
       requestBody:
         required: true
         content:
@@ -551,7 +551,7 @@ paths:
   /admin/ads/{adId}/approve:
     put:
       tags: [Admin]
-      summary: İlan Durumunu Onaylama (26)
+      summary: İlan Durumunu Onaylama 
       parameters:
         - $ref: '#/components/parameters/adIdParam'
       responses:
@@ -567,7 +567,7 @@ paths:
   /admin/ads/{adId}:
     delete:
       tags: [Admin]
-      summary: Uygunsuz İlanı Silme (28)
+      summary: Uygunsuz İlanı Silme 
       parameters:
         - $ref: '#/components/parameters/adIdParam'
       responses:
@@ -583,7 +583,7 @@ paths:
   /admin/users/{userId}/suspend:
     put:
       tags: [Admin]
-      summary: Kullanıcı Hesabını Askıya Alma (27)
+      summary: Kullanıcı Hesabını Askıya Alma 
       parameters:
         - name: userId
           in: path
