@@ -1,6 +1,6 @@
 # API Tasarımı - OpenAPI Specification Örneği
 
-**OpenAPI Spesifikasyon Dosyası:** [lamine.yaml](lamine.yaml)
+**OpenAPI Spesifikasyon Dosyası:** [Sekondy.yaml](Sekondy.yaml)
 
 Bu doküman, OpenAPI Specification (OAS) 3.0 standardına göre hazırlanmış örnek bir API tasarımını içermektedir.
 
@@ -14,9 +14,18 @@ info:
   description: >
     Bu API, ikinci el eşya/mülk alım satım platformunun temel gereksinimlerini karşılamak üzere tasarlanmıştır.
     Kullanıcı yönetimi, ilan işlemleri, mesajlaşma, favoriler, arama kayıtları ve admin moderasyon süreçlerini içerir.
+
+  contact:
+    name: '2. El Kralları'
+    email: ikinci.el.krallariii@gmail.com
+
 servers:
-  - url: https://api.ikincielprojesi.com/v1
-    description: Üretim Sunucusu (Production) (Örnektir)
+  - url: https://api.sekondy.com/v1
+    description: Üretim Sunucusu (Production)
+  - url: https://staging-api.sekondy.com/v1
+    description: Test Sunucusu (Staging)
+  - url: http://localhost:3000/v1
+    description: Yerel Geliştirme Sunucusu (Development)
 
 tags:
   - name: Auth
