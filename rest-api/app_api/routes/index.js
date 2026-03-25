@@ -33,5 +33,9 @@ router.post('/listings/:id/photos', upload.array('photos', 5), ctrlListings.uplo
 
 // YENİ EKLENEN: 12. Görev: Kendi İlanlarını Listeleme
 router.get('/my-listings', ctrlListings.getMyListings);
+// ... önceki rotalar ...
+
+// YENİ EKLENEN: 9. Görev: İlan Bilgilerini Güncelleme
+router.put('/listings/:id', ctrlListings.updateListing);
 
 module.exports = router;
