@@ -43,4 +43,10 @@ router.put('/listings/:id', ctrlListings.updateListing);
 // YENİ EKLENEN: 10. Görev: İlan Detaylarını Görüntüleme
 router.get('/listings/:id', ctrlListings.getListingById);
 
+// ... önceki rotalar ...
+
+// 11. Görev: İlanı Silme
+router.post('/listings/:id', ctrlListings.deleteListing); // Bazı sistemlerde DELETE yerine POST kullanılır ama doğrusu:
+router.delete('/listings/:id', ctrlListings.deleteListing);
+
 module.exports = router;
