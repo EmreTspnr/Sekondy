@@ -26,7 +26,12 @@ router.get('/', (req, res) => {
 // 7. Görev: İlan Ekleme
 router.post('/listings', ctrlListings.addListing);
 
-// 8. Görev: İlana Fotoğraf Yükleme (Tek seferde en fazla 5 resim limiti koyduk)
+// ... önceki kodlar ...
+
+// 8. Görev: İlana Fotoğraf Yükleme
 router.post('/listings/:id/photos', upload.array('photos', 5), ctrlListings.uploadPhotos);
+
+// YENİ EKLENEN: 12. Görev: Kendi İlanlarını Listeleme
+router.get('/my-listings', ctrlListings.getMyListings);
 
 module.exports = router;

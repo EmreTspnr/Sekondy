@@ -54,9 +54,27 @@ const uploadPhotos = async (req, res) => {
     res.status(500).json({ mesaj: "Fotoğraf yüklenirken bir hata oluştu.", hata: error });
   }
 };
+// 3. Kendi İlanlarını Listeleme Fonksiyonu
+const getMyListings = async (req, res) => {
+  try {
+    // Şimdilik URL'den gelen 'owner' bilgisini okuyoruz. 
+    // Eğer URL'de gönderilmezse varsayılan olarak senin adını arayacak.
+    const ownerName = req.query.owner || "Emre Taspinar";
 
-// Modülleri dışarı aktarıyoruz
+    // Veritabanında owner alanı bu isme eşit olan TÜM ilanları bul
+    // .sort({ createdAt: -1 }) kısmı en yeni eklenen ilanın en üstte gelmesini sağlar
+    const myListings = await Listing.find({ owner: ownerName }).sort({ createdAt: -1 });
+
+    // 200: İşlem başarılı
+    res.status(200).json(myListings);
+  } catch (error) {
+    res.status(500).json({ mesaj: "İlanlar getirilirken bir hata oluştu.", hata: error });
+  }
+};
+
+// Alt kısmı güncellemeyi UNUTMA!
 module.exports = {
   addListing,
-  uploadPhotos
+  uploadPhotos,
+  getMyListings // Yeni fonksiyonumuzu dışarı aktardık
 };
