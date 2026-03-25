@@ -112,11 +112,32 @@ const getListingById = async (req, res) => {
   }
 };
 
-// Dışarı aktarılanlar listesini güncelliyoruz
+// 6. İlanı Tamamen Silme Fonksiyonu
+const deleteListing = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // findByIdAndDelete komutu veriyi bulur ve tek seferde siler
+    const deletedListing = await Listing.findByIdAndDelete(id);
+
+    if (!deletedListing) {
+      return res.status(404).json({ mesaj: "Silinecek ilan bulunamadı." });
+    }
+
+    // 204 No Content genelde silme işlemleri için kullanılır ama 
+    // başarılı mesajı dönmek için 200 de tercih edilebilir.
+    res.status(200).json({ mesaj: "İlan başarıyla sistemden kaldırıldı." });
+  } catch (error) {
+    res.status(500).json({ mesaj: "İlan silinirken bir hata oluştu.", hata: error });
+  }
+};
+
+// FİNAL EXPORTS LİSTESİ
 module.exports = {
   addListing,
   uploadPhotos,
   getMyListings,
   updateListing,
-  getListingById // YENİ EKLENDİ
+  getListingById,
+  deleteListing // SON GÖREV
 };
