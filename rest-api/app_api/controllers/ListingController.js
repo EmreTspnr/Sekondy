@@ -92,10 +92,31 @@ const updateListing = async (req, res) => {
   }
 };
 
+// 5. Tek Bir İlanın Detaylarını Görüntüleme Fonksiyonu
+const getListingById = async (req, res) => {
+  try {
+    const { id } = req.params; // URL'den ID'yi al
+    
+    // Veritabanında o ID'ye sahip ilanı bul
+    const listing = await Listing.findById(id);
+
+    // Eğer ilan yoksa veya silinmişse 404 döndür
+    if (!listing) {
+      return res.status(404).json({ mesaj: "İlan bulunamadı." });
+    }
+
+    // İlan bulunduysa 200 koduyla detayları gönder
+    res.status(200).json(listing);
+  } catch (error) {
+    res.status(500).json({ mesaj: "İlan detayları getirilirken bir hata oluştu.", hata: error });
+  }
+};
+
 // Dışarı aktarılanlar listesini güncelliyoruz
 module.exports = {
   addListing,
   uploadPhotos,
   getMyListings,
-  updateListing // YENİ EKLENDİ
+  updateListing,
+  getListingById // YENİ EKLENDİ
 };

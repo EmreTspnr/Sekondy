@@ -38,4 +38,9 @@ router.get('/my-listings', ctrlListings.getMyListings);
 // YENİ EKLENEN: 9. Görev: İlan Bilgilerini Güncelleme
 router.put('/listings/:id', ctrlListings.updateListing);
 
+// ... önceki rotalar ...
+
+// YENİ EKLENEN: 10. Görev: İlan Detaylarını Görüntüleme
+router.get('/listings/:id', ctrlListings.getListingById);
+
 module.exports = router;
