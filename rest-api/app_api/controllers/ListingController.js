@@ -72,9 +72,30 @@ const getMyListings = async (req, res) => {
   }
 };
 
-// Alt kısmı güncellemeyi UNUTMA!
+// 4. İlan Bilgilerini Güncelleme Fonksiyonu
+const updateListing = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updateData = req.body; // Kullanıcının gönderdiği yeni verileri alıyoruz
+
+    // Veritabanında ilanı bul ve güncelle. 
+    // { new: true } parametresi, işlemin ardından bize ilanın güncellenmiş son halini döndürür.
+    const updatedListing = await Listing.findByIdAndUpdate(id, updateData, { new: true });
+
+    if (!updatedListing) {
+      return res.status(404).json({ mesaj: "Güncellenecek ilan bulunamadı." });
+    }
+
+    res.status(200).json(updatedListing);
+  } catch (error) {
+    res.status(500).json({ mesaj: "İlan güncellenirken bir hata oluştu.", hata: error });
+  }
+};
+
+// Dışarı aktarılanlar listesini güncelliyoruz
 module.exports = {
   addListing,
   uploadPhotos,
-  getMyListings // Yeni fonksiyonumuzu dışarı aktardık
+  getMyListings,
+  updateListing // YENİ EKLENDİ
 };
