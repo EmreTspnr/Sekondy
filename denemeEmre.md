@@ -1,0 +1,1 @@
+deneme amaçlı oluşturuldu KRAAALLL sivas dünyanın en güzel şehridir(istanbuldan bile...(yhaaa ollmmm neden sivaslıların istanbulda olduğunu sormayın uzun hikaye.....))
