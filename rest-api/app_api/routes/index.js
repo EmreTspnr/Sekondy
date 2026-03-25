@@ -1,9 +1,32 @@
 const express = require('express');
 const router = express.Router();
+const multer = require('multer');
+const path = require('path');
+const ctrlListings = require('../controllers/ListingController');
 
-// Sistemin çalışıp çalışmadığını test etmek için basit bir rota
+// --- MULTER AYARLARI ---
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    // Resimler oluşturduğumuz 'uploads' klasörüne gidecek
+    cb(null, 'uploads/') 
+  },
+  filename: function (req, file, cb) {
+    // Aynı isimli resimler çakışmasın diye isimlerin sonuna o anki tarihi ekliyoruz
+    cb(null, Date.now() + path.extname(file.originalname))
+  }
+});
+const upload = multer({ storage: storage });
+// -----------------------
+
+// Test rotası
 router.get('/', (req, res) => {
   res.status(200).json({ mesaj: "Sekondy API başarıyla çalışıyor!" });
 });
+
+// 7. Görev: İlan Ekleme
+router.post('/listings', ctrlListings.addListing);
+
+// 8. Görev: İlana Fotoğraf Yükleme (Tek seferde en fazla 5 resim limiti koyduk)
+router.post('/listings/:id/photos', upload.array('photos', 5), ctrlListings.uploadPhotos);
 
 module.exports = router;
