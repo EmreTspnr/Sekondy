@@ -4,7 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6ace3ca0-acff-46f3-bcb9-7f153127cfb0" name="Changes" comment="" />
+    <list default="true" id="6ace3ca0-acff-46f3-bcb9-7f153127cfb0" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rest-api/app_api/routes/adminRoutes.js" beforeDir="false" afterPath="$PROJECT_DIR$/rest-api/app_api/routes/adminRoutes.js" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -13,21 +16,21 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "MrVeys"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;MrVeys&quot;
   }
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/EmreTspnr/Sekondy.git",
-    "accountId": "962eae01-5754-4f62-a273-26e9d8401a1d"
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/EmreTspnr/Sekondy.git&quot;,
+    &quot;accountId&quot;: &quot;962eae01-5754-4f62-a273-26e9d8401a1d&quot;
   }
-}]]></component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 2
-}]]></component>
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 2
+}</component>
   <component name="ProjectId" id="3BU0sQARjdg1xIuaWPHwUrl9xHo" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -39,11 +42,11 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "main",
+    "git-widget-placeholder": "VeyselEmirHartavi",
     "javascript.nodejs.core.library.configured.version": "22.11.0",
     "javascript.nodejs.core.library.typings.version": "22.19.15",
     "junie.onboarding.icon.badge.shown": "true",
-    "last_opened_file_path": "C:/Users/veyse/OneDrive/Belgeler/GitHub/Sekondy",
+    "last_opened_file_path": "C:/Users/veyse/OneDrive/Belgeler/GitHub/Sekondy/rest-api/app_api/routes",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -55,6 +58,12 @@
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\veyse\OneDrive\Belgeler\GitHub\Sekondy\rest-api\app_api\routes" />
+      <recent name="C:\Users\veyse\OneDrive\Belgeler\GitHub\Sekondy\rest-api\app_api\controllers" />
+    </key>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -69,7 +78,8 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1774528547884</updated>
-      <workItem from="1774528549240" duration="451000" />
+      <workItem from="1774528549240" duration="1395000" />
+      <workItem from="1774554482133" duration="710000" />
     </task>
     <servers />
   </component>
