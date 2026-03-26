@@ -2,7 +2,13 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const path = require('path');
+
+// --- KONTROLCÜLER (CONTROLLERS) ---
 const ctrlListings = require('../controllers/ListingController');
+const ctrlAuth = require('../controllers/AuthController'); // YENİ EKLENDİ
+
+// --- MİDDLEWARE'LER ---
+const verifyToken = require('../middlewares/authMiddleware'); // YENİ EKLENDİ
 
 // --- MULTER AYARLARI ---
 const storage = multer.diskStorage({
