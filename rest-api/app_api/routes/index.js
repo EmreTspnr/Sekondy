@@ -2,7 +2,13 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const path = require('path');
+
+// --- KONTROLCÜLER (CONTROLLERS) ---
 const ctrlListings = require('../controllers/ListingController');
+const ctrlAuth = require('../controllers/AuthController'); // YENİ EKLENDİ
+
+// --- MİDDLEWARE'LER ---
+const verifyToken = require('../middlewares/authMiddleware'); // YENİ EKLENDİ
 
 // --- MULTER AYARLARI ---
 const storage = multer.diskStorage({
@@ -24,7 +30,7 @@ router.get('/', (req, res) => {
 });
 
 // 7. Görev: İlan Ekleme
-router.post('/listings', ctrlListings.addListing);
+router.post('/listings', verifyToken, ctrlListings.addListing);
 
 // ... önceki kodlar ...
 
@@ -47,6 +53,6 @@ router.get('/listings/:id', ctrlListings.getListingById);
 
 // 11. Görev: İlanı Silme
 router.post('/listings/:id', ctrlListings.deleteListing); // Bazı sistemlerde DELETE yerine POST kullanılır ama doğrusu:
-router.delete('/listings/:id', ctrlListings.deleteListing);
+router.delete('/listings/:id', verifyToken, ctrlListings.deleteListing);
 
 module.exports = router;

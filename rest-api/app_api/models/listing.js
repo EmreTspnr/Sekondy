@@ -6,10 +6,12 @@ const listingSchema = new mongoose.Schema({
   category: { type: String, required: true }, 
   listingType: { type: String, default: 'For Sale' }, 
   condition: { type: String }, 
+  summary: { type: String, required: true }, // Unutulan özet alanı eklendi
   description: { type: String, required: true },
   location: { type: String, required: true }, 
-  photos: [String], // Yüklenen fotoğrafların URL'lerini burada tutacağız
-  owner: { type: String, required: false } 
-}, { timestamps: true }); // İlanın eklenme tarihini otomatik tutar
+  photos: [String], 
+  owner: { type: String, required: false },
+  status: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending' } // Veysel'in kodları için içeriye eklendi
+}, { timestamps: true }); 
 
 mongoose.model('Listing', listingSchema);
