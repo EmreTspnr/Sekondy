@@ -11,6 +11,7 @@ const listingSchema = new mongoose.Schema({
   location: { type: String, required: true }, 
   photos: [String], 
   owner: { type: String, required: false },
+  isShowcase: { type: Boolean, default: false },
   status: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending' } // Veysel'in kodları için içeriye eklendi
 }, { timestamps: true }); 
 
