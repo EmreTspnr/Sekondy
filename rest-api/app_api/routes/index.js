@@ -9,7 +9,8 @@ const ctrlListings = require('../controllers/ListingController');
 const ctrlFollow = require('../controllers/FollowController');
 const ctrlSavedSearch = require('../controllers/SavedSearchController');
 const ctrlDiscovery = require('../controllers/DiscoveryController');
-
+const ctrlFavorite = require('../controllers/FavoriteController');
+const ctrlMessage = require('../controllers/MessageController');
 
 const verifyToken = require('../middlewares/authMiddleware'); 
 
@@ -49,4 +50,11 @@ router.delete('/saved-searches/:searchId', verifyToken, ctrlSavedSearch.deleteSa
 router.get('/listings/category/:categoryId', ctrlDiscovery.getListingsByCategory);
 router.get('/listings/showcase', ctrlDiscovery.getShowcaseListings);
 
+router.post('/favorites', verifyToken, ctrlFavorite.addFavorite);
+router.get('/favorites', verifyToken, ctrlFavorite.getFavorites);
+
+router.post('/messages', verifyToken, ctrlMessage.sendMessage);
+router.get('/messages', verifyToken, ctrlMessage.getMessages);
+router.put('/messages/:messageId/read', verifyToken, ctrlMessage.markAsRead);
+router.delete('/messages/:messageId', verifyToken, ctrlMessage.deleteMessage);
 module.exports = router;
