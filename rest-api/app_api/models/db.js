@@ -14,6 +14,9 @@ mongoose.connection.on('error', err => {
 
 require('./listing');
 require('./user');
-require('./report'); // EKSİK OLAN EKLENDİ
+require('./report');
 require('./follow');
 require('./savedSearch');
+
+require('./favorite');
+require('./message');
