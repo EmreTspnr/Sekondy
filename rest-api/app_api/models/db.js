@@ -14,3 +14,6 @@ mongoose.connection.on('error', err => {
 });
 
 require('./listing');
+require('./user');
+require('./follow');
+require('./savedSearch');
