@@ -1,143 +1,202 @@
 const mongoose = require('mongoose');
 const Listing = mongoose.model('Listing');
 
-// 1. İlan Ekleme Fonksiyonu
+const EDITABLE_FIELDS = [
+  'title',
+  'price',
+  'category',
+  'listingType',
+  'condition',
+  'summary',
+  'description',
+  'location'
+];
+
+const isBlank = (value) => typeof value !== 'string' || value.trim() === '';
+
+const buildSummary = (summary, description) => {
+  if (typeof summary === 'string' && summary.trim() !== '') {
+    return summary.trim();
+  }
+
+  if (typeof description === 'string' && description.trim() !== '') {
+    return description.trim().slice(0, 160);
+  }
+
+  return '';
+};
+
+const ensureListingOwner = (listing, userId, res) => {
+  if (!listing) {
+    res.status(404).json({ mesaj: 'Ilan bulunamadi.' });
+    return false;
+  }
+
+  if (String(listing.owner) !== String(userId)) {
+    res.status(403).json({ mesaj: 'Bu ilan uzerinde islem yapma yetkiniz yok.' });
+    return false;
+  }
+
+  return true;
+};
+
+const pickEditableFields = (payload) => {
+  const updateData = {};
+
+  for (const field of EDITABLE_FIELDS) {
+    if (payload[field] !== undefined) {
+      updateData[field] = payload[field];
+    }
+  }
+
+  return updateData;
+};
+
 const addListing = async (req, res) => {
   try {
-    const { title, price, category, listingType, condition, description, location, owner } = req.body;
-
-    if (!title || !price || !category || !description || !location) {
-      return res.status(400).json({ mesaj: "Lütfen tüm zorunlu (*) alanları doldurun." });
-    }
-
-    const newListing = await Listing.create({
+    const {
       title,
       price,
       category,
       listingType,
       condition,
+      summary,
       description,
-      location,
+      location
+    } = req.body;
+    const owner = req.user.userId;
+
+    if (
+      isBlank(title) ||
+      price === undefined ||
+      price === null ||
+      isBlank(category) ||
+      isBlank(description) ||
+      isBlank(location)
+    ) {
+      return res.status(400).json({ mesaj: 'Lutfen tum zorunlu (*) alanlari doldurun.' });
+    }
+
+    const newListing = await Listing.create({
+      title: title.trim(),
+      price,
+      category: category.trim(),
+      listingType,
+      condition,
+      summary: buildSummary(summary, description),
+      description: description.trim(),
+      location: location.trim(),
       owner,
-      photos: [] 
+      photos: []
     });
 
     res.status(201).json(newListing);
   } catch (error) {
-    res.status(500).json({ mesaj: "İlan eklenirken bir hata oluştu.", hata: error });
+    res.status(500).json({ mesaj: 'Ilan eklenirken hata olustu.', hata: error.message });
   }
 };
 
-// 2. Fotoğraf Yükleme Fonksiyonu
 const uploadPhotos = async (req, res) => {
   try {
-    const { id } = req.params; 
+    const { id } = req.params;
     const listing = await Listing.findById(id);
 
-    if (!listing) {
-      return res.status(404).json({ mesaj: "İlan bulunamadı." });
+    if (!ensureListingOwner(listing, req.user.userId, res)) {
+      return;
     }
 
     if (!req.files || req.files.length === 0) {
-      return res.status(400).json({ mesaj: "Lütfen en az bir fotoğraf yükleyin." });
+      return res.status(400).json({ mesaj: 'Fotograf yukleyin.' });
     }
 
-    // Yüklenen resimlerin dosya yollarını (isimlerini) bir diziye alıyoruz
-    const photoUrls = req.files.map(file => `/uploads/${file.filename}`);
-
-    // İlanın 'photos' dizisine yeni resimleri ekle ve kaydet
+    const photoUrls = req.files.map((file) => `/uploads/${file.filename}`);
     listing.photos.push(...photoUrls);
-    await listing.save(); 
+    await listing.save();
 
-    res.status(200).json({ mesaj: "Fotoğraflar başarıyla eklendi", photos: listing.photos });
+    res.status(200).json({ mesaj: 'Fotograflar eklendi', photos: listing.photos });
   } catch (error) {
-    res.status(500).json({ mesaj: "Fotoğraf yüklenirken bir hata oluştu.", hata: error });
+    res.status(500).json({ mesaj: 'Fotograf yuklenirken hata olustu.', hata: error.message });
   }
 };
-// 3. Kendi İlanlarını Listeleme Fonksiyonu
+
 const getMyListings = async (req, res) => {
   try {
-    // Şimdilik URL'den gelen 'owner' bilgisini okuyoruz. 
-    // Eğer URL'de gönderilmezse varsayılan olarak senin adını arayacak.
-    const ownerName = req.query.owner || "Emre Taspinar";
-
-    // Veritabanında owner alanı bu isme eşit olan TÜM ilanları bul
-    // .sort({ createdAt: -1 }) kısmı en yeni eklenen ilanın en üstte gelmesini sağlar
-    const myListings = await Listing.find({ owner: ownerName }).sort({ createdAt: -1 });
-
-    // 200: İşlem başarılı
+    const ownerId = req.user.userId;
+    const myListings = await Listing.find({ owner: ownerId }).sort({ createdAt: -1 });
     res.status(200).json(myListings);
   } catch (error) {
-    res.status(500).json({ mesaj: "İlanlar getirilirken bir hata oluştu.", hata: error });
+    res.status(500).json({ mesaj: 'Ilanlar getirilemedi.', hata: error.message });
   }
 };
 
-// 4. İlan Bilgilerini Güncelleme Fonksiyonu
 const updateListing = async (req, res) => {
   try {
     const { id } = req.params;
-    const updateData = req.body; // Kullanıcının gönderdiği yeni verileri alıyoruz
-
-    // Veritabanında ilanı bul ve güncelle. 
-    // { new: true } parametresi, işlemin ardından bize ilanın güncellenmiş son halini döndürür.
-    const updatedListing = await Listing.findByIdAndUpdate(id, updateData, { new: true });
-
-    if (!updatedListing) {
-      return res.status(404).json({ mesaj: "Güncellenecek ilan bulunamadı." });
-    }
-
-    res.status(200).json(updatedListing);
-  } catch (error) {
-    res.status(500).json({ mesaj: "İlan güncellenirken bir hata oluştu.", hata: error });
-  }
-};
-
-// 5. Tek Bir İlanın Detaylarını Görüntüleme Fonksiyonu
-const getListingById = async (req, res) => {
-  try {
-    const { id } = req.params; // URL'den ID'yi al
-    
-    // Veritabanında o ID'ye sahip ilanı bul
     const listing = await Listing.findById(id);
 
-    // Eğer ilan yoksa veya silinmişse 404 döndür
-    if (!listing) {
-      return res.status(404).json({ mesaj: "İlan bulunamadı." });
+    if (!ensureListingOwner(listing, req.user.userId, res)) {
+      return;
     }
 
-    // İlan bulunduysa 200 koduyla detayları gönder
+    const updateData = pickEditableFields(req.body);
+
+    if (Object.keys(updateData).length === 0) {
+      return res.status(400).json({ mesaj: 'Guncellenecek en az bir gecerli alan gonderin.' });
+    }
+
+    if (updateData.description !== undefined && updateData.summary === undefined && !listing.summary) {
+      updateData.summary = buildSummary(undefined, updateData.description);
+    }
+
+    listing.set(updateData);
+    await listing.save();
+
     res.status(200).json(listing);
   } catch (error) {
-    res.status(500).json({ mesaj: "İlan detayları getirilirken bir hata oluştu.", hata: error });
+    res.status(500).json({ mesaj: 'Ilan guncellenemedi.', hata: error.message });
   }
 };
 
-// 6. İlanı Tamamen Silme Fonksiyonu
+const getListingById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const listing = await Listing.findById(id);
+
+    if (!listing) {
+      return res.status(404).json({ mesaj: 'Ilan bulunamadi.' });
+    }
+
+    res.status(200).json(listing);
+  } catch (error) {
+    if (error instanceof mongoose.Error.CastError) {
+      return res.status(400).json({ mesaj: 'Gecersiz ilan kimligi.' });
+    }
+
+    res.status(500).json({ mesaj: 'Ilan detaylari getirilemedi.', hata: error.message });
+  }
+};
+
 const deleteListing = async (req, res) => {
   try {
     const { id } = req.params;
+    const listing = await Listing.findById(id);
 
-    // findByIdAndDelete komutu veriyi bulur ve tek seferde siler
-    const deletedListing = await Listing.findByIdAndDelete(id);
-
-    if (!deletedListing) {
-      return res.status(404).json({ mesaj: "Silinecek ilan bulunamadı." });
+    if (!ensureListingOwner(listing, req.user.userId, res)) {
+      return;
     }
 
-    // 204 No Content genelde silme işlemleri için kullanılır ama 
-    // başarılı mesajı dönmek için 200 de tercih edilebilir.
-    res.status(200).json({ mesaj: "İlan başarıyla sistemden kaldırıldı." });
+    await listing.deleteOne();
+    res.status(200).json({ mesaj: 'Ilan basariyla sistemden kaldirildi.' });
   } catch (error) {
-    res.status(500).json({ mesaj: "İlan silinirken bir hata oluştu.", hata: error });
+    res.status(500).json({ mesaj: 'Ilan silinemedi.', hata: error.message });
   }
 };
 
-// FİNAL EXPORTS LİSTESİ
 module.exports = {
   addListing,
   uploadPhotos,
   getMyListings,
   updateListing,
   getListingById,
-  deleteListing // SON GÖREV
+  deleteListing
 };

@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 
-
 let dbURI = 'mongodb://127.0.0.1:27017/sekondy'; 
 
 mongoose.connect(dbURI);
@@ -15,5 +14,9 @@ mongoose.connection.on('error', err => {
 
 require('./listing');
 require('./user');
+require('./report');
 require('./follow');
 require('./savedSearch');
+
+require('./favorite');
+require('./message');
