@@ -1,19 +1,32 @@
 const mongoose = require('mongoose');
 const Message = mongoose.model('Message');
 const User = mongoose.model('User');
+const Listing = mongoose.model('Listing');
 
-// 1. Satıcıya Mesaj Gönderme
 const sendMessage = async (req, res) => {
   try {
     const senderId = req.user.userId;
-    const { receiverId, listingId, content } = req.body;
+    const { receiverId, content } = req.body;
+    const listingId = req.body.listingId || req.body.adId;
 
     if (senderId === receiverId) {
-      return res.status(400).json({ mesaj: "Kendinize mesaj gönderemezsiniz." });
+      return res.status(400).json({ mesaj: 'Kendinize mesaj gonderemezsiniz.' });
     }
 
     if (!content) {
-      return res.status(400).json({ mesaj: "Mesaj içeriği boş olamaz." });
+      return res.status(400).json({ mesaj: 'Mesaj icerigi bos olamaz.' });
+    }
+
+    const receiver = await User.findById(receiverId);
+    if (!receiver) {
+      return res.status(404).json({ mesaj: 'Mesaj gonderilecek kullanici bulunamadi.' });
+    }
+
+    if (listingId) {
+      const listing = await Listing.findById(listingId);
+      if (!listing) {
+        return res.status(404).json({ mesaj: 'Mesajla iliskili ilan bulunamadi.' });
+      }
     }
 
     const newMessage = await Message.create({
@@ -23,52 +36,47 @@ const sendMessage = async (req, res) => {
       content
     });
 
-    res.status(201).json({ mesaj: "Mesaj başarıyla gönderildi.", message: newMessage });
+    res.status(201).json({ mesaj: 'Mesaj basariyla gonderildi.', message: newMessage });
   } catch (error) {
-    res.status(500).json({ mesaj: "Mesaj gönderilirken hata oluştu.", hata: error.message });
+    res.status(500).json({ mesaj: 'Mesaj gonderilirken hata olustu.', hata: error.message });
   }
 };
 
-// 2. Gelen Mesajları Listeleme
 const getMessages = async (req, res) => {
   try {
     const userId = req.user.userId;
-    
-    // Sadece giriş yapan kullanıcıya "gelen" mesajları buluyoruz
     const messages = await Message.find({ receiver: userId })
-      .populate('sender', 'firstName lastName') // Sadece gönderenin ad/soyadını alıyoruz
-      .populate('listing', 'title') // İlanın başlığını alıyoruz
+      .populate('sender', 'firstName lastName')
+      .populate('listing', 'title')
       .sort({ createdAt: -1 });
 
     res.status(200).json(messages);
   } catch (error) {
-    res.status(500).json({ mesaj: "Mesajlar getirilemedi.", hata: error.message });
+    res.status(500).json({ mesaj: 'Mesajlar getirilemedi.', hata: error.message });
   }
 };
 
-// 3. Mesajı Okundu İşaretleme
 const markAsRead = async (req, res) => {
   try {
     const userId = req.user.userId;
     const { messageId } = req.params;
 
     const message = await Message.findOneAndUpdate(
-      { _id: messageId, receiver: userId }, // Sadece alıcı okundu olarak işaretleyebilir
+      { _id: messageId, receiver: userId },
       { isRead: true },
       { new: true }
     );
 
     if (!message) {
-      return res.status(404).json({ mesaj: "Mesaj bulunamadı veya bu işlem için yetkiniz yok." });
+      return res.status(404).json({ mesaj: 'Mesaj bulunamadi veya bu islem icin yetkiniz yok.' });
     }
 
-    res.status(200).json({ mesaj: "Mesaj okundu olarak işaretlendi.", message });
+    res.status(200).json({ mesaj: 'Mesaj okundu olarak isaretlendi.', message });
   } catch (error) {
-    res.status(500).json({ mesaj: "İşlem sırasında hata oluştu.", hata: error.message });
+    res.status(500).json({ mesaj: 'Islem sirasinda hata olustu.', hata: error.message });
   }
 };
 
-// 4. Gelen Mesajı Silme
 const deleteMessage = async (req, res) => {
   try {
     const userId = req.user.userId;
@@ -76,16 +84,16 @@ const deleteMessage = async (req, res) => {
 
     const deletedMessage = await Message.findOneAndDelete({
       _id: messageId,
-      receiver: userId // Sadece mesajı alan kişi kendi kutusundan silebilir
+      receiver: userId
     });
 
     if (!deletedMessage) {
-      return res.status(404).json({ mesaj: "Silinecek mesaj bulunamadı." });
+      return res.status(404).json({ mesaj: 'Silinecek mesaj bulunamadi.' });
     }
 
-    res.status(200).json({ mesaj: "Mesaj başarıyla silindi." });
+    res.status(200).json({ mesaj: 'Mesaj basariyla silindi.' });
   } catch (error) {
-    res.status(500).json({ mesaj: "Mesaj silinirken hata oluştu.", hata: error.message });
+    res.status(500).json({ mesaj: 'Mesaj silinirken hata olustu.', hata: error.message });
   }
 };
 
