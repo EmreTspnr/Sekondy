@@ -14,3 +14,4 @@ mongoose.connection.on('error', err => {
 });
 
 require('./listing');
+require('./user')
