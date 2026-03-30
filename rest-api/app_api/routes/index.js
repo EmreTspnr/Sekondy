@@ -27,6 +27,15 @@ const upload = multer({ storage: storage });
 router.get('/', (_req, res) => {
   res.status(200).json({ mesaj: 'Sekondy API basariyla calisiyor!' });
 });
+// ==========================================
+// FURKAN'IN GÖREVLERİ (YETKİLENDİRME VE PROFİL)
+// ==========================================
+router.post('/auth/register', ctrlAuth.register);
+router.post('/auth/login', ctrlAuth.login);
+router.put('/profile', verifyToken, ctrlAuth.updateProfile);
+router.get('/profile', verifyToken, ctrlAuth.getProfile);
+router.delete('/profile', verifyToken, ctrlAuth.deleteProfile);
+router.get('/auth/history', verifyToken, ctrlAuth.getLoginHistory);
 
 router.post('/auth/register', ctrlAuth.register);
 router.post('/auth/login', ctrlAuth.login);
