@@ -1,2 +1,14 @@
+node_modules/
+**/node_modules/
 .DS_Store
-rest-api/node_modules/
+
+# Env Files
+.env
+.env.local
+.env.*.local
+*.env
+
+# Build outputs
+/dist
+/frontend/dist
+/rest-api/uploads
