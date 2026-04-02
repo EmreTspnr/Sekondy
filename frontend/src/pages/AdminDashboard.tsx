@@ -1,11 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 
-/* ==========================================
-   GÖREVLİ: VEYSEL EMİR HARTAVİ
-   GÖREV KAPSAMI: Şikayetler, İlan Onayı, Askıya Alma (Admin Dashboards)
-   ==========================================
-*/
 
 export default function AdminDashboard() {
   const [pendingAds, setPendingAds] = useState([]);
@@ -15,7 +10,7 @@ export default function AdminDashboard() {
       try {
         const response = await api.get('/admin/ads/pending');
         setPendingAds(response.data);
-      } catch (error) {}
+      } catch (error) { }
     };
     fetchPending();
   }, []);
@@ -25,7 +20,7 @@ export default function AdminDashboard() {
     try {
       await api.put(`/admin/ads/${adId}/approve`);
       alert("İlan onaylandı!");
-    } catch (error) {}
+    } catch (error) { }
   };
 
   // İlan Silme Metodu
@@ -33,7 +28,7 @@ export default function AdminDashboard() {
     try {
       await api.delete(`/admin/ads/${adId}`);
       alert("Uygunsuz İlan tamamen silindi!");
-    } catch (error) {}
+    } catch (error) { }
   };
 
   return (

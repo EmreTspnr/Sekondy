@@ -2,17 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import api from '../services/api';
 
-/* ==========================================
-   GÖREVLİ: EMRE TAŞPINAR
-   GÖREV KAPSAMI: Yeni İlan Ekleme ve Detaylarını Görme
-   ==========================================
-   NE YAPACAKSIN?
-   1. EskiTasarim.tsx içindeki `AdDetailPage` tasarımını tam olarak buraya al.
-   2. useParams kullanarak linkteki adId'yi alıp o ilana ait tüm verileri axios ile çektireceksin.
-*/
 
 export default function AdDetail() {
-  const { adId } = useParams(); // URL'den id'yi alır (Örn: /ad/5)
+  const { adId } = useParams();
   const [adInfo, setAdInfo] = useState(null);
 
   useEffect(() => {
