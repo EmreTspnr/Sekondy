@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6ace3ca0-acff-46f3-bcb9-7f153127cfb0" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/rest-api/app_api/models/report.js" afterDir="false" />
-    </list>
+    <list default="true" id="6ace3ca0-acff-46f3-bcb9-7f153127cfb0" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -87,7 +85,7 @@
       <workItem from="1774528549240" duration="1395000" />
       <workItem from="1774554482133" duration="972000" />
       <workItem from="1774556286478" duration="1176000" />
-      <workItem from="1774629597612" duration="123000" />
+      <workItem from="1774629597612" duration="485000" />
     </task>
     <servers />
   </component>
