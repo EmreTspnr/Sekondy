@@ -20,11 +20,8 @@ export default function Footer() {
         <div className="md:border-l md:border-gray-800 md:pl-10 space-y-3">
           <h4 className="text-white font-bold tracking-widest text-sm mb-4">BAĞLANTILAR</h4>
           <ul className="space-y-3 text-sm font-semibold">
-            <li><a href="#" className="hover:text-[#D4AF37] transition-colors">VİTRİN</a></li>
-            <li><a href="#" className="hover:text-[#D4AF37] transition-colors">YENİ İLAN YÜKLE</a></li>
-            <li><a href="#" className="hover:text-[#D4AF37] transition-colors">KULLANIM KOŞULLARI</a></li>
-            <li><a href="#" className="hover:text-[#D4AF37] transition-colors flex items-center gap-2">GİZLİLİK POLİTİKASI <span className="bg-[#D4AF37] text-black text-[10px] px-1.5 py-0.5 rounded font-black">YENİ</span></a></li>
-            <li><a href="#" className="hover:text-[#D4AF37] transition-colors">YASAL UYARI</a></li>
+            <li><a href="/" className="hover:text-[#D4AF37] transition-colors">VİTRİN</a></li>
+            <li><a href="/post-ad" className="hover:text-[#D4AF37] transition-colors">YENİ İLAN YÜKLE</a></li>
           </ul>
         </div>
 
@@ -52,12 +49,8 @@ export default function Footer() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto mt-12 pt-6 border-t border-gray-800 text-xs font-semibold flex flex-col md:flex-row justify-between items-center gap-4 text-gray-500">
+      <div className="max-w-7xl mx-auto mt-12 pt-6 border-t border-gray-800 text-xs font-semibold flex justify-center text-gray-500">
         <div>© 2026 Sekondy Inc. | Designed for the future of e-commerce.</div>
-        <div className="flex gap-4">
-          <a href="#" className="hover:text-gray-300">TR</a>
-          <a href="#" className="hover:text-gray-300">EN</a>
-        </div>
       </div>
     </footer>
   );
