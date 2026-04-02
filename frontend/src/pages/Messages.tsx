@@ -13,7 +13,7 @@ export default function Messages() {
       try {
         const response = await api.get('/messages');
         setMessages(response.data);
-      } catch (error) {}
+      } catch (error) { }
     };
     fetchMessages();
   }, []);
@@ -24,7 +24,7 @@ export default function Messages() {
       try {
         const response = await api.get('/favorites');
         setFavorites(response.data);
-      } catch (error) {}
+      } catch (error) { }
     };
     fetchFavorites();
   }, []);
@@ -33,7 +33,7 @@ export default function Messages() {
     try {
       await api.delete(`/messages/${msgId}`);
       // Lojik: messages.filter ile state'den de sil ki ekrandan gitsin
-    } catch (error) {}
+    } catch (error) { }
   };
 
   return (
