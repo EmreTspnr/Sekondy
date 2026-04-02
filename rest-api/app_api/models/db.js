@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-let dbURI = 'mongodb://127.0.0.1:27017/sekondy'; 
+let dbURI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/sekondy'; 
 
 mongoose.connect(dbURI);
 

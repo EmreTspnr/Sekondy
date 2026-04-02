@@ -42,8 +42,8 @@ export default function Auth() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center py-10 px-4 font-sans text-gray-900">
-      <div className="text-4xl font-black tracking-tighter cursor-pointer mb-8" onClick={() => window.location.href='/'}>
-        SEKOND<span className="text-[#D4AF37]">Y</span>
+      <div className="cursor-pointer mb-8" onClick={() => window.location.href='/'}>
+        <img src="/logo.png" alt="Sekondy Logo" className="h-12 md:h-16 object-contain" />
       </div>
 
       <div className="w-full max-w-md bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-4">
