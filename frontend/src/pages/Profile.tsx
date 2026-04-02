@@ -1,37 +1,135 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 
-
-
 export default function Profile() {
-  const [profile, setProfile] = useState(null);
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
 
-  // Sayfa ilk açıldığında profil bilgilerini çeker
+  
   useEffect(() => {
-    const fetchProfile = async () => {
+    const loadProfile = async () => {
       try {
         const response = await api.get('/profile');
-        setProfile(response.data);
+        if(response.data) {
+          setFirstName(response.data.name?.split(' ')[0] || '');
+          setLastName(response.data.name?.split(' ')[1] || '');
+          setPhone(response.data.telefon || '');
+          setEmail(response.data.email || '');
+        }
       } catch (error) {
         console.error("Profil alınamadı", error);
       }
     };
-    fetchProfile();
+    loadProfile();
   }, []);
 
-  const handleUpdate = async (updatedData) => {
+  const handleUpdate = async (e: React.FormEvent) => {
+    e.preventDefault();
     try {
-      await api.put('/profile', updatedData);
-      alert("Profil güncellendi.");
+      await api.put('/profile', { 
+        name: `${firstName} ${lastName}`,
+        telefon: phone 
+      });
+      alert('Profilin başarıyla güncellendi!');
     } catch (error) {
-      console.error("Hata oluştu", error);
+      alert('Profil güncellenirken bir hata oluştu');
+    }
+  };
+
+  const handleDelete = async () => {
+    if(window.confirm('Hesabını tamamen silmek istediğine emin misin? Bu işlem geri alınamaz.')) {
+      try {
+        await api.delete('/profile');
+        alert('Hesabınız başarıyla silindi.');
+        localStorage.removeItem('token');
+        window.location.href = '/auth';
+      } catch (error) {
+        alert('Hesap silinirken hata oluştu.');
+      }
     }
   };
 
   return (
-    <div className="p-8 text-center bg-blue-50 border-2 border-blue-200 mt-10 max-w-lg mx-auto rounded-lg">
-      <h1 className="text-2xl font-bold mb-4">GÖREVLİ: FURKAN SARIBAŞ</h1>
-      <p>Buraya profil yönetimi sayfası gelecek. Eski koddan kopyalayabilirsin.</p>
-    </div>
+    <main className="max-w-3xl mx-auto px-4 py-8 w-full mt-10">
+      <h1 className="text-2xl font-bold text-black mb-6">Profil Ayarları</h1>
+      
+      <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+        {/* Section 1: Personal Information */}
+        <div className="p-6 md:p-8">
+          <h2 className="text-xl font-bold text-black mb-6">Kişisel Bilgiler</h2>
+          
+          <form className="space-y-5" onSubmit={handleUpdate}>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">E-Posta Adresi</label>
+              <input 
+                type="text" 
+                disabled 
+                value={email || 'Geçici Email Yükleniyor...'} 
+                className="w-full px-4 py-3 bg-gray-100 text-gray-500 border border-gray-200 rounded-lg cursor-not-allowed"
+              />
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Adınız</label>
+                <input 
+                  type="text" 
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#D4AF37]/50 focus:border-[#D4AF37] outline-none transition-all"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Soyadınız</label>
+                <input 
+                  type="text" 
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#D4AF37]/50 focus:border-[#D4AF37] outline-none transition-all"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Telefon Numarası</label>
+              <input 
+                type="tel" 
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#D4AF37]/50 focus:border-[#D4AF37] outline-none transition-all"
+              />
+            </div>
+
+            <div className="pt-4">
+              <button 
+                type="submit" 
+                className="bg-black text-white font-bold py-3 px-8 rounded-lg hover:bg-gray-800 transition-colors shadow-sm"
+              >
+                Değişiklikleri Kaydet
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <hr className="border-gray-100" />
+
+        {/* Section 2: Danger Zone */}
+        <div className="p-6 md:p-8 bg-gray-50/50">
+          <h2 className="text-lg font-bold text-red-600 mb-2">Hesabı Sil</h2>
+          <p className="text-sm text-gray-600 mb-5 max-w-2xl">
+            Hesabınızı sildiğiniz zaman bu işlemin geri dönüşü yoktur. Tüm aktif ilanlarınız, favorileriniz ve mesajlarınız Sekondy sisteminden sonsuza dek silinir.
+          </p>
+          <button 
+            type="button" 
+            onClick={handleDelete}
+            className="border-2 border-red-200 text-red-600 font-bold py-2.5 px-6 rounded-lg hover:bg-red-50 hover:border-red-300 transition-colors"
+          >
+            Hesabımı Tamamen Sil
+          </button>
+        </div>
+      </div>
+    </main>
   );
 }
