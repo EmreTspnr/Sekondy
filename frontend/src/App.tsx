@@ -13,6 +13,7 @@ import AdDetail from './pages/AdDetail';
 import PostAd from './pages/PostAd';
 import Messages from './pages/Messages';
 import AdminDashboard from './pages/AdminDashboard';
+import MyAds from './pages/MyAds';
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
             <Route path="/ad/:adId" element={<AdDetail />} />
             <Route path="/post-ad" element={<PostAd />} />
             <Route path="/messages" element={<Messages />} />
+            <Route path="/my-ads" element={<MyAds />} />
             <Route path="/admin" element={<AdminDashboard />} />
           </Routes>
         </div>
