@@ -43,12 +43,16 @@ export default function Header() {
           </Link>
 
           {/* Nav Links */}
-          <nav className="hidden md:flex items-center gap-6 lg:gap-8 text-sm font-bold text-gray-800">
+          <nav className="hidden md:flex items-center gap-4 lg:gap-6 text-sm font-bold text-gray-800">
             <Link to="/" className={`${isActive('/') ? 'text-[#D4AF37]' : 'hover:text-[#D4AF37]'} transition-colors`}>VİTRİN</Link>
-            <Link to="/my-ads" className={`${isActive('/my-ads') ? 'text-[#D4AF37]' : 'hover:text-[#D4AF37]'} transition-colors`}>İLANLARIM</Link>
-            <Link to="/favorites" className={`${isActive('/favorites') ? 'text-[#D4AF37]' : 'hover:text-[#D4AF37]'} transition-colors`}>FAVORİLER</Link>
-            <Link to="/messages" className={`${isActive('/messages') ? 'text-[#D4AF37]' : 'hover:text-[#D4AF37]'} transition-colors`}>MESAJLAR</Link>
-            <Link to="/profile" className={`${isActive('/profile') ? 'text-[#D4AF37]' : 'hover:text-[#D4AF37]'} transition-colors`}>PROFİL</Link>
+            {token && (
+              <>
+                <Link to="/my-ads" className={`${isActive('/my-ads') ? 'text-[#D4AF37]' : 'hover:text-[#D4AF37]'} transition-colors`}>İLANLARIM</Link>
+                <Link to="/favorites" className={`${isActive('/favorites') ? 'text-[#D4AF37]' : 'hover:text-[#D4AF37]'} transition-colors`}>FAVORİLER</Link>
+                <Link to="/messages" className={`${isActive('/messages') ? 'text-[#D4AF37]' : 'hover:text-[#D4AF37]'} transition-colors`}>MESAJLAR</Link>
+                <Link to="/profile" className={`${isActive('/profile') ? 'text-[#D4AF37]' : 'hover:text-[#D4AF37]'} transition-colors`}>PROFİL</Link>
+              </>
+            )}
             <Link to="/admin" className={`${isActive('/admin') ? 'text-[#D4AF37]' : 'hover:text-[#D4AF37]'} transition-colors`}>YÖNETİM</Link>
             {!token ? (
               <Link to="/auth" className={`${isActive('/auth') ? 'text-[#D4AF37]' : 'hover:text-[#D4AF37]'} transition-colors`}>GİRİŞ YAP</Link>
@@ -63,13 +67,18 @@ export default function Header() {
           </Link>
         </div>
         
-        {/* Mobile Nav (Simple flex wrap for very small screens) */}
+        {/* Mobile Nav */}
         <nav className="md:hidden flex flex-wrap justify-center gap-4 mt-4 text-xs font-bold text-gray-800 border-t pt-3">
             <Link to="/">VİTRİN</Link>
-            <Link to="/my-ads">İLANLARIM</Link>
-            <Link to="/favorites">FAVORİLER</Link>
-            <Link to="/messages">MESAJLAR</Link>
-            <Link to="/profile">PROFİL</Link>
+            {token && (
+              <>
+                <Link to="/my-ads">İLANLARIM</Link>
+                <Link to="/favorites">FAVORİLER</Link>
+                <Link to="/messages">MESAJLAR</Link>
+                <Link to="/profile">PROFİL</Link>
+              </>
+            )}
+            <Link to="/admin">YÖNETİM</Link>
             {!token ? (
               <Link to="/auth">GİRİŞ</Link>
             ) : (
