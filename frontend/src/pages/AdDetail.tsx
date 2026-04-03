@@ -30,6 +30,27 @@ export default function AdDetail() {
 
   if (!adInfo) return <div className="text-center py-20">Yükleniyor...</div>;
 
+  const handleFavorite = async () => {
+    try {
+      await api.post('/favorites', { listingId: adInfo._id || adId });
+      alert('Favorilere eklendi!');
+    } catch {
+      alert('Giriş yapmanız gerekli veya ilan zaten favorilerinizde!');
+    }
+  };
+
+  const handleSendMessage = async () => {
+    const content = window.prompt("Mesajınızı yazın:");
+    if (!content) return;
+    try {
+      const receiverId = adInfo.owner?._id || 'MOCK_ID';
+      await api.post('/messages', { receiverId, content, listingId: adInfo._id || adId });
+      alert('Mesajınız başarıyla iletildi!');
+    } catch {
+      alert('Mesaj gönderilirken hata oluştu. Giriş yaptığınızdan emin olun veya kendi ilanınıza mesaj atmadığınızı kontrol edin.');
+    }
+  };
+
   return (
     <main className="max-w-7xl mx-auto px-4 py-8 w-full">
       <div className="flex flex-col lg:flex-row gap-8">
@@ -64,10 +85,10 @@ export default function AdDetail() {
             <div className="text-4xl font-black text-[#D4AF37] mb-6">{adInfo.price}</div>
 
             <div className="flex gap-3 mb-6">
-              <button onClick={() => api.post(`/messages/${adInfo._id}`)} className="flex-1 bg-black text-white font-bold py-3.5 rounded-xl hover:bg-gray-800 transition-colors flex items-center justify-center gap-2">
+              <button onClick={handleSendMessage} className="flex-1 bg-black text-white font-bold py-3.5 rounded-xl hover:bg-gray-800 transition-colors flex items-center justify-center gap-2">
                 <MessageCircle className="w-5 h-5" /> Mesaj At
               </button>
-              <button className="p-3.5 border-2 border-gray-200 text-gray-600 font-bold rounded-xl hover:bg-gray-50 hover:text-red-500 transition-colors">
+              <button onClick={handleFavorite} className="p-3.5 border-2 border-gray-200 text-gray-600 font-bold rounded-xl hover:bg-gray-50 hover:text-red-500 transition-colors">
                 <Heart className="w-6 h-6" />
               </button>
             </div>
@@ -76,11 +97,11 @@ export default function AdDetail() {
               <h3 className="font-bold text-gray-900 mb-4">Satıcı Bilgileri</h3>
               <div className="flex items-center gap-4">
                 <div className="w-14 h-14 bg-[#D4AF37] text-white rounded-full flex items-center justify-center text-xl font-bold shadow-md">
-                  {adInfo.seller?.name?.charAt(0) || 'S'}
+                  {adInfo.owner ? `${adInfo.owner.firstName?.charAt(0)}${adInfo.owner.lastName?.charAt(0) || ''}` : (adInfo.seller?.name?.charAt(0) || 'S')}
                 </div>
                 <div>
-                  <div className="font-bold text-lg text-black">{adInfo.seller?.name || 'Satıcı'}</div>
-                  <div className="text-sm text-gray-500">{adInfo.seller?.phone || 'Gizli Numara'}</div>
+                  <div className="font-bold text-lg text-black">{adInfo.owner ? `${adInfo.owner.firstName} ${adInfo.owner.lastName}` : (adInfo.seller?.name || 'Satıcı')}</div>
+                  <div className="text-sm text-gray-500">{adInfo.owner?.phone || adInfo.seller?.phone || 'Gizli Numara'}</div>
                 </div>
               </div>
             </div>

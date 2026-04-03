@@ -160,7 +160,7 @@ const updateListing = async (req, res) => {
 const getListingById = async (req, res) => {
   try {
     const { id } = req.params;
-    const listing = await Listing.findById(id);
+    const listing = await Listing.findById(id).populate('owner', 'firstName lastName phone');
 
     if (!listing) {
       return res.status(404).json({ mesaj: 'Ilan bulunamadi.' });
