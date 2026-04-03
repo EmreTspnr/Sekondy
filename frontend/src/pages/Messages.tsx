@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, MoreVertical, Paperclip, Send, Mic, Video, Phone, Check, CheckCheck } from 'lucide-react';
+import { Search, MoreVertical, Send, Check, CheckCheck } from 'lucide-react';
 import api from '../services/api';
 
 const WA_BG = "https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png";
@@ -184,17 +184,17 @@ export default function Messages() {
                     <div className="flex-1 min-w-0">
                       <div className="flex justify-between items-center mb-0.5">
                         <span className="font-semibold text-gray-800 text-base truncate">{partnerName}</span>
-                        <span className={`text-xs ${chat.unreadCount > 0 ? 'text-green-500 font-bold' : 'text-gray-500'}`}>{date}</span>
+                        <span className={`text-xs ${chat.unreadCount > 0 ? 'text-[#D4AF37] font-bold' : 'text-gray-500'}`}>{date}</span>
                       </div>
                       <div className="flex items-center gap-1">
                         {amISender && (
-                          <span className={`${lastMsg.isRead ? 'text-blue-500' : 'text-gray-400'}`}>
+                          <span className={`${lastMsg.isRead ? 'text-[#D4AF37]' : 'text-gray-400'}`}>
                             <CheckCheck className="w-3.5 h-3.5" />
                           </span>
                         )}
                         <p className="text-sm text-gray-500 truncate flex-1">{lastMsg?.content}</p>
                         {chat.unreadCount > 0 && (
-                          <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center text-[10px] font-bold text-white flex-shrink-0">
+                          <div className="w-5 h-5 bg-[#D4AF37] rounded-full flex items-center justify-center text-[10px] font-bold text-white flex-shrink-0">
                             {chat.unreadCount}
                           </div>
                         )}
@@ -208,9 +208,7 @@ export default function Messages() {
         </div>
 
         {/* SAĞ TARAF: SOHBET EKRANI */}
-        <div className={`${!activeChatId ? 'hidden md:flex' : 'flex'} flex-col flex-1 bg-[#efeae2] relative`}>
-          {/* Arka plan deseni */}
-          <div className="absolute inset-0 opacity-[0.06] pointer-events-none" style={{ backgroundImage: `url(${WA_BG})`, backgroundSize: '400px' }} />
+        <div className={`${!activeChatId ? 'hidden md:flex' : 'flex'} flex-col flex-1 bg-gray-50 relative`}>
           
           {activeChat ? (
             <>
@@ -228,13 +226,7 @@ export default function Messages() {
                   </div>
                   <div>
                     <h2 className="font-semibold text-gray-800">{activeChat.partner.firstName} {activeChat.partner.lastName}</h2>
-                    <p className="text-xs text-gray-500">Çevrimiçi (Uygulama İçi)</p>
                   </div>
-                </div>
-                <div className="flex items-center gap-4 text-gray-500">
-                  <button><Video className="w-5 h-5" /></button>
-                  <button><Search className="w-5 h-5" /></button>
-                  <button><MoreVertical className="w-5 h-5" /></button>
                 </div>
               </div>
 
@@ -256,15 +248,15 @@ export default function Messages() {
                         className={`flex flex-col max-w-[85%] sm:max-w-[70%] ${amISender ? 'self-end' : 'self-start'}`}
                       >
                         <div 
-                          className={`relative px-3 pt-1.5 pb-2 rounded-lg shadow-sm ${amISender ? 'bg-[#d9fdd3] rounded-tr-sm' : 'bg-white rounded-tl-sm'}`}
+                          className={`relative px-3 pt-1.5 pb-2 rounded-lg shadow-sm ${amISender ? 'bg-[#D4AF37] text-white rounded-tr-sm' : 'bg-white border text-gray-800 border-gray-200 rounded-tl-sm'}`}
                         >
-                          <span className="text-sm text-gray-800 break-words leading-relaxed pr-8">
+                          <span className="text-sm break-words leading-relaxed pr-8">
                             {msg.content}
                           </span>
-                          <span className="text-[10px] text-gray-500 float-right mt-2 ml-3 flex items-center gap-1">
+                          <span className={`text-[10px] float-right mt-2 ml-3 flex items-center gap-1 ${amISender ? 'text-white/80' : 'text-gray-400'}`}>
                             {date}
                             {amISender && (
-                              <CheckCheck className={`w-3.5 h-3.5 ${msg.isRead ? 'text-blue-500' : 'text-gray-400'}`} />
+                              <CheckCheck className={`w-3.5 h-3.5 ${msg.isRead ? 'text-white' : 'text-white/50'}`} />
                             )}
                           </span>
                         </div>
@@ -276,33 +268,28 @@ export default function Messages() {
               </div>
 
               {/* Alt Mesaj Yazma Alanı */}
-              <div className="h-16 px-4 bg-gray-100 flex items-center gap-2 flex-shrink-0 relative z-10">
-                <button className="p-2 text-gray-500 hover:text-gray-700 transition flex-shrink-0">
-                  <Paperclip className="w-6 h-6" />
-                </button>
-                <form onSubmit={handleSendMessage} className="flex-1 flex items-center">
+              <div className="h-16 px-4 bg-gray-100 flex items-center flex-shrink-0 relative z-10">
+                <form onSubmit={handleSendMessage} className="w-full flex items-center">
                   <input
                     type="text"
                     value={newMessage}
                     onChange={(e) => setNewMessage(e.target.value)}
                     placeholder="Bir mesaj yazın"
-                    className="w-full bg-white h-10 px-4 rounded-lg outline-none text-sm shadow-sm"
+                    className="flex-1 bg-white border border-gray-200 focus:border-[#D4AF37] h-10 px-4 rounded-lg outline-none text-sm transition-colors shadow-sm"
                   />
-                  {newMessage.trim() ? (
-                     <button type="submit" className="p-2 ml-2 text-green-600 hover:text-green-700 transition flex-shrink-0">
-                       <Send className="w-6 h-6" />
-                     </button>
-                  ) : (
-                    <button type="button" className="p-2 ml-2 text-gray-500 hover:text-gray-700 transition flex-shrink-0">
-                      <Mic className="w-6 h-6" />
-                    </button>
-                  )}
+                  <button 
+                    type="submit" 
+                    disabled={!newMessage.trim()}
+                    className={`ml-3 p-2 rounded-lg flex-shrink-0 transition-colors ${newMessage.trim() ? 'bg-[#D4AF37] text-white hover:bg-[#c19b2e]' : 'bg-gray-200 text-gray-400 cursor-not-allowed'}`}
+                  >
+                    <Send className="w-5 h-5" />
+                  </button>
                 </form>
               </div>
             </>
           ) : (
             /* Boş Durum (Sohbet Seçilmediğinde) */
-            <div className="flex-1 flex flex-col items-center justify-center bg-gray-50 relative z-10 p-8 border-b-[6px] border-green-500">
+            <div className="flex-1 flex flex-col items-center justify-center bg-gray-50 relative z-10 p-8 border-b-[6px] border-[#D4AF37]">
               <div className="w-80 max-w-full">
                 <img src="https://cdni.iconscout.com/illustration/premium/thumb/empty-state-2130362-1800926.png" alt="Empty" className="w-full opacity-60 mix-blend-multiply" />
               </div>
