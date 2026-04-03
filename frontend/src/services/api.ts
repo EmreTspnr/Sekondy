@@ -1,7 +1,12 @@
 import axios from 'axios';
 
+<<<<<<< Updated upstream
 // Backend portumuz 9000 (app.js'te öyle görünüyor). Canlıya alınca VITE_API_URL çalışacak.
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:9000/v1';
+=======
+
+const API_URL = import.meta.env.VITE_API_URL || 'https://sekondy.onrender.com/v1';
+>>>>>>> Stashed changes
 
 const api = axios.create({
   baseURL: API_URL,
