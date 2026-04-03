@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, MoreVertical, Send, Check, CheckCheck } from 'lucide-react';
+import { Search, MoreVertical, Send, Check, CheckCheck, Trash2 } from 'lucide-react';
 import api from '../services/api';
 
 const WA_BG = "https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png";
@@ -111,6 +111,27 @@ export default function Messages() {
     }
   };
 
+  const handleDeleteChat = async (e: React.MouseEvent, partnerId: string) => {
+    e.stopPropagation();
+    if (!window.confirm("Bu sohbetteki tüm mesajları kalıcı olarak silmek istediğinize emin misiniz?")) return;
+
+    const chat = chats.get(partnerId);
+    if (!chat) return;
+
+    try {
+      // Backend'de toplu silme rotası olmadığından mesajlar tek tek Promise.all ile siliniyor.
+      const promises = chat.messages.map(m => api.delete(`/messages/${m._id}`));
+      await Promise.all(promises);
+      
+      if (activeChatId === partnerId) {
+        setActiveChatId(null);
+      }
+      fetchMessages();
+    } catch (error) {
+      alert('Sohbet silinirken hata oluştu');
+    }
+  };
+
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newMessage.trim() || !activeChatId) return;
@@ -184,7 +205,16 @@ export default function Messages() {
                     <div className="flex-1 min-w-0">
                       <div className="flex justify-between items-center mb-0.5">
                         <span className="font-semibold text-gray-800 text-base truncate">{partnerName}</span>
-                        <span className={`text-xs ${chat.unreadCount > 0 ? 'text-[#D4AF37] font-bold' : 'text-gray-500'}`}>{date}</span>
+                        <div className="flex items-center gap-2">
+                          <button 
+                            onClick={(e) => handleDeleteChat(e, chat.partner._id)}
+                            className="text-gray-300 hover:text-red-500 transition-colors p-0.5"
+                            title="Sohbeti Sil"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                          <span className={`text-xs ${chat.unreadCount > 0 ? 'text-[#D4AF37] font-bold' : 'text-gray-500'}`}>{date}</span>
+                        </div>
                       </div>
                       <div className="flex items-center gap-1">
                         {amISender && (
