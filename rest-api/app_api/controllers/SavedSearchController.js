@@ -115,8 +115,19 @@ const deleteSavedSearch = async (req, res) => {
   }
 };
 
+const getSavedSearches = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const searches = await SavedSearch.find({ user: userId }).sort({ createdAt: -1 });
+    res.status(200).json(searches);
+  } catch (error) {
+    res.status(500).json({ mesaj: 'Kayitli aramalar getirilemedi.', hata: error.message });
+  }
+};
+
 module.exports = {
   createSavedSearch,
   updateSearchNotifications,
-  deleteSavedSearch
+  deleteSavedSearch,
+  getSavedSearches
 };

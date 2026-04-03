@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Shield, Monitor } from 'lucide-react';
+import { Shield, Monitor, UserCheck, Search, Bell, BellOff, X } from 'lucide-react';
 import api from '../services/api';
 
 export default function Profile() {
@@ -8,6 +8,8 @@ export default function Profile() {
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [loginHistory, setLoginHistory] = useState<any[]>([]);
+  const [followedSellers, setFollowedSellers] = useState<any[]>([]);
+  const [savedSearches, setSavedSearches] = useState<any[]>([]);
 
   
   useEffect(() => {
@@ -26,6 +28,14 @@ export default function Profile() {
       try {
         const histRes = await api.get('/auth/history');
         setLoginHistory(histRes.data.loginHistory || []);
+      } catch {}
+      try {
+        const followRes = await api.get('/follows');
+        setFollowedSellers(followRes.data || []);
+      } catch {}
+      try {
+        const searchRes = await api.get('/saved-searches');
+        setSavedSearches(searchRes.data || []);
       } catch {}
     };
     loadProfile();
@@ -152,6 +162,76 @@ export default function Profile() {
                   ))}
                 </tbody>
               </table>
+            </div>
+          )}
+        </div>
+
+        <hr className="border-gray-100" />
+
+        {/* Section 3: Followed Sellers */}
+        <div className="p-6 md:p-8">
+          <h2 className="text-xl font-bold text-black mb-4 flex items-center gap-2">
+            <UserCheck className="w-5 h-5 text-[#D4AF37]" /> Takip Edilen Satıcılar
+          </h2>
+          {followedSellers.length === 0 ? (
+            <p className="text-sm text-gray-500">Henüz takip ettiğiniz satıcı bulunmuyor.</p>
+          ) : (
+            <div className="space-y-3">
+              {followedSellers.map((f: any) => (
+                <div key={f._id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-[#D4AF37] text-white rounded-full flex items-center justify-center font-bold text-sm">
+                      {f.seller?.firstName?.charAt(0)}{f.seller?.lastName?.charAt(0)}
+                    </div>
+                    <div>
+                      <div className="font-bold text-sm">{f.seller?.firstName} {f.seller?.lastName}</div>
+                      <div className="text-xs text-gray-500">{f.seller?.email}</div>
+                    </div>
+                  </div>
+                  <button onClick={async () => {
+                    await api.delete(`/users/${f.seller?._id}/follow`);
+                    setFollowedSellers(followedSellers.filter(x => x._id !== f._id));
+                  }} className="text-xs text-red-400 hover:text-red-600 font-bold">Takipten Çık</button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <hr className="border-gray-100" />
+
+        {/* Section 4: Saved Searches */}
+        <div className="p-6 md:p-8">
+          <h2 className="text-xl font-bold text-black mb-4 flex items-center gap-2">
+            <Search className="w-5 h-5 text-gray-500" /> Kayıtlı Aramalarım
+          </h2>
+          {savedSearches.length === 0 ? (
+            <p className="text-sm text-gray-500">Kayıtlı aramanız bulunmuyor. Ana sayfada arama yaptıktan sonra kaydetme özelliğini kullanabilirsiniz.</p>
+          ) : (
+            <div className="space-y-3">
+              {savedSearches.map((s: any) => (
+                <div key={s._id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div>
+                    <div className="font-bold text-sm">{s.keyword || 'Tüm'} {s.category ? `• ${s.category}` : ''}</div>
+                    <div className="text-xs text-gray-500">{s.location || 'Tüm Konumlar'} {s.minPrice || s.maxPrice ? `• ${s.minPrice || 0} - ${s.maxPrice || '∞'} TL` : ''}</div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button onClick={async () => {
+                      const enabled = !s.notificationsEnabled;
+                      await api.put(`/saved-searches/${s._id}/notifications`, { notificationsEnabled: enabled });
+                      setSavedSearches(savedSearches.map(x => x._id === s._id ? {...x, notificationsEnabled: enabled} : x));
+                    }} className={`p-1.5 rounded-lg transition-colors ${s.notificationsEnabled ? 'text-[#D4AF37] bg-yellow-50' : 'text-gray-400 hover:text-gray-600'}`} title={s.notificationsEnabled ? 'Bildirimi Kapat' : 'Bildirimi Aç'}>
+                      {s.notificationsEnabled ? <Bell className="w-4 h-4" /> : <BellOff className="w-4 h-4" />}
+                    </button>
+                    <button onClick={async () => {
+                      await api.delete(`/saved-searches/${s._id}`);
+                      setSavedSearches(savedSearches.filter(x => x._id !== s._id));
+                    }} className="p-1.5 text-gray-400 hover:text-red-500 rounded-lg transition-colors">
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              ))}
             </div>
           )}
         </div>

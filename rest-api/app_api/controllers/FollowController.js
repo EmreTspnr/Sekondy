@@ -42,6 +42,36 @@ const followSeller = async (req, res) => {
   }
 };
 
+const getFollowedSellers = async (req, res) => {
+  try {
+    const followerId = req.user.userId;
+    const follows = await Follow.find({ follower: followerId })
+      .populate('seller', 'firstName lastName email phone')
+      .sort({ createdAt: -1 });
+
+    res.status(200).json(follows);
+  } catch (error) {
+    res.status(500).json({ mesaj: 'Takip edilen saticilar getirilemedi.', hata: error.message });
+  }
+};
+
+const unfollowSeller = async (req, res) => {
+  try {
+    const followerId = req.user.userId;
+    const { userId: sellerId } = req.params;
+
+    const deleted = await Follow.findOneAndDelete({ follower: followerId, seller: sellerId });
+    if (!deleted) {
+      return res.status(404).json({ mesaj: 'Takip kaydı bulunamadı.' });
+    }
+    res.status(200).json({ mesaj: 'Takipten çıkıldı.' });
+  } catch (error) {
+    res.status(500).json({ mesaj: 'Takipten çıkılırken hata oluştu.', hata: error.message });
+  }
+};
+
 module.exports = {
-  followSeller
+  followSeller,
+  getFollowedSellers,
+  unfollowSeller
 };

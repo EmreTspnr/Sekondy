@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, Heart, MapPin, SlidersHorizontal, ChevronRight, Clock, X } from 'lucide-react';
+import { Search, Heart, MapPin, SlidersHorizontal, ChevronRight, Clock, X, Bookmark } from 'lucide-react';
 import api from '../services/api';
 
 const CATEGORIES = ['Tümü', 'Vasıta', 'Emlak', 'Elektronik', 'Moda', 'Ev & Bahçe'];
@@ -81,10 +81,22 @@ export default function Home() {
 
   const toggleFavorite = async (adId: string) => {
     try {
-      await api.post(`/favorites/${adId}`);
+      await api.post('/favorites', { listingId: adId });
       alert('Favorilere eklendi!');
     } catch {
-      alert('Giriş yapmanız gerekli!');
+      alert('Giriş yapmanız gerekli veya ilan zaten favorilerinizde!');
+    }
+  };
+
+  const handleSaveSearch = async () => {
+    try {
+      await api.post('/saved-searches', {
+        keyword: search.trim(),
+        category: category !== 'Tümü' ? category : ''
+      });
+      alert('Arama kriteri kaydedildi! Profil sayfanızdan yönetebilirsiniz.');
+    } catch {
+      alert('Arama kaydedilemedi. Giriş yaptığınızdan emin olun.');
     }
   };
 
@@ -153,9 +165,16 @@ export default function Home() {
         <h2 className="text-2xl font-bold text-black border-l-4 border-[#D4AF37] pl-3">
           {category === 'Tümü' ? 'Vitrin İlanları' : `${category} İlanları`}
         </h2>
-        <button className="flex items-center gap-2 text-sm font-bold text-gray-600 hover:text-black">
-          <SlidersHorizontal className="w-4 h-4" /> Filtrele
-        </button>
+        <div className="flex items-center gap-3">
+          {(search.trim() || category !== 'Tümü') && (
+            <button onClick={handleSaveSearch} className="flex items-center gap-1.5 text-sm font-bold text-[#D4AF37] hover:text-[#c19b2e] transition-colors">
+              <Bookmark className="w-4 h-4" /> Aramayı Kaydet
+            </button>
+          )}
+          <button className="flex items-center gap-2 text-sm font-bold text-gray-600 hover:text-black">
+            <SlidersHorizontal className="w-4 h-4" /> Filtrele
+          </button>
+        </div>
       </div>
 
       {/* İlan Grid */}
