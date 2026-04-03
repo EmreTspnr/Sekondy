@@ -42,12 +42,6 @@ router.get('/profile', verifyToken, ctrlAuth.getProfile);
 router.delete('/profile', verifyToken, ctrlAuth.deleteProfile);
 router.get('/auth/history', verifyToken, ctrlAuth.getLoginHistory);
 
-router.post('/auth/register', ctrlAuth.register);
-router.post('/auth/login', ctrlAuth.login);
-router.put('/profile', verifyToken, ctrlAuth.updateProfile);
-router.get('/profile', verifyToken, ctrlAuth.getProfile);
-router.delete('/profile', verifyToken, ctrlAuth.deleteProfile);
-router.get('/auth/history', verifyToken, ctrlAuth.getLoginHistory);
 
 router.post('/listings', verifyToken, ctrlListings.addListing);
 router.post('/ads', verifyToken, ctrlListings.addListing);

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Shield, Monitor } from 'lucide-react';
 import api from '../services/api';
 
 export default function Profile() {
@@ -6,6 +7,7 @@ export default function Profile() {
   const [lastName, setLastName] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
+  const [loginHistory, setLoginHistory] = useState<any[]>([]);
 
   
   useEffect(() => {
@@ -13,14 +15,18 @@ export default function Profile() {
       try {
         const response = await api.get('/profile');
         if(response.data) {
-          setFirstName(response.data.name?.split(' ')[0] || '');
-          setLastName(response.data.name?.split(' ')[1] || '');
-          setPhone(response.data.telefon || '');
+          setFirstName(response.data.firstName || '');
+          setLastName(response.data.lastName || '');
+          setPhone(response.data.phone || '');
           setEmail(response.data.email || '');
         }
       } catch (error) {
         console.error("Profil alınamadı", error);
       }
+      try {
+        const histRes = await api.get('/auth/history');
+        setLoginHistory(histRes.data.loginHistory || []);
+      } catch {}
     };
     loadProfile();
   }, []);
@@ -29,8 +35,9 @@ export default function Profile() {
     e.preventDefault();
     try {
       await api.put('/profile', { 
-        name: `${firstName} ${lastName}`,
-        telefon: phone 
+        firstName,
+        lastName,
+        phone 
       });
       alert('Profilin başarıyla güncellendi!');
     } catch (error) {
@@ -111,6 +118,42 @@ export default function Profile() {
               </button>
             </div>
           </form>
+        </div>
+
+        <hr className="border-gray-100" />
+
+        {/* Section 2: Login History */}
+        <div className="p-6 md:p-8">
+          <h2 className="text-xl font-bold text-black mb-4 flex items-center gap-2">
+            <Shield className="w-5 h-5 text-gray-500" /> Giriş Geçmişi
+          </h2>
+          {loginHistory.length === 0 ? (
+            <p className="text-sm text-gray-500">Henüz giriş kaydı bulunmuyor.</p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-gray-200 text-left text-gray-500">
+                    <th className="pb-2 font-semibold">Cihaz</th>
+                    <th className="pb-2 font-semibold">IP Adresi</th>
+                    <th className="pb-2 font-semibold">Tarih</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {loginHistory.slice(0, 10).map((entry: any, i: number) => (
+                    <tr key={i} className="text-gray-700">
+                      <td className="py-2.5 flex items-center gap-2">
+                        <Monitor className="w-4 h-4 text-gray-400" />
+                        <span className="truncate max-w-[200px]">{entry.device || 'Bilinmiyor'}</span>
+                      </td>
+                      <td className="py-2.5 font-mono text-xs">{entry.ipAddress || '-'}</td>
+                      <td className="py-2.5">{entry.date ? new Date(entry.date).toLocaleDateString('tr-TR') : '-'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
 
         <hr className="border-gray-100" />
