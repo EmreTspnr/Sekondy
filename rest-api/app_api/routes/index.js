@@ -66,6 +66,8 @@ router.put('/saved-searches/:searchId/notifications', verifyToken, ctrlSavedSear
 router.delete('/saved-searches/:searchId', verifyToken, ctrlSavedSearch.deleteSavedSearch);
 router.get('/listings/showcase', ctrlDiscovery.getShowcaseListings);
 router.get('/ads/showcase', ctrlDiscovery.getShowcaseListings);
+router.get('/listings/search', ctrlDiscovery.searchListings);
+router.get('/ads/search', ctrlDiscovery.searchListings);
 router.get('/listings/category/:categoryId', ctrlDiscovery.getListingsByCategory);
 router.get('/ads/category/:categoryId', ctrlDiscovery.getListingsByCategory);
 router.get('/categories/:categoryId/listings', ctrlDiscovery.getListingsByCategory);
