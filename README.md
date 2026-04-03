@@ -1,4 +1,5 @@
 # SEKONDY
+[Sekondy](https://www.sekondy.com)
 
 ---
 
