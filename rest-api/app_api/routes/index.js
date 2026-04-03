@@ -55,7 +55,10 @@ router.get('/my-listings', verifyToken, ctrlListings.getMyListings);
 router.get('/my-ads', verifyToken, ctrlListings.getMyListings);
 
 router.post('/users/:userId/follow', verifyToken, ctrlFollow.followSeller);
+router.get('/follows', verifyToken, ctrlFollow.getFollowedSellers);
+router.delete('/users/:userId/follow', verifyToken, ctrlFollow.unfollowSeller);
 router.post('/saved-searches', verifyToken, ctrlSavedSearch.createSavedSearch);
+router.get('/saved-searches', verifyToken, ctrlSavedSearch.getSavedSearches);
 router.put('/saved-searches/:searchId/notifications', verifyToken, ctrlSavedSearch.updateSearchNotifications);
 router.delete('/saved-searches/:searchId', verifyToken, ctrlSavedSearch.deleteSavedSearch);
 router.get('/listings/showcase', ctrlDiscovery.getShowcaseListings);

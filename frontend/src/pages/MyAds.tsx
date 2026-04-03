@@ -33,16 +33,27 @@ export default function MyAds() {
     }
   };
 
-  const handleEditPrice = async (id: string, currentPrice: string) => {
-    const newPrice = window.prompt("Yeni fiyatı girin (örn: 15.000 TL):", currentPrice);
-    if (!newPrice || newPrice === currentPrice) return;
+  const handleEdit = async (ad: any) => {
+    const title = window.prompt("Başlık:", ad.title);
+    if (title === null) return;
+    const price = window.prompt("Fiyat:", String(ad.price));
+    if (price === null) return;
+    const description = window.prompt("Açıklama:", ad.description);
+    if (description === null) return;
+    const location = window.prompt("Konum:", ad.location);
+    if (location === null) return;
 
     try {
-      await api.put(`/listings/${id}`, { price: newPrice });
-      setAds(ads.map(ad => ad._id === id ? { ...ad, price: newPrice } : ad));
-      alert("Fiyat güncellendi!");
+      const res = await api.put(`/listings/${ad._id}`, { 
+        title: title || ad.title, 
+        price: price || ad.price, 
+        description: description || ad.description, 
+        location: location || ad.location 
+      });
+      setAds(ads.map(a => a._id === ad._id ? res.data : a));
+      alert("İlan güncellendi!");
     } catch (error) {
-      alert("Fiyat güncellenirken bir hata oluştu.");
+      alert("İlan güncellenirken bir hata oluştu.");
     }
   };
 
@@ -95,8 +106,8 @@ export default function MyAds() {
                   <Link to={`/ad/${ad._id}`} className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-3 py-2 border border-gray-200 rounded-lg text-sm font-semibold text-gray-600 hover:text-black hover:border-black transition-colors">
                     <Eye className="w-4 h-4" /> Görüntüle
                   </Link>
-                  <button onClick={() => handleEditPrice(ad._id, ad.price)} className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-3 py-2 border border-gray-200 rounded-lg text-sm font-semibold text-gray-600 hover:text-blue-500 hover:border-blue-500 transition-colors">
-                    <Edit3 className="w-4 h-4" /> Fiyat
+                  <button onClick={() => handleEdit(ad)} className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-3 py-2 border border-gray-200 rounded-lg text-sm font-semibold text-gray-600 hover:text-blue-500 hover:border-blue-500 transition-colors">
+                    <Edit3 className="w-4 h-4" /> Düzenle
                   </button>
                   <button onClick={() => handleDelete(ad._id)} className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-3 py-2 border border-red-200 rounded-lg text-sm font-semibold text-red-500 hover:bg-red-50 transition-colors">
                     <Trash2 className="w-4 h-4" /> Sil
