@@ -109,7 +109,7 @@ const uploadPhotos = async (req, res) => {
       return res.status(400).json({ mesaj: 'Fotograf yukleyin.' });
     }
 
-    const photoUrls = req.files.map((file) => `/uploads/${file.filename}`);
+    const photoUrls = req.files.map((file) => file.path);
     listing.photos.push(...photoUrls);
     await listing.save();
 
