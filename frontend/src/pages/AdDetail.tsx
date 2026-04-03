@@ -43,7 +43,7 @@ export default function AdDetail() {
     const content = window.prompt("Mesajınızı yazın:");
     if (!content) return;
     try {
-      const receiverId = adInfo.owner?._id || 'MOCK_ID';
+      const receiverId = (typeof adInfo.owner === 'object' ? adInfo.owner?._id : adInfo.owner) || 'MOCK_ID';
       await api.post('/messages', { receiverId, content, listingId: adInfo._id || adId });
       alert('Mesajınız başarıyla iletildi!');
     } catch {
