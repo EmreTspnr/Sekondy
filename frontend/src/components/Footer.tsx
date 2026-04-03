@@ -3,7 +3,7 @@ import React from 'react';
 export default function Footer() {
   return (
     <footer className="bg-[#0a0a0a] text-gray-400 py-12 px-4 font-sans mt-auto border-t-[6px] border-[#D4AF37]">
-      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-10 lg:gap-16">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 lg:gap-16">
         
         {/* Sol Sütun - Hakkında */}
         <div className="space-y-4">
@@ -16,36 +16,13 @@ export default function Footer() {
           </p>
         </div>
 
-        {/* Orta Sütun - Linkler */}
+        {/* Sağ Sütun - Linkler */}
         <div className="md:border-l md:border-gray-800 md:pl-10 space-y-3">
           <h4 className="text-white font-bold tracking-widest text-sm mb-4">BAĞLANTILAR</h4>
           <ul className="space-y-3 text-sm font-semibold">
             <li><a href="/" className="hover:text-[#D4AF37] transition-colors">VİTRİN</a></li>
             <li><a href="/post-ad" className="hover:text-[#D4AF37] transition-colors">YENİ İLAN YÜKLE</a></li>
           </ul>
-        </div>
-
-        {/* Sağ Sütun - Bülten */}
-        <div className="space-y-4">
-          <h4 className="text-[#D4AF37] font-bold text-sm tracking-widest mb-2 leading-snug">
-            SEKONDY BÜLTENİNE KAYIT OLUN!
-          </h4>
-          <p className="text-sm font-medium text-gray-400 mb-4">
-            Bilgilerinizi asla üçüncü şahıslarla paylaşmayız ve size spam göndermeyiz.
-          </p>
-          <form className="flex gap-2 h-10" onSubmit={e => e.preventDefault()}>
-            <input 
-              type="email" 
-              placeholder="E-posta adresiniz" 
-              className="flex-1 bg-white px-3 text-black text-sm outline-none font-medium h-full"
-            />
-            <button 
-              type="submit" 
-              className="bg-[#D4AF37] hover:bg-[#c19b2e] text-black font-black px-6 h-full transition-colors flex-shrink-0"
-            >
-              KAYIT
-            </button>
-          </form>
         </div>
       </div>
 
