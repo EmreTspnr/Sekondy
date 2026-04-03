@@ -23,9 +23,9 @@ export default function Home() {
         console.error("İlanlar gelmedi");
         
         setAds([
-          { _id: '1', title: '(Mock Data) iPhone 14 Pro Max 256GB', price: '$1200', location: 'İstanbul', image: 'https://picsum.photos/400/300?random=1' },
-          { _id: '2', title: '(Mock Data) 2019 BMW 320i M Sport', price: '$32500', location: 'Ankara', image: 'https://picsum.photos/400/300?random=2' },
-          { _id: '3', title: '(Mock Data) Sony A7III Mirrorless Camera', price: '$1800', location: 'İzmir', image: 'https://picsum.photos/400/300?random=3' }
+          { _id: '1', title: '(Mock Data) iPhone 14 Pro Max 256GB', price: '$1200', location: 'İstanbul', photos: ['https://picsum.photos/400/300?random=1'] },
+          { _id: '2', title: '(Mock Data) 2019 BMW 320i M Sport', price: '$32500', location: 'Ankara', photos: ['https://picsum.photos/400/300?random=2'] },
+          { _id: '3', title: '(Mock Data) Sony A7III Mirrorless Camera', price: '$1800', location: 'İzmir', photos: ['https://picsum.photos/400/300?random=3'] }
         ]);
       }
     };
@@ -96,8 +96,8 @@ export default function Home() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {ads.filter(a => a.title.toLowerCase().includes(search.toLowerCase())).map(ad => (
           <div key={ad._id} onClick={() => window.location.href=`/ad/${ad._id}`} className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-2xl transition-shadow group cursor-pointer">
-            <div className="relative aspect-[4/3] overflow-hidden">
-              <img src={ad.image} alt={ad.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+            <div className="relative aspect-[4/3] overflow-hidden bg-gray-100">
+              <img src={ad.photos?.[0] || 'https://via.placeholder.com/400x300?text=Gorsel+Yok'} alt={ad.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
               <button 
                 className="absolute top-3 right-3 p-2 bg-white/90 backdrop-blur-sm rounded-full hover:bg-white transition-colors shadow-sm z-10"
                 onClick={(e) => { e.stopPropagation(); toggleFavorite(ad._id); }}
