@@ -91,7 +91,7 @@ export default function Home() {
   return (
     <main className="max-w-7xl mx-auto px-4 py-8 w-full">
       {/* Banner / Arama */}
-      <div className="bg-[#1a1a1a] rounded-2xl p-8 mb-10 text-center shadow-lg relative overflow-hidden">
+      <div className="bg-[#1a1a1a] rounded-2xl p-8 mb-10 text-center shadow-lg relative">
         <div className="relative z-10">
           <h1 className="text-3xl md:text-5xl font-black text-white mb-4">Aradığın her şey <span className="text-[#D4AF37]">Sekondy'de.</span></h1>
           <p className="text-gray-400 mb-8 max-w-xl mx-auto">İkinci el araba, telefon, bilgisayar ve daha fazlası binlerce ilan arasından seni bekliyor.</p>
