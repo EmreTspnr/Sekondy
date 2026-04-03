@@ -45,10 +45,13 @@ const sendMessage = async (req, res) => {
 const getMessages = async (req, res) => {
   try {
     const userId = req.user.userId;
-    const messages = await Message.find({ receiver: userId })
+    const messages = await Message.find({
+      $or: [{ receiver: userId }, { sender: userId }]
+    })
       .populate('sender', 'firstName lastName')
+      .populate('receiver', 'firstName lastName')
       .populate('listing', 'title')
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: 1 }); // Chat sırası için eskiden yeniye
 
     res.status(200).json(messages);
   } catch (error) {
