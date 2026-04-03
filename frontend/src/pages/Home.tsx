@@ -11,6 +11,7 @@ export default function Home() {
 
   
   useEffect(() => {
+    if (search.trim()) return; // Arama aktifken useEffect tetiklenmesin
     const fetchAds = async () => {
       try {
         let endpoint = '/ads/showcase';
@@ -25,7 +26,22 @@ export default function Home() {
       }
     };
     fetchAds();
-  }, [category]);
+  }, [category, search]);
+
+  const handleSearch = async () => {
+    if (!search.trim()) return;
+    try {
+      const response = await api.get(`/ads/search?q=${encodeURIComponent(search.trim())}`);
+      setAds(response.data);
+    } catch (error) {
+      console.error('Arama hatası:', error);
+      setAds([]);
+    }
+  };
+
+  const handleSearchKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') handleSearch();
+  };
 
   const toggleFavorite = async (adId: string) => {
     try {
@@ -51,10 +67,11 @@ export default function Home() {
                 type="text" 
                 placeholder="Ne arıyorsunuz? (Örn: iphone, bmw)" 
                 value={search} onChange={e => setSearch(e.target.value)}
+                onKeyDown={handleSearchKeyDown}
                 className="w-full px-4 py-3 bg-transparent border-none outline-none text-black font-medium placeholder-gray-400"
               />
             </div>
-            <button className="bg-[#D4AF37] hover:bg-[#c19b2e] text-black font-bold py-3 px-8 rounded-full transition-colors whitespace-nowrap">
+            <button onClick={handleSearch} className="bg-[#D4AF37] hover:bg-[#c19b2e] text-black font-bold py-3 px-8 rounded-full transition-colors whitespace-nowrap">
               Araştır
             </button>
           </div>
@@ -89,7 +106,7 @@ export default function Home() {
 
       {/* İlan Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {ads.filter(a => a.title.toLowerCase().includes(search.toLowerCase())).map(ad => (
+        {ads.map(ad => (
           <div key={ad._id} onClick={() => window.location.href=`/ad/${ad._id}`} className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-2xl transition-shadow group cursor-pointer">
             <div className="relative aspect-[4/3] overflow-hidden bg-gray-100">
               <img src={ad.photos?.[0] || 'https://via.placeholder.com/400x300?text=Gorsel+Yok'} alt={ad.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
