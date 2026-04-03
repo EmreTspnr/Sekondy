@@ -27,10 +27,11 @@ export default function Auth() {
     } else {
       try {
         await api.post('/auth/register', { 
-          name: `${firstName} ${lastName}`,
+          firstName,
+          lastName,
           email, 
           password, 
-          telefon: phone
+          phone
         });
         alert('Kayıt Başarılı! Şimdi giriş yapabilirsiniz.');
         setActiveTab('login');

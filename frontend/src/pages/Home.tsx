@@ -20,13 +20,8 @@ export default function Home() {
         const response = await api.get(endpoint);
         setAds(response.data.length ? response.data : []);
       } catch (error) {
-        console.error("İlanlar gelmedi");
-        
-        setAds([
-          { _id: '1', title: '(Mock Data) iPhone 14 Pro Max 256GB', price: '$1200', location: 'İstanbul', image: 'https://picsum.photos/400/300?random=1' },
-          { _id: '2', title: '(Mock Data) 2019 BMW 320i M Sport', price: '$32500', location: 'Ankara', image: 'https://picsum.photos/400/300?random=2' },
-          { _id: '3', title: '(Mock Data) Sony A7III Mirrorless Camera', price: '$1800', location: 'İzmir', image: 'https://picsum.photos/400/300?random=3' }
-        ]);
+        console.error("İlanlar gelmedi", error);
+        setAds([]);
       }
     };
     fetchAds();
