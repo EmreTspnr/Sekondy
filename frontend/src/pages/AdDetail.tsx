@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { MapPin, Heart, MessageCircle, AlertCircle, Share2 } from 'lucide-react';
+import { MapPin, Heart, MessageCircle, AlertCircle, Share2, UserPlus, Flag } from 'lucide-react';
 import api from '../services/api';
 
 export default function AdDetail() {
@@ -48,6 +48,28 @@ export default function AdDetail() {
       alert('Mesajınız başarıyla iletildi!');
     } catch {
       alert('Mesaj gönderilirken hata oluştu. Giriş yaptığınızdan emin olun veya kendi ilanınıza mesaj atmadığınızı kontrol edin.');
+    }
+  };
+
+  const handleFollow = async () => {
+    try {
+      const sellerId = typeof adInfo.owner === 'object' ? adInfo.owner?._id : adInfo.owner;
+      if (!sellerId) return alert('Satıcı bilgisi bulunamadı.');
+      await api.post(`/users/${sellerId}/follow`);
+      alert('Satıcı başarıyla takip edildi!');
+    } catch {
+      alert('Zaten takip ediyorsunuz veya giriş yapmanız gerekli.');
+    }
+  };
+
+  const handleReport = async () => {
+    const reason = window.prompt('Şikayet nedeninizi yazın:');
+    if (!reason) return;
+    try {
+      await api.post('/reports', { listingId: adInfo._id || adId, reason });
+      alert('Şikayet başarıyla iletildi. Teşekkürler!');
+    } catch {
+      alert('Şikayet gönderilirken hata oluştu.');
     }
   };
 
@@ -104,7 +126,14 @@ export default function AdDetail() {
                   <div className="text-sm text-gray-500">{adInfo.owner?.phone || adInfo.seller?.phone || 'Gizli Numara'}</div>
                 </div>
               </div>
+              <button onClick={handleFollow} className="mt-3 w-full flex items-center justify-center gap-2 py-2.5 border-2 border-[#D4AF37] text-[#D4AF37] font-bold rounded-xl hover:bg-[#D4AF37] hover:text-black transition-colors text-sm">
+                <UserPlus className="w-4 h-4" /> Satıcıyı Takip Et
+              </button>
             </div>
+
+            <button onClick={handleReport} className="mt-4 w-full flex items-center justify-center gap-2 py-2.5 text-gray-400 hover:text-red-500 text-sm font-medium transition-colors">
+              <Flag className="w-4 h-4" /> İlanı Şikayet Et
+            </button>
           </div>
         </aside>
       </div>
