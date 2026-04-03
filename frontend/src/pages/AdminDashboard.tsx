@@ -11,35 +11,32 @@ export default function AdminDashboard() {
                 const response = await api.get('/admin/ads/pending');
                 setPendingAds(response.data);
             } catch (error) {
-                // Mock data
-                setPendingAds([
-                    { id: 101, title: '(Mock Data) PS5 Temiz', seller: 'Efe K.', price: '$450', reason: 'Yeni İlan' },
-                    { id: 102, title: '(Mock Data) Şüpheli İlan', seller: 'UserX', price: '$10', reason: 'Şikayet Edildi' },
-                ]);
+                console.error("Bekleyen ilanlar getirilemedi:", error);
+                setPendingAds([]);
             }
         };
         fetchPending();
     }, []);
 
-    const handleApprove = async (id: number) => {
+    const handleApprove = async (id: string) => {
         try {
             await api.put(`/admin/ads/${id}/approve`);
-            setPendingAds(pendingAds.filter(ad => ad.id !== id));
+            setPendingAds(pendingAds.filter(ad => ad._id !== id));
             alert('İlan Onaylandı!');
-        } catch {
-            setPendingAds(pendingAds.filter(ad => ad.id !== id));
-            alert('İlan Onaylandı! (Demo)');
+        } catch (error) {
+            console.error(error);
+            alert('İlan onaylanırken bir hata oluştu.');
         }
     };
 
-    const handleReject = async (id: number) => {
+    const handleReject = async (id: string) => {
         try {
             await api.delete(`/admin/ads/${id}`);
-            setPendingAds(pendingAds.filter(ad => ad.id !== id));
+            setPendingAds(pendingAds.filter(ad => ad._id !== id));
             alert('İlan Reddedildi ve Silindi!');
-        } catch {
-            setPendingAds(pendingAds.filter(ad => ad.id !== id));
-            alert('İlan Reddedildi! (Demo)');
+        } catch (error) {
+            console.error(error);
+            alert('İlan reddedilirken bir hata oluştu.');
         }
     };
 
@@ -76,24 +73,24 @@ export default function AdminDashboard() {
                         </thead>
                         <tbody className="divide-y divide-gray-100">
                         {pendingAds.map(ad => (
-                            <tr key={ad.id} className="hover:bg-gray-50 transition-colors">
+                            <tr key={ad._id} className="hover:bg-gray-50 transition-colors">
                                 <td className="p-4 font-bold text-gray-900">{ad.title}</td>
-                                <td className="p-4 text-gray-600">{ad.seller}</td>
+                                <td className="p-4 text-gray-600">{ad.seller || 'Bilinmiyor'}</td>
                                 <td className="p-4 text-gray-600">{ad.price}</td>
                                 <td className="p-4">
                     <span className="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-bold">
-                      {ad.reason}
+                      {ad.reason || 'Sistem Onayı'}
                     </span>
                                 </td>
                                 <td className="p-4 flex gap-2 justify-end">
                                     <button
-                                        onClick={() => handleApprove(ad.id)}
+                                        onClick={() => handleApprove(ad._id)}
                                         className="flex items-center gap-1 bg-green-100 text-green-700 px-3 py-1.5 rounded-lg hover:bg-green-200 font-bold text-sm transition-colors"
                                     >
                                         <CheckCircle className="w-4 h-4" /> Onayla
                                     </button>
                                     <button
-                                        onClick={() => handleReject(ad.id)}
+                                        onClick={() => handleReject(ad._id)}
                                         className="flex items-center gap-1 bg-red-100 text-red-700 px-3 py-1.5 rounded-lg hover:bg-red-200 font-bold text-sm transition-colors"
                                     >
                                         <XCircle className="w-4 h-4" /> Reddet
