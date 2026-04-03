@@ -41,7 +41,24 @@ const getFavorites = async (req, res) => {
   }
 };
 
+const deleteFavorite = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const { id } = req.params;
+
+    const deleted = await Favorite.findOneAndDelete({ _id: id, user: userId });
+    if (!deleted) {
+      return res.status(404).json({ mesaj: 'Silinecek favori bulunamadi.' });
+    }
+
+    res.status(200).json({ mesaj: 'Favorilerden basariyla kaldirildi.' });
+  } catch (error) {
+    res.status(500).json({ mesaj: 'Favori silinirken hata olustu.', hata: error.message });
+  }
+};
+
 module.exports = {
   addFavorite,
-  getFavorites
+  getFavorites,
+  deleteFavorite
 };
