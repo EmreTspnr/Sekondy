@@ -5,6 +5,12 @@ import { Link, useLocation } from 'react-router-dom';
 export default function Header() {
   const location = useLocation();
   const isActive = (path: string) => location.pathname === path;
+  const token = localStorage.getItem('token');
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    window.location.href = '/auth';
+  };
 
   return (
     <header className="w-full flex flex-col font-sans border-b border-gray-100">
@@ -43,7 +49,11 @@ export default function Header() {
             <Link to="/messages" className={`${isActive('/messages') ? 'text-[#D4AF37]' : 'hover:text-[#D4AF37]'} transition-colors`}>MESAJLAR</Link>
             <Link to="/profile" className={`${isActive('/profile') ? 'text-[#D4AF37]' : 'hover:text-[#D4AF37]'} transition-colors`}>PROFİL</Link>
             <Link to="/admin" className={`${isActive('/admin') ? 'text-[#D4AF37]' : 'hover:text-[#D4AF37]'} transition-colors`}>YÖNETİM</Link>
-            <Link to="/auth" className={`${isActive('/auth') ? 'text-[#D4AF37]' : 'hover:text-[#D4AF37]'} transition-colors`}>GİRİŞ YAP</Link>
+            {!token ? (
+              <Link to="/auth" className={`${isActive('/auth') ? 'text-[#D4AF37]' : 'hover:text-[#D4AF37]'} transition-colors`}>GİRİŞ YAP</Link>
+            ) : (
+              <button onClick={handleLogout} className="hover:text-red-500 font-bold transition-colors">ÇIKIŞ YAP</button>
+            )}
           </nav>
 
           {/* Action Button */}
@@ -58,7 +68,11 @@ export default function Header() {
             <Link to="/my-ads">İLANLARIM</Link>
             <Link to="/messages">MESAJLAR</Link>
             <Link to="/profile">PROFİL</Link>
-            <Link to="/auth">GİRİŞ</Link>
+            {!token ? (
+              <Link to="/auth">GİRİŞ</Link>
+            ) : (
+              <button onClick={handleLogout} className="text-red-500 font-bold">ÇIKIŞ</button>
+            )}
         </nav>
       </div>
     </header>
