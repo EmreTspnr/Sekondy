@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Search, Heart, MapPin, SlidersHorizontal, ChevronRight } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Search, Heart, MapPin, SlidersHorizontal, ChevronRight, Clock, X } from 'lucide-react';
 import api from '../services/api';
 
 const CATEGORIES = ['Tümü', 'Vasıta', 'Emlak', 'Elektronik', 'Moda', 'Ev & Bahçe'];
@@ -8,6 +8,38 @@ export default function Home() {
   const [ads, setAds] = useState<any[]>([]);
   const [category, setCategory] = useState('Tümü');
   const [search, setSearch] = useState('');
+  const [showHistory, setShowHistory] = useState(false);
+  const [searchHistory, setSearchHistory] = useState<string[]>([]);
+  const searchRef = useRef<HTMLDivElement>(null);
+
+  // localStorage'dan arama geçmişini yükle
+  useEffect(() => {
+    const saved = localStorage.getItem('searchHistory');
+    if (saved) setSearchHistory(JSON.parse(saved));
+  }, []);
+
+  // Dışarı tıklanınca dropdown'u kapat
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
+        setShowHistory(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const saveToHistory = (term: string) => {
+    const updated = [term, ...searchHistory.filter(h => h !== term)].slice(0, 8);
+    setSearchHistory(updated);
+    localStorage.setItem('searchHistory', JSON.stringify(updated));
+  };
+
+  const removeFromHistory = (term: string) => {
+    const updated = searchHistory.filter(h => h !== term);
+    setSearchHistory(updated);
+    localStorage.setItem('searchHistory', JSON.stringify(updated));
+  };
 
   
   useEffect(() => {
@@ -28,10 +60,14 @@ export default function Home() {
     fetchAds();
   }, [category, search]);
 
-  const handleSearch = async () => {
-    if (!search.trim()) return;
+  const handleSearch = async (term?: string) => {
+    const q = (term || search).trim();
+    if (!q) return;
+    saveToHistory(q);
+    setShowHistory(false);
+    if (term) setSearch(term);
     try {
-      const response = await api.get(`/ads/search?q=${encodeURIComponent(search.trim())}`);
+      const response = await api.get(`/ads/search?q=${encodeURIComponent(q)}`);
       setAds(response.data);
     } catch (error) {
       console.error('Arama hatası:', error);
@@ -60,20 +96,38 @@ export default function Home() {
           <h1 className="text-3xl md:text-5xl font-black text-white mb-4">Aradığın her şey <span className="text-[#D4AF37]">Sekondy'de.</span></h1>
           <p className="text-gray-400 mb-8 max-w-xl mx-auto">İkinci el araba, telefon, bilgisayar ve daha fazlası binlerce ilan arasından seni bekliyor.</p>
           
-          <div className="max-w-3xl mx-auto bg-white rounded-full p-2 flex items-center shadow-xl">
-            <div className="flex-1 flex items-center pl-4">
-              <Search className="w-5 h-5 text-gray-400" />
-              <input 
-                type="text" 
-                placeholder="Ne arıyorsunuz? (Örn: iphone, bmw)" 
-                value={search} onChange={e => setSearch(e.target.value)}
-                onKeyDown={handleSearchKeyDown}
-                className="w-full px-4 py-3 bg-transparent border-none outline-none text-black font-medium placeholder-gray-400"
-              />
+          <div className="max-w-3xl mx-auto relative" ref={searchRef}>
+            <div className="bg-white rounded-full p-2 flex items-center shadow-xl">
+              <div className="flex-1 flex items-center pl-4">
+                <Search className="w-5 h-5 text-gray-400" />
+                <input 
+                  type="text" 
+                  placeholder="Ne arıyorsunuz? (Örn: iphone, bmw)" 
+                  value={search} onChange={e => setSearch(e.target.value)}
+                  onKeyDown={handleSearchKeyDown}
+                  onFocus={() => searchHistory.length > 0 && setShowHistory(true)}
+                  className="w-full px-4 py-3 bg-transparent border-none outline-none text-black font-medium placeholder-gray-400"
+                />
+              </div>
+              <button onClick={() => handleSearch()} className="bg-[#D4AF37] hover:bg-[#c19b2e] text-black font-bold py-3 px-8 rounded-full transition-colors whitespace-nowrap">
+                Araştır
+              </button>
             </div>
-            <button onClick={handleSearch} className="bg-[#D4AF37] hover:bg-[#c19b2e] text-black font-bold py-3 px-8 rounded-full transition-colors whitespace-nowrap">
-              Araştır
-            </button>
+            {/* Arama Geçmişi Dropdown */}
+            {showHistory && searchHistory.length > 0 && (
+              <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-50">
+                <div className="px-4 py-2.5 text-xs font-bold text-gray-400 uppercase tracking-wider border-b border-gray-100">Son Aramalar</div>
+                {searchHistory.map((term, i) => (
+                  <div key={i} className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors group">
+                    <Clock className="w-4 h-4 text-gray-300 flex-shrink-0" />
+                    <span onClick={() => handleSearch(term)} className="flex-1 text-sm font-medium text-gray-700 group-hover:text-black">{term}</span>
+                    <button onClick={(e) => { e.stopPropagation(); removeFromHistory(term); }} className="p-1 text-gray-300 hover:text-red-400 rounded-full hover:bg-red-50 transition-colors opacity-0 group-hover:opacity-100">
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>
