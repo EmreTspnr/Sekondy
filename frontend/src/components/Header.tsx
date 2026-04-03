@@ -18,9 +18,6 @@ export default function Header() {
             <div className="flex items-center gap-1.5 hover:text-[#D4AF37] transition-colors cursor-pointer">
               <Mail className="w-3.5 h-3.5 text-[#D4AF37]" /> info@sekondy.com
             </div>
-            <div className="flex items-center gap-1.5">
-              <Clock className="w-3.5 h-3.5 text-[#D4AF37]" /> Pzt - Cts: 09:00 - 18:00
-            </div>
           </div>
           <div className="flex items-center gap-4">
             <Facebook className="w-4 h-4 hover:text-[#D4AF37] transition-colors cursor-pointer" />
