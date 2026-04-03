@@ -74,6 +74,7 @@ router.get('/ads/:id', ctrlListings.getListingById);
 
 router.post('/favorites', verifyToken, ctrlFavorite.addFavorite);
 router.get('/favorites', verifyToken, ctrlFavorite.getFavorites);
+router.delete('/favorites/:id', verifyToken, ctrlFavorite.deleteFavorite);
 
 router.post('/messages', verifyToken, ctrlMessage.sendMessage);
 router.get('/messages', verifyToken, ctrlMessage.getMessages);
