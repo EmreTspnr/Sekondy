@@ -20,7 +20,7 @@ export default function AdDetail() {
           location: 'Çankaya, Ankara',
           description: 'Araç sıfır ayarındadır. Tramer kaydı bulunmamaktadır.',
           seller: { name: 'Ahmet Yılmaz', phone: '0555 123 4567', rating: 4.8 },
-          images: ['https://picsum.photos/800/500?random=11'],
+          photos: ['https://picsum.photos/800/500?random=11'],
           attributes: { Marka: 'BMW', Seri: '3 Serisi', Model: '320i', Yıl: '2019', Kilometre: '45.000 km' }
         });
       }
@@ -36,7 +36,7 @@ export default function AdDetail() {
         <div className="flex-1 space-y-6">
           <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
             <div className="aspect-[16/9] w-full bg-black flex items-center justify-center">
-              <img src={adInfo.images?.[0] || adInfo.image} className="w-full h-full object-contain" alt={adInfo.title} />
+              <img src={adInfo.photos?.[0] || 'https://via.placeholder.com/800x500?text=Gorsel+Yok'} className="w-full h-full object-contain" alt={adInfo.title} />
             </div>
           </div>
 
