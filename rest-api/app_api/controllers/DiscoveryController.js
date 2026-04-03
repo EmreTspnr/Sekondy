@@ -22,11 +22,10 @@ const getListingsByCategory = async (req, res) => {
 const getShowcaseListings = async (req, res) => {
   try {
     const listings = await Listing.find({
-      status: 'approved',
-      isShowcase: true
+      status: 'approved'
     })
       .sort({ createdAt: -1 })
-      .limit(12);
+      .limit(20);
 
     res.status(200).json(listings);
   } catch (error) {

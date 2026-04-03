@@ -122,7 +122,13 @@ const uploadPhotos = async (req, res) => {
 const getMyListings = async (req, res) => {
   try {
     const ownerId = req.user.userId;
-    const myListings = await Listing.find({ owner: ownerId }).sort({ createdAt: -1 });
+    // Hem ObjectId hem de eski string formatındaki owner değerlerini eşleştir
+    const myListings = await Listing.find({
+      $or: [
+        { owner: ownerId },
+        { owner: String(ownerId) }
+      ]
+    }).sort({ createdAt: -1 });
     res.status(200).json(myListings);
   } catch (error) {
     res.status(500).json({ mesaj: 'Ilanlar getirilemedi.', hata: error.message });
