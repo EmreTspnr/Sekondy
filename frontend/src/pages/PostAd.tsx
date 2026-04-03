@@ -5,28 +5,65 @@ import api from '../services/api';
 const CATEGORIES = ['Tümü', 'Vasıta', 'Emlak', 'Elektronik', 'Moda', 'Ev & Bahçe'];
 
 export default function PostAd() {
-  const [images, setImages] = useState<string[]>([]);
+  const [images, setImages] = useState<File[]>([]);
+  const [previews, setPreviews] = useState<string[]>([]);
   const [title, setTitle] = useState('');
   const [price, setPrice] = useState('');
   const [category, setCategory] = useState('');
   const [description, setDescription] = useState('');
   const [location, setLocation] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const newFiles = Array.from(e.target.files) as File[];
+      setImages([...images, ...newFiles]);
+      setPreviews([...previews, ...newFiles.map(f => URL.createObjectURL(f))]);
+    }
+  };
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
-    setImages([...images, `https://picsum.photos/seed/${Math.random()}/400/300`]);
+    if (e.dataTransfer.files) {
+      const newFiles = Array.from(e.dataTransfer.files) as File[];
+      setImages([...images, ...newFiles]);
+      setPreviews([...previews, ...newFiles.map(f => URL.createObjectURL(f))]);
+    }
+  };
+
+  const removeImage = (idx: number) => {
+    setImages(images.filter((_, i) => i !== idx));
+    setPreviews(previews.filter((_, i) => i !== idx));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
     try {
-      await api.post('/ads', {
-        title, price, description, category, location, type: 'For Sale'
+      // 1. İlanı yarat
+      const res = await api.post('/ads', {
+        title, price, description, category, location, listingType: 'For Sale'
       });
-      alert("İlanın yayına alındı! (Şu an bekliyor durumuna düştü)");
+      
+      const adId = res.data._id;
+
+      // 2. Fotoğraflar varsa FormData ile gönder
+      if (images.length > 0) {
+        const formData = new FormData();
+        images.forEach(img => formData.append('photos', img));
+        
+        await api.post(`/ads/${adId}/photos`, formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+      }
+
+      alert("İlan ve fotoğraflar yayına alındı! (Şu an onay bekliyor)");
       window.location.href = '/';
     } catch (err) {
+      console.error(err);
       alert("İlan yüklenirken hata oluştu!");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -81,17 +118,18 @@ export default function PostAd() {
             <h2 className="text-lg font-bold text-black border-b border-gray-100 pb-2">Görseller</h2>
             <div className="space-y-4">
               <label className="block text-sm font-medium text-gray-700">Fotoğraflar</label>
-              <div onDragOver={e => e.preventDefault()} onDrop={handleDrop} onClick={() => setImages([...images, `https://picsum.photos/seed/${Math.random()}/400/300`])} className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:bg-gray-50 hover:border-[#D4AF37] transition-colors cursor-pointer">
+              <label onDragOver={e => e.preventDefault()} onDrop={handleDrop} className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:bg-gray-50 hover:border-[#D4AF37] transition-colors cursor-pointer block">
+                <input type="file" multiple accept="image/*" onChange={handleFileChange} className="hidden" />
                 <UploadCloud className="w-10 h-10 text-gray-400 mx-auto mb-3" />
                 <p className="text-sm font-medium text-gray-700">Yüklemek için tıklayın veya sürükleyin</p>
-              </div>
+              </label>
 
-              {images.length > 0 && (
+              {previews.length > 0 && (
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-4">
-                  {images.map((img, idx) => (
+                  {previews.map((img, idx) => (
                     <div key={idx} className="relative aspect-square rounded-lg overflow-hidden border border-gray-200 group">
                       <img src={img} alt="preview" className="w-full h-full object-cover" />
-                      <button type="button" onClick={e => { e.stopPropagation(); setImages(images.filter((_, i) => i !== idx)); }} className="absolute top-2 right-2 p-1 bg-white/90 rounded-full text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button type="button" onClick={(e) => { e.preventDefault(); removeImage(idx); }} className="absolute top-2 right-2 p-1 bg-white/90 rounded-full text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">
                         <X className="w-4 h-4" />
                       </button>
                     </div>
@@ -102,7 +140,9 @@ export default function PostAd() {
           </div>
 
           <div className="pt-6 border-t border-gray-100 flex justify-end gap-3">
-            <button type="submit" className="bg-[#D4AF37] hover:bg-[#c19b2e] text-black font-bold py-3 px-8 rounded-lg transition-colors shadow-md">İlanı Yayınla</button>
+            <button type="submit" disabled={loading} className="bg-[#D4AF37] hover:bg-[#c19b2e] text-black font-bold py-3 px-8 rounded-lg transition-colors shadow-md disabled:opacity-50">
+              {loading ? 'Yükleniyor...' : 'İlanı Yayınla'}
+            </button>
           </div>
         </form>
       </div>
