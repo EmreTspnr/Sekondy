@@ -11,24 +11,29 @@ export default function Messages() {
         const response = await api.get('/messages');
         setMessages(response.data);
       } catch (error) {
-      
-        setMessages([
-          { id: 1, sender: '(Mock Data) Alice Demir', listing: 'iPhone 14 Pro Max 256GB', preview: 'Merhaba, en son ne olur?', date: '10:30 AM', unread: true },
-          { id: 2, sender: '(Mock Data) Cem Kaya', listing: '2019 BMW 320i', preview: 'Takas düşünüyor musunuz?', date: 'Dün', unread: false },
-          { id: 3, sender: '(Mock Data) Merve Arslan', listing: 'Sony Kamera', preview: 'Ürün satıldı mı?', date: '3 Gün Önce', unread: false }
-        ]);
+        console.error('Mesajlar alınırken hata oluştu', error);
       }
     };
     fetchMessages();
   }, []);
 
-  const handleDeleteMessage = async (msgId: number) => {
+  const handleDeleteMessage = async (msgId: string) => {
+    if(!window.confirm("Bu mesajı silmek istediğinize emin misiniz?")) return;
     try {
       await api.delete(`/messages/${msgId}`);
-      setMessages(messages.filter(m => m.id !== msgId));
+      setMessages(messages.filter(m => m._id !== msgId));
     } catch (error) {
-      setMessages(messages.filter(m => m.id !== msgId));
-      alert('Mesaj Silindi');
+      alert('Mesaj Silinemedi');
+    }
+  };
+
+  const handleMarkAsRead = async (msgId: string, isRead: boolean) => {
+    if(isRead) return;
+    try {
+      await api.put(`/messages/${msgId}/read`);
+      setMessages(messages.map(m => m._id === msgId ? { ...m, isRead: true } : m));
+    } catch (error) {
+      console.error(error);
     }
   };
 
@@ -59,33 +64,42 @@ export default function Messages() {
           </div>
         ) : (
           <div className="divide-y divide-gray-100">
-            {messages.map(msg => (
-              <div key={msg.id} className={`flex items-start gap-4 p-5 hover:bg-gray-50 transition-colors cursor-pointer ${msg.unread ? 'bg-blue-50/30' : ''}`}>
+            {messages.map(msg => {
+              const senderName = msg.sender ? `${msg.sender.firstName} ${msg.sender.lastName}` : 'Bilinmeyen Kullanıcı';
+              const listingTitle = msg.listing?.title || 'Bilinmeyen İlan';
+              const date = new Date(msg.createdAt).toLocaleDateString('tr-TR');
+
+              return (
+              <div 
+                key={msg._id} 
+                onClick={() => handleMarkAsRead(msg._id, msg.isRead)}
+                className={`flex items-start gap-4 p-5 hover:bg-gray-50 transition-colors cursor-pointer ${!msg.isRead ? 'bg-blue-50/30' : ''}`}
+              >
                 <div className="w-12 h-12 rounded-full bg-gray-200 flex-shrink-0 border border-gray-300 overflow-hidden flex items-center justify-center font-bold text-gray-500">
-                  {msg.sender.charAt(0)}
+                  {senderName.charAt(0)}
                 </div>
                 
                 <div className="flex-1 min-w-0">
                   <div className="flex justify-between items-baseline mb-1">
-                    <h3 className={`font-bold ${msg.unread ? 'text-black' : 'text-gray-800'}`}>{msg.sender}</h3>
-                    <span className="text-xs text-gray-500 font-medium">{msg.date}</span>
+                    <h3 className={`font-bold ${!msg.isRead ? 'text-black' : 'text-gray-800'}`}>{senderName}</h3>
+                    <span className="text-xs text-gray-500 font-medium">{date}</span>
                   </div>
-                  <h4 className="text-xs font-bold text-gray-500 mb-1">{msg.listing}</h4>
-                  <p className={`text-sm truncate ${msg.unread ? 'text-gray-900 font-semibold' : 'text-gray-600'}`}>
-                    {msg.preview}
+                  <h4 className="text-xs font-bold text-gray-500 mb-1">{listingTitle}</h4>
+                  <p className={`text-sm truncate ${!msg.isRead ? 'text-gray-900 font-semibold' : 'text-gray-600'}`}>
+                    {msg.content}
                   </p>
                 </div>
 
                 <div className="flex items-center">
                   <button 
-                    onClick={(e) => { e.stopPropagation(); handleDeleteMessage(msg.id); }}
+                    onClick={(e) => { e.stopPropagation(); handleDeleteMessage(msg._id); }}
                     className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
                   >
                     <Trash2 className="w-5 h-5" />
                   </button>
                 </div>
               </div>
-            ))}
+            )})}
           </div>
         )}
       </div>
