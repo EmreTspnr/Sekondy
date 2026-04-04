@@ -1,46 +1,64 @@
-# Ali Tutar'ın REST API Metotları
+# Emre Taspınar'ın REST API Metotları
 
 **API Test Videosu:** [Link buraya eklenecek](https://example.com)
 
-## 1. Üye Olma
-- **Endpoint:** `POST /auth/register`
+## 1. İlan Ekleme
+- **Endpoint:** `POST /listings`
 - **Request Body:** 
   ```json
   {
-    "email": "kullanici@example.com",
-    "password": "Guvenli123!",
-    "firstName": "Ahmet",
-    "lastName": "Yılmaz"
+    "title": "Sahibinden Temiz iPhone 13",
+    "price": 25000,
+    "category": "Elektronik",
+    "listingType": "Satılık",
+    "condition": "İkinci El",
+    "summary": "Sorunsuz, az kullanılmış iPhone 13.",
+    "description": "Cihazın hiçbir sorunu yoktur, ilk günkü gibi temizdir. Garantisi devam etmektedir.",
+    "location": "İstanbul, Kadıköy"
   }
   ```
-- **Response:** `201 Created` - Kullanıcı başarıyla oluşturuldu
-
-## 2. Kullanıcı Bilgilerini Görüntüleme
-- **Endpoint:** `GET /users/{userId}`
-- **Path Parameters:** 
-  - `userId` (string, required) - Kullanıcı ID'si
 - **Authentication:** Bearer Token gerekli
-- **Response:** `200 OK` - Kullanıcı bilgileri başarıyla getirildi
+- **Response:** `201 Created` - İlan başarıyla oluşturuldu
 
-## 3. Kullanıcı Bilgilerini Güncelleme
-- **Endpoint:** `PUT /users/{userId}`
+## 2. İlana Fotoğraf Yükleme
+- **Endpoint:** `POST /listings/{id}/photos`
 - **Path Parameters:** 
-  - `userId` (string, required) - Kullanıcı ID'si
+  - `id` (string, required) - İlan ID'si
+- **Request Body:** `multipart/form-data`
+  - `photos`: Resim dosyalarınız (Maksimum 5 dosya, desteklenen formatlar: jpg, jpeg, png, webp)
+- **Authentication:** Bearer Token gerekli
+- **Response:** `200 OK` - Fotoğraflar eklendi
+
+## 3. İlan Bilgilerini Güncelleme
+- **Endpoint:** `PUT /listings/{id}`
+- **Path Parameters:** 
+  - `id` (string, required) - İlan ID'si
 - **Request Body:** 
   ```json
   {
-    "firstName": "Ahmet",
-    "lastName": "Yılmaz",
-    "email": "yeniemail@example.com",
-    "phone": "+905551234567"
+    "price": 24000,
+    "condition": "İkinci El",
+    "summary": "Fiyat düştü, acil satılık!"
   }
   ```
 - **Authentication:** Bearer Token gerekli
-- **Response:** `200 OK` - Kullanıcı başarıyla güncellendi
+- **Response:** `200 OK` - İlan başarıyla güncellendi
 
-## 4. Kullanıcı Silme
-- **Endpoint:** `DELETE /users/{userId}`
+## 4. İlan Detaylarını Görüntüleme
+- **Endpoint:** `GET /listings/{id}`
 - **Path Parameters:** 
-  - `userId` (string, required) - Kullanıcı ID'si
-- **Authentication:** Bearer Token gerekli (Yönetici yetkisi veya kendi hesabını silme yetkisi)
-- **Response:** `204 No Content` - Kullanıcı başarıyla silindi
+  - `id` (string, required) - İlan ID'si
+- **Authentication:** Gerekli değil (Herkes görebilir)
+- **Response:** `200 OK` - İlan bilgileri başarıyla getirildi
+
+## 5. İlanı Silme
+- **Endpoint:** `DELETE /listings/{id}`
+- **Path Parameters:** 
+  - `id` (string, required) - İlan ID'si
+- **Authentication:** Bearer Token gerekli (Sadece ilan sahibi veya yönetici silebilir)
+- **Response:** `200 OK` - İlan başarıyla sistemden kaldırıldı
+
+## 6. Kendi İlanlarını Listeleme
+- **Endpoint:** `GET /my-listings`
+- **Authentication:** Bearer Token gerekli
+- **Response:** `200 OK` - İlanlar başarıyla getirildi, kullanıcının ilan listesi dizi formatında döndürülür
