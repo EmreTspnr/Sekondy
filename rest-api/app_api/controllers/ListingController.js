@@ -29,13 +29,16 @@ const buildSummary = (summary, description) => {
   return '';
 };
 
-const ensureListingOwner = (listing, userId, res) => {
+const ensureListingOwner = (listing, reqUser, res) => {
   if (!listing) {
     res.status(404).json({ mesaj: 'Ilan bulunamadi.' });
     return false;
   }
 
-  if (String(listing.owner) !== String(userId)) {
+  const ownerStr = String(listing.owner?._id || listing.owner);
+  const userStr = String(reqUser.userId);
+
+  if (ownerStr !== userStr && !reqUser.isAdmin) {
     res.status(403).json({ mesaj: 'Bu ilan uzerinde islem yapma yetkiniz yok.' });
     return false;
   }
@@ -48,7 +51,12 @@ const pickEditableFields = (payload) => {
 
   for (const field of EDITABLE_FIELDS) {
     if (payload[field] !== undefined) {
-      updateData[field] = payload[field];
+      if (field === 'price') {
+        const val = parseFloat(String(payload[field]).replace(',', '.'));
+        if (!isNaN(val)) updateData[field] = val;
+      } else {
+        updateData[field] = payload[field];
+      }
     }
   }
 
@@ -149,7 +157,7 @@ const uploadPhotos = async (req, res) => {
     const { id } = req.params;
     const listing = await Listing.findById(id);
 
-    if (!ensureListingOwner(listing, req.user.userId, res)) {
+    if (!ensureListingOwner(listing, req.user, res)) {
       return;
     }
 
@@ -188,7 +196,7 @@ const updateListing = async (req, res) => {
     const { id } = req.params;
     const listing = await Listing.findById(id);
 
-    if (!ensureListingOwner(listing, req.user.userId, res)) {
+    if (!ensureListingOwner(listing, req.user, res)) {
       return;
     }
 
@@ -235,7 +243,7 @@ const deleteListing = async (req, res) => {
     const { id } = req.params;
     const listing = await Listing.findById(id);
 
-    if (!ensureListingOwner(listing, req.user.userId, res)) {
+    if (!ensureListingOwner(listing, req.user, res)) {
       return;
     }
 
