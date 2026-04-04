@@ -1,46 +1,60 @@
-# Ali Tutar'ın REST API Metotları
+# Furkan Sarıbaş'ın REST API Metotları
 
 **API Test Videosu:** [Link buraya eklenecek](https://example.com)
 
-## 1. Üye Olma
+## 1. Kullanıcı Kayıt Olma
 - **Endpoint:** `POST /auth/register`
 - **Request Body:** 
   ```json
   {
-    "email": "kullanici@example.com",
-    "password": "Guvenli123!",
-    "firstName": "Ahmet",
-    "lastName": "Yılmaz"
+    "firstName": "Furkan",
+    "lastName": "Sarıbaş",
+    "email": "furkan@example.com",
+    "password": "GuvenliSifre123",
+    "phone": "05551234567",
+    "address": "İstanbul, Türkiye"
   }
   ```
+- **Authentication:** Gerekli değil
 - **Response:** `201 Created` - Kullanıcı başarıyla oluşturuldu
 
-## 2. Kullanıcı Bilgilerini Görüntüleme
-- **Endpoint:** `GET /users/{userId}`
-- **Path Parameters:** 
-  - `userId` (string, required) - Kullanıcı ID'si
-- **Authentication:** Bearer Token gerekli
-- **Response:** `200 OK` - Kullanıcı bilgileri başarıyla getirildi
-
-## 3. Kullanıcı Bilgilerini Güncelleme
-- **Endpoint:** `PUT /users/{userId}`
-- **Path Parameters:** 
-  - `userId` (string, required) - Kullanıcı ID'si
+## 2. Sisteme Giriş Yapma
+- **Endpoint:** `POST /auth/login`
 - **Request Body:** 
   ```json
   {
-    "firstName": "Ahmet",
-    "lastName": "Yılmaz",
-    "email": "yeniemail@example.com",
-    "phone": "+905551234567"
+    "email": "furkan@example.com",
+    "password": "GuvenliSifre123"
+  }
+  ```
+- **Authentication:** Gerekli değil
+- **Response:** `200 OK` - Başarıyla giriş yapıldı, JWT Token döndürülür
+
+## 3. Profil Bilgilerini Güncelleme
+- **Endpoint:** `PUT /profile`
+- **Request Body:** 
+  ```json
+  {
+    "firstName": "Furkan",
+    "lastName": "Sarıbaş",
+    "phone": "05559876543",
+    "address": "Ankara, Türkiye"
   }
   ```
 - **Authentication:** Bearer Token gerekli
-- **Response:** `200 OK` - Kullanıcı başarıyla güncellendi
+- **Response:** `200 OK` - Profil başarıyla güncellendi
 
-## 4. Kullanıcı Silme
-- **Endpoint:** `DELETE /users/{userId}`
-- **Path Parameters:** 
-  - `userId` (string, required) - Kullanıcı ID'si
-- **Authentication:** Bearer Token gerekli (Yönetici yetkisi veya kendi hesabını silme yetkisi)
-- **Response:** `204 No Content` - Kullanıcı başarıyla silindi
+## 4. Kullanıcı Profilini Görüntüleme
+- **Endpoint:** `GET /profile`
+- **Authentication:** Bearer Token gerekli
+- **Response:** `200 OK` - Kullanıcının güncel profil bilgileri döndürülür
+
+## 5. Kullanıcı Hesabını Silme
+- **Endpoint:** `DELETE /profile`
+- **Authentication:** Bearer Token gerekli
+- **Response:** `200 OK` - Hesap sistemden başarıyla silindi
+
+## 6. Giriş Geçmişini Listeleme
+- **Endpoint:** `GET /auth/history`
+- **Authentication:** Bearer Token gerekli
+- **Response:** `200 OK` - Kullanıcının son giriş yaptığı cihazlar ve IP logları döndürülür
