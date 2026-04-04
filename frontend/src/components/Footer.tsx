@@ -4,14 +4,14 @@ export default function Footer() {
   return (
     <footer className="bg-[#0a0a0a] text-gray-400 py-12 px-4 font-sans mt-auto border-t-[6px] border-[#D4AF37]">
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 lg:gap-16">
-        
+
         {/* Sol Sütun - Hakkında */}
         <div className="space-y-4">
-          <img src="/logo.png" alt="Sekondy Logo" className="h-8 md:h-10 object-contain mb-2 brightness-0 invert opacity-90" />
+          <img src="/logo.png" alt="Sekondy Logo" className="h-8 md:h-10 object-contain mb-2 opacity-90" />
           <p className="text-sm leading-relaxed text-gray-400 text-balance">
-            Sekondy, 2026 yılında kurulmuş yeni nesil bir ikinci el platformudur. 
-            Güvenli, hızlı ve şeffaf bir e-ticaret deneyimi sunarak alıcı ve satıcıları 
-            en modern altyapı ile bir araya getirmeyi hedefler. Öğrenci veya profesyonel, 
+            Sekondy, 2026 yılında kurulmuş yeni nesil bir ikinci el platformudur.
+            Güvenli, hızlı ve şeffaf bir e-ticaret deneyimi sunarak alıcı ve satıcıları
+            en modern altyapı ile bir araya getirmeyi hedefler. Öğrenci veya profesyonel,
             aradığın her şey burada.
           </p>
         </div>
