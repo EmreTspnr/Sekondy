@@ -1,4 +1,4 @@
-# Sinan Ecer'in REST API Metotları
+# Sinan Ece'in REST API Metotları
 
 **API Test Videosu:** [Link buraya eklenecek](https://example.com)
 
