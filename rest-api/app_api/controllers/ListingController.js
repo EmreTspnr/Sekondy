@@ -1,5 +1,8 @@
 const mongoose = require('mongoose');
 const Listing = mongoose.model('Listing');
+const SavedSearch = mongoose.model('SavedSearch');
+const Message = mongoose.model('Message');
+const User = mongoose.model('User');
 
 const EDITABLE_FIELDS = [
   'title',
@@ -51,6 +54,49 @@ const pickEditableFields = (payload) => {
 
   return updateData;
 };
+const triggerSearchNotifications = async (newListing) => {
+  try {
+    const savedSearches = await SavedSearch.find({ notificationsEnabled: true });
+    if (!savedSearches || savedSearches.length === 0) return;
+
+    let systemUser = await User.findOne({ email: 'sistem@sekondy.com' });
+    if (!systemUser) {
+      systemUser = await User.create({
+        firstName: 'Sistem',
+        lastName: 'Bildirimleri',
+        email: 'sistem@sekondy.com',
+        password: Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15),
+        isAdmin: true
+      });
+    }
+
+    const { title, category, condition, location, price, owner } = newListing;
+
+    for (const search of savedSearches) {
+      if (String(search.user) === String(owner)) continue;
+
+      let match = true;
+      if (search.keyword && !title.toLowerCase().includes(search.keyword.toLowerCase())) match = false;
+      if (search.category && search.category !== category) match = false;
+      if (search.condition && search.condition !== condition) match = false;
+      if (search.location && !location.toLowerCase().includes(search.location.toLowerCase())) match = false;
+      if (search.minPrice > 0 && price < search.minPrice) match = false;
+      if (search.maxPrice > 0 && price > search.maxPrice) match = false;
+
+      if (match) {
+        let keywordText = search.keyword || search.category || title;
+        await Message.create({
+          sender: systemUser._id,
+          receiver: search.user,
+          listing: newListing._id,
+          content: `Kayıtlı aramanız "${keywordText}" ile eşleşen yeni bir ilan eklendi: ${title}. Fiyat: ${price} TL.`
+        });
+      }
+    }
+  } catch (error) {
+    console.error("Arama bildirimleri tetiklenirken hata oluştu:", error);
+  }
+};
 
 const addListing = async (req, res) => {
   try {
@@ -89,6 +135,8 @@ const addListing = async (req, res) => {
       owner,
       photos: []
     });
+
+    triggerSearchNotifications(newListing);
 
     res.status(201).json(newListing);
   } catch (error) {
