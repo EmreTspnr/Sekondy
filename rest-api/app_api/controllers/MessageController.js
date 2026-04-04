@@ -46,7 +46,8 @@ const getMessages = async (req, res) => {
   try {
     const userId = req.user.userId;
     const messages = await Message.find({
-      $or: [{ receiver: userId }, { sender: userId }]
+      $or: [{ receiver: userId }, { sender: userId }],
+      deletedBy: { $ne: userId }
     })
       .populate('sender', 'firstName lastName')
       .populate('receiver', 'firstName lastName')
@@ -85,13 +86,19 @@ const deleteMessage = async (req, res) => {
     const userId = req.user.userId;
     const { messageId } = req.params;
 
-    const deletedMessage = await Message.findOneAndDelete({
-      _id: messageId,
-      receiver: userId
-    });
+    const message = await Message.findById(messageId);
 
-    if (!deletedMessage) {
+    if (!message) {
       return res.status(404).json({ mesaj: 'Silinecek mesaj bulunamadi.' });
+    }
+
+    if (message.sender.toString() !== userId && message.receiver.toString() !== userId) {
+      return res.status(403).json({ mesaj: 'Bu mesaji silme yetkiniz yok.' });
+    }
+
+    if (!message.deletedBy.includes(userId)) {
+      message.deletedBy.push(userId);
+      await message.save();
     }
 
     res.status(200).json({ mesaj: 'Mesaj basariyla silindi.' });
