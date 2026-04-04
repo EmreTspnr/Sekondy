@@ -1,46 +1,58 @@
-# Ali Tutar'ın REST API Metotları
+# Ramize Elif Ermiş'in REST API Metotları
 
 **API Test Videosu:** [Link buraya eklenecek](https://example.com)
 
-## 1. Üye Olma
-- **Endpoint:** `POST /auth/register`
+## 1. Satıcıya Mesaj Gönderme
+- **Endpoint:** `POST /messages`
 - **Request Body:** 
   ```json
   {
-    "email": "kullanici@example.com",
-    "password": "Guvenli123!",
-    "firstName": "Ahmet",
-    "lastName": "Yılmaz"
+    "receiverId": "65bfa2c10f3c5f401234abcd",
+    "listingId": "65bfa3d50f3c5f405678efgh",
+    "content": "Merhaba, ürün hala satılık mı?"
   }
   ```
-- **Response:** `201 Created` - Kullanıcı başarıyla oluşturuldu
-
-## 2. Kullanıcı Bilgilerini Görüntüleme
-- **Endpoint:** `GET /users/{userId}`
-- **Path Parameters:** 
-  - `userId` (string, required) - Kullanıcı ID'si
 - **Authentication:** Bearer Token gerekli
-- **Response:** `200 OK` - Kullanıcı bilgileri başarıyla getirildi
+- **Response:** `201 Created` - Mesaj başarıyla gönderildi
 
-## 3. Kullanıcı Bilgilerini Güncelleme
-- **Endpoint:** `PUT /users/{userId}`
-- **Path Parameters:** 
-  - `userId` (string, required) - Kullanıcı ID'si
+## 2. İlanı Favorilere Ekleme
+- **Endpoint:** `POST /favorites`
 - **Request Body:** 
   ```json
   {
-    "firstName": "Ahmet",
-    "lastName": "Yılmaz",
-    "email": "yeniemail@example.com",
-    "phone": "+905551234567"
+    "listingId": "65bfa3d50f3c5f405678efgh"
   }
   ```
 - **Authentication:** Bearer Token gerekli
-- **Response:** `200 OK` - Kullanıcı başarıyla güncellendi
+- **Response:** `201 Created` - İlan favorilere eklendi
 
-## 4. Kullanıcı Silme
-- **Endpoint:** `DELETE /users/{userId}`
+## 3. Mesajı Okundu İşaretleme
+- **Endpoint:** `PUT /messages/{messageId}/read`
 - **Path Parameters:** 
-  - `userId` (string, required) - Kullanıcı ID'si
-- **Authentication:** Bearer Token gerekli (Yönetici yetkisi veya kendi hesabını silme yetkisi)
-- **Response:** `204 No Content` - Kullanıcı başarıyla silindi
+  - `messageId` (string, required) - Mesaj ID'si
+- **Authentication:** Bearer Token gerekli
+- **Response:** `200 OK` - Mesaj okundu olarak işaretlendi
+
+## 4. Mesaj Silme (Gelen veya Giden)
+- **Endpoint:** `DELETE /messages/{messageId}`
+- **Path Parameters:** 
+  - `messageId` (string, required) - Mesaj ID'si
+- **Authentication:** Bearer Token gerekli (Sadece mesajın alıcısı veya göndericisi silebilir)
+- **Response:** `200 OK` - Mesaj başarıyla silindi (Kullanıcı tarafı için gizlenir)
+
+## 5. Mesajları Listeleme
+- **Endpoint:** `GET /messages`
+- **Authentication:** Bearer Token gerekli
+- **Response:** `200 OK` - Kullanıcının gelen ve giden aktif mesajları (silinmemiş olanlar) döndürülür
+
+## 6. Favori İlanları Listeleme
+- **Endpoint:** `GET /favorites`
+- **Authentication:** Bearer Token gerekli
+- **Response:** `200 OK` - Kullanıcının favoriye aldığı ilanlar tarih sırasına göre döndürülür
+
+## 7. İlanı Favorilerden Çıkarma
+- **Endpoint:** `DELETE /favorites/{id}`
+- **Path Parameters:** 
+  - `id` (string, required) - Favori Kayıt ID'si (İlan ID değil, favori ilişkisinin ID'si)
+- **Authentication:** Bearer Token gerekli
+- **Response:** `200 OK` - İlan favorilerden başarıyla kaldırıldı
