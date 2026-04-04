@@ -22,7 +22,7 @@ export default function Header() {
               <Phone className="w-3.5 h-3.5 text-[#D4AF37]" /> +90 555 123 4567
             </div>
             <div className="flex items-center gap-1.5 hover:text-[#D4AF37] transition-colors cursor-pointer">
-              <Mail className="w-3.5 h-3.5 text-[#D4AF37]" /> info@sekondy.com
+              <Mail className="w-3.5 h-3.5 text-[#D4AF37]" /> ikinci.el.krallariii@gmail.com
             </div>
           </div>
           <div className="flex items-center gap-4">
