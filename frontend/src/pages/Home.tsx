@@ -41,7 +41,7 @@ export default function Home() {
     localStorage.setItem('searchHistory', JSON.stringify(updated));
   };
 
-  
+
   useEffect(() => {
     if (search.trim()) return; // Arama aktifken useEffect tetiklenmesin
     const fetchAds = async () => {
@@ -107,14 +107,14 @@ export default function Home() {
         <div className="relative z-10">
           <h1 className="text-3xl md:text-5xl font-black text-white mb-4">Aradığın her şey <span className="text-[#D4AF37]">Sekondy'de.</span></h1>
           <p className="text-gray-400 mb-8 max-w-xl mx-auto">İkinci el araba, telefon, bilgisayar ve daha fazlası binlerce ilan arasından seni bekliyor.</p>
-          
+
           <div className="max-w-3xl mx-auto relative" ref={searchRef}>
             <div className="bg-white rounded-full p-2 flex items-center shadow-xl">
               <div className="flex-1 flex items-center pl-4">
                 <Search className="w-5 h-5 text-gray-400" />
-                <input 
-                  type="text" 
-                  placeholder="Ne arıyorsunuz? (Örn: iphone, bmw)" 
+                <input
+                  type="text"
+                  placeholder="Ne arıyorsunuz? (Örn: iphone, bmw)"
                   value={search} onChange={e => setSearch(e.target.value)}
                   onKeyDown={handleSearchKeyDown}
                   onFocus={() => searchHistory.length > 0 && setShowHistory(true)}
@@ -147,13 +147,12 @@ export default function Home() {
       {/* Kategoriler */}
       <div className="flex overflow-x-auto gap-4 mb-10 pb-2 scrollbar-hide">
         {CATEGORIES.map(cat => (
-          <button 
+          <button
             key={cat} onClick={() => setCategory(cat)}
-            className={`px-6 py-2.5 rounded-full font-bold whitespace-nowrap transition-colors border-2 ${
-              category === cat 
-                ? 'bg-black text-white border-black' 
+            className={`px-6 py-2.5 rounded-full font-bold whitespace-nowrap transition-colors border-2 ${category === cat
+                ? 'bg-black text-white border-black'
                 : 'bg-white text-gray-700 border-gray-200 hover:border-black'
-            }`}
+              }`}
           >
             {cat}
           </button>
@@ -171,19 +170,16 @@ export default function Home() {
               <Bookmark className="w-4 h-4" /> Aramayı Kaydet
             </button>
           )}
-          <button className="flex items-center gap-2 text-sm font-bold text-gray-600 hover:text-black">
-            <SlidersHorizontal className="w-4 h-4" /> Filtrele
-          </button>
         </div>
       </div>
 
       {/* İlan Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {ads.map(ad => (
-          <div key={ad._id} onClick={() => window.location.href=`/ad/${ad._id}`} className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-2xl transition-shadow group cursor-pointer">
+          <div key={ad._id} onClick={() => window.location.href = `/ad/${ad._id}`} className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-2xl transition-shadow group cursor-pointer">
             <div className="relative aspect-[4/3] overflow-hidden bg-gray-100">
               <img src={ad.photos?.[0] || 'https://via.placeholder.com/400x300?text=Gorsel+Yok'} alt={ad.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-              <button 
+              <button
                 className="absolute top-3 right-3 p-2 bg-white/90 backdrop-blur-sm rounded-full hover:bg-white transition-colors shadow-sm z-10"
                 onClick={(e) => { e.stopPropagation(); toggleFavorite(ad._id); }}
               >
