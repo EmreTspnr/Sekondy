@@ -36,7 +36,7 @@ export default function Header() {
       {/* Main Navigation - White */}
       <div className="bg-white px-4 py-4 md:py-5">
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
-          
+
           {/* Logo */}
           <Link to="/" className="flex items-center">
             <img src="/logo.png" alt="Sekondy Logo" className="h-8 md:h-10 object-contain" />
@@ -53,7 +53,7 @@ export default function Header() {
                 <Link to="/profile" className={`${isActive('/profile') ? 'text-[#D4AF37]' : 'hover:text-[#D4AF37]'} transition-colors`}>PROFİL</Link>
               </>
             )}
-            <Link to="/admin" className={`${isActive('/admin') ? 'text-[#D4AF37]' : 'hover:text-[#D4AF37]'} transition-colors`}>YÖNETİM</Link>
+
             {!token ? (
               <Link to="/auth" className={`${isActive('/auth') ? 'text-[#D4AF37]' : 'hover:text-[#D4AF37]'} transition-colors`}>GİRİŞ YAP</Link>
             ) : (
@@ -66,24 +66,24 @@ export default function Header() {
             YENİ İLAN YÜKLE
           </Link>
         </div>
-        
+
         {/* Mobile Nav */}
         <nav className="md:hidden flex flex-wrap justify-center gap-4 mt-4 text-xs font-bold text-gray-800 border-t pt-3">
-            <Link to="/">VİTRİN</Link>
-            {token && (
-              <>
-                <Link to="/my-ads">İLANLARIM</Link>
-                <Link to="/favorites">FAVORİLER</Link>
-                <Link to="/messages">MESAJLAR</Link>
-                <Link to="/profile">PROFİL</Link>
-              </>
-            )}
-            <Link to="/admin">YÖNETİM</Link>
-            {!token ? (
-              <Link to="/auth">GİRİŞ</Link>
-            ) : (
-              <button onClick={handleLogout} className="text-red-500 font-bold">ÇIKIŞ</button>
-            )}
+          <Link to="/">VİTRİN</Link>
+          {token && (
+            <>
+              <Link to="/my-ads">İLANLARIM</Link>
+              <Link to="/favorites">FAVORİLER</Link>
+              <Link to="/messages">MESAJLAR</Link>
+              <Link to="/profile">PROFİL</Link>
+            </>
+          )}
+          <Link to="/admin">YÖNETİM</Link>
+          {!token ? (
+            <Link to="/auth">GİRİŞ</Link>
+          ) : (
+            <button onClick={handleLogout} className="text-red-500 font-bold">ÇIKIŞ</button>
+          )}
         </nav>
       </div>
     </header>
