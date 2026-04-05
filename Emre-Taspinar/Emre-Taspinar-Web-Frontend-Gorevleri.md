@@ -1,5 +1,7 @@
 # Emre Taşpınar'ın Web Frontend Görevleri
 
+**FrontEnd Test Videosu:** [Youtube Videosu](https://www.youtube.com/watch?v=49kT6bmNL1g)
+
 Bu dokümanda Emre Taşpınar'ın sorumluluğunda olan ilan oluşturma ve detay fonksiyonları detaylandırılmıştır. (Gereksinimler 7-12)
 
 ## 1. Yeni İlan Ekleme Modülü

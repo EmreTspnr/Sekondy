@@ -1,6 +1,6 @@
 # Emre Taspınar'ın REST API Metotları
 
-**API Test Videosu:** [Link buraya eklenecek](https://example.com)
+**API Test Videosu:** [Youtube Videosu](https://www.youtube.com/watch?v=2W1dxc_D2mE)
 
 ## 1. İlan Ekleme
 - **Endpoint:** `POST /listings`
