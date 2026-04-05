@@ -1,0 +1,405 @@
+{
+  "info": {
+    "_postman_id": "101b04c9-0de8-4ca4-bc76-d25bf65d3e11",
+    "name": "Ramize Elif Ermis - Postman Video Koleksiyonu",
+    "description": "Mesajlasma ve favori akisini video sirasina gore test eder. Alici ve satici kullanicilarini kendi icinde olusturur.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "if (!pm.collectionVariables.get('runId')) {",
+          "  pm.collectionVariables.set('runId', Date.now().toString());",
+          "}"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:9000/v1",
+      "type": "string"
+    },
+    {
+      "key": "runId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "sellerToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "sellerId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "buyerToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "buyerId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "listingId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "messageId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "00 API Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/",
+        "description": "Video basinda backend ayakta mi kontrol eder."
+      },
+      "response": []
+    },
+    {
+      "name": "01 Satici Kayit Ol",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/auth/register",
+        "description": "Mesaj ve favori senaryosunda ilan sahibi kullaniciyi olusturur.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"firstName\": \"Ramize\",\n  \"lastName\": \"Seller\",\n  \"email\": \"ramize_seller_{{runId}}@test.com\",\n  \"password\": \"123456\",\n  \"phone\": \"5554004000\",\n  \"address\": \"Istanbul\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "02 Satici Giris Yap",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/auth/login",
+        "description": "Satici token ve sellerId saklar.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"ramize_seller_{{runId}}@test.com\",\n  \"password\": \"123456\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const json = pm.response.json();",
+              "pm.collectionVariables.set('sellerToken', json.token);",
+              "pm.collectionVariables.set('sellerId', json.user.id);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 Alici Kayit Ol",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/auth/register",
+        "description": "Mesaj gonderecek ve favoriye ekleyecek kullaniciyi olusturur.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"firstName\": \"Ramize\",\n  \"lastName\": \"Buyer\",\n  \"email\": \"ramize_buyer_{{runId}}@test.com\",\n  \"password\": \"123456\",\n  \"phone\": \"5554004001\",\n  \"address\": \"Ankara\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "04 Alici Giris Yap",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/auth/login",
+        "description": "Alici token ve buyerId saklar.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"ramize_buyer_{{runId}}@test.com\",\n  \"password\": \"123456\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const json = pm.response.json();",
+              "pm.collectionVariables.set('buyerToken', json.token);",
+              "pm.collectionVariables.set('buyerId', json.user.id);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "05 Satici Ilan Olustur",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/ads",
+        "description": "Favori ve mesaj akisinda kullanilacak ilan hazirlanir.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Ramize Listing {{runId}}\",\n  \"price\": 420000,\n  \"category\": \"vasita\",\n  \"listingType\": \"For Sale\",\n  \"condition\": \"ikinci el\",\n  \"description\": \"Ramize video senaryosu icin ilan\",\n  \"location\": \"Istanbul\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{sellerToken}}",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const json = pm.response.json();",
+              "pm.collectionVariables.set('listingId', json._id);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "06 Ilani Favorilere Ekle",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/favorites",
+        "description": "Ramize gereksinimi 2: alici ilani favorilerine ekler.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"adId\": \"{{listingId}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{buyerToken}}",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "07 Favori Ilanlari Listele",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/favorites",
+        "description": "Ramize gereksinimi 6: favori ilan listesini getirir.",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{buyerToken}}",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "08 Saticiya Mesaj Gonder",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/messages",
+        "description": "Ramize gereksinimi 1: alici saticiya mesaj yollar.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"receiverId\": \"{{sellerId}}\",\n  \"adId\": \"{{listingId}}\",\n  \"content\": \"Merhaba, bu ilan hala satilik mi?\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{buyerToken}}",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "09 Mesajlari Listele (Satici)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/messages",
+        "description": "Ramize gereksinimi 5: satici mesaj kutusunu gorur. Son mesaj id bilgisi de saklanir.",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{sellerToken}}",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const json = pm.response.json();",
+              "if (Array.isArray(json) && json.length > 0) {",
+              "  pm.collectionVariables.set('messageId', json[json.length - 1]._id);",
+              "}"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "10 Mesaji Okundu Isaretle",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "url": "{{baseUrl}}/messages/{{messageId}}/read",
+        "description": "Ramize gereksinimi 3: alinan mesaj okunduya cekilir.",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{sellerToken}}",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "11 Gelen Mesaji Sil",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": "{{baseUrl}}/messages/{{messageId}}",
+        "description": "Ramize gereksinimi 4: receiver kendi kutusundan mesaji siler.",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{sellerToken}}",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
