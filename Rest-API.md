@@ -1,7 +1,7 @@
 # REST API Görev Dağılımı
 
 **Yerel Geliştirme (Local):** [http://localhost:9000/v1](http://localhost:9000/v1)  
-**Canlı Sunucu (Production):** [https://sekondy.com/v1](https://sekondy.com/v1)
+**Canlı Sunucu (Production):** [https://api.sekondy.com/v1](https://api.sekondy.com/v1)
 
 Bu dokümanda, proje ekibindeki her üyenin geliştirmekten sorumlu olduğu REST API metotları listelenmektedir.
 
