@@ -1,6 +1,7 @@
 # REST API Görev Dağılımı
 
-**REST API Adresi:** [api.yazmuh.com](https://api.yazmuh.com)
+**Yerel Geliştirme (Local):** [http://localhost:9000/v1](http://localhost:9000/v1)  
+**Canlı Sunucu (Production):** [https://sekondy.com/v1](https://sekondy.com/v1)
 
 Bu dokümanda, proje ekibindeki her üyenin geliştirmekten sorumlu olduğu REST API metotları listelenmektedir.
 
@@ -8,9 +9,8 @@ Bu dokümanda, proje ekibindeki her üyenin geliştirmekten sorumlu olduğu REST
 
 ## Grup Üyelerinin REST API Metotları
 
-1. [Emre Taşpınar'ın REST API Metotları](Emre-Taspinar/Emre-Taspinar-Mobil-Frontend-Gorevleri.md)
-2. [Grup Üyesi 2'nin REST API Metotları](Grup-Uyesi-2/Grup-Uyesi-2-Rest-API-Gorevleri.md)
-3. [Grup Üyesi 3'ün REST API Metotları](Grup-Uyesi-3/Grup-Uyesi-3-Rest-API-Gorevleri.md)
-4. [Grup Üyesi 4'ün REST API Metotları](Grup-Uyesi-4/Grup-Uyesi-4-Rest-API-Gorevleri.md)
-5. [Grup Üyesi 5'in REST API Metotları](Grup-Uyesi-5/Grup-Uyesi-5-Rest-API-Gorevleri.md)
-6. [Grup Üyesi 6'nın REST API Metotları](Grup-Uyesi-6/Grup-Uyesi-6-Rest-API-Gorevleri.md)
+1. [Furkan Sarıbaş'ın REST API Metotları (Kullanıcı ve Hesap Yönetimi)](Furkan-Saribas/Furkan-Saribas-Rest-API-Gorevleri.md)
+2. [Emre Taşpınar'ın REST API Metotları (İlan Oluşturma ve Yönetimi)](Emre-Taspinar/Emre-Taspinar-Rest-API-Gorevleri.md)
+3. [Ramize Elif Ermiş'in REST API Metotları (Etkileşim, Mesajlaşma ve Favoriler)](Ramize-Elif-Ermis/Ramize-Elif-Ermis-Rest-API-Gorevleri.md)
+4. [Sinan Ecer'in REST API Metotları (Arama, Filtreleme ve Takip)](Sinan-Ece/Sinan-Ecer-Rest-API-Gorevleri.md)
+5. [Veysel Emir Hartavi'nin REST API Metotları (Yönetim Paneli ve Sistem Denetimi)](Veysel-Emir-Hartavi/Veysel-Emir-Hartavi-Rest-API-Gorevleri.md)
