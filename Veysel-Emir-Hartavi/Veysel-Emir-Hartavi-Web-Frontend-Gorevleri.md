@@ -1,5 +1,7 @@
 # Veysel Emir Hartavi'nin Web Frontend Görevleri
 
+**Web Frontend Adresi:** [Video](https://youtu.be/PF_RD_GO2r0)
+
 Bu dokümanda Veysel Emir Hartavi'nin geliştireceği Admin Panel yapısı ve güvelik/şikayet sistemleri ele alınmaktadır. (Gereksinimler 25-30)
 
 ## 1. İlan Şikayet Etme
