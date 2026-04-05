@@ -1,6 +1,6 @@
 # Furkan Sarıbaş'ın REST API Metotları
 
-**API Test Videosu:** [Link buraya eklenecek](https://example.com)
+**API Test Videosu:** [https://youtu.be/XfQASzGdI34]
 
 ## 1. Kullanıcı Kayıt Olma
 - **Endpoint:** `POST /auth/register`

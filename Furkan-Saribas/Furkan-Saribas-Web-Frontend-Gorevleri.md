@@ -1,5 +1,5 @@
 # Furkan Sarıbaş'ın Web Frontend Görevleri
-
+**Web Front-end Demo Videosu:** [https://youtu.be/fWZNP3T2WjU]
 Bu dokümanda Furkan Sarıbaş'ın sorumluluğunda olan sistem yapılandırmaları ve bileşenler detaylandırılmıştır. (Gereksinimler 1-6)
 
 ## 1. Kullanıcı Kayıt Olma Ekranı
