@@ -1,5 +1,5 @@
 # Sinan Ece'nin Web Frontend Görevleri
-
+**Web Front-end Demo Videosu:** [https://youtu.be/ogyRzV6vKuU]
 Bu dokümanda Sinan Ece'nin odaklandığı listeleme, arama ve vitrin fonksiyonlarına ait UI/UX sorumlulukları listelenmiştir. (Gereksinimler 13-18)
 
 ## 1. Satıcıyı Takip Etme Sistemi

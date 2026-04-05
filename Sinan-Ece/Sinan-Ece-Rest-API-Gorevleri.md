@@ -1,6 +1,6 @@
 # Sinan Ece'in REST API Metotları
 
-**API Test Videosu:** [Link buraya eklenecek](https://example.com)
+**API Test Videosu:** [https://youtu.be/ItKxVjoKbeQ]
 
 ## 1. Satıcıyı Takip Etme
 - **Endpoint:** `POST /users/{userId}/follow`
