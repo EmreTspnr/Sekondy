@@ -1,5 +1,5 @@
 # Ramize Elif Ermiş'in Web Frontend Görevleri
-
+**WEB Front-end Demo Videosu:** [https://youtu.be/tauYLG6zWP4]
 Bu dokümanda Ramize Elif Ermiş'in sahip olduğu mesajlaşma akışı ve favori ilan yönetim ekranları sorumlulukları listelenmiştir. (Gereksinimler 19-24)
 
 ## 1. Satıcıya Mesaj Gönderme
