@@ -39,7 +39,7 @@ export default function Header() {
 
           {/* Logo */}
           <Link to="/" className="flex items-center">
-            <img src="/logo.png" alt="Sekondy Logo" className="h-8 md:h-10 object-contain" />
+            <img src="/logo1.png" alt="Sekondy Logo" className="h-8 md:h-10 object-contain" />
           </Link>
 
           {/* Nav Links */}

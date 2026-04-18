@@ -7,7 +7,7 @@ export default function Footer() {
 
         {/* Sol Sütun - Hakkında */}
         <div className="space-y-4">
-          <img src="/logo.png" alt="Sekondy Logo" className="h-8 md:h-10 object-contain mb-2 opacity-90" />
+          <img src="/logo2.png" alt="Sekondy Logo" className="h-8 md:h-10 object-contain mb-2 opacity-90" />
           <p className="text-sm leading-relaxed text-gray-400 text-balance">
             Sekondy, 2026 yılında kurulmuş yeni nesil bir ikinci el platformudur.
             Güvenli, hızlı ve şeffaf bir e-ticaret deneyimi sunarak alıcı ve satıcıları
