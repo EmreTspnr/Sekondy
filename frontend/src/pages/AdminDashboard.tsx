@@ -6,29 +6,62 @@ export default function AdminDashboard() {
     const [activeTab, setActiveTab] = useState<'pending' | 'reported'>('pending');
     const [pendingAds, setPendingAds] = useState<any[]>([]);
     const [reportedAds, setReportedAds] = useState<any[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [isAuthorized, setIsAuthorized] = useState(false);
 
     useEffect(() => {
-        const fetchPending = async () => {
+        const fetchData = async () => {
             try {
-                const response = await api.get('/admin/ads/pending');
-                setPendingAds(response.data);
-            } catch (error) {
-                console.error("Bekleyen ilanlar getirilemedi:", error);
-                setPendingAds([]);
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    setIsAuthorized(false);
+                    setIsLoading(false);
+                    return;
+                }
+
+                const [pendingRes, reportedRes] = await Promise.all([
+                    api.get('/admin/ads/pending'),
+                    api.get('/admin/reports')
+                ]);
+                setPendingAds(pendingRes.data);
+                setReportedAds(reportedRes.data);
+                setIsAuthorized(true);
+            } catch (error: any) {
+                if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+                    setIsAuthorized(false);
+                } else {
+                    console.error("Veriler getirilemedi:", error);
+                    setIsAuthorized(true); 
+                }
+            } finally {
+                setIsLoading(false);
             }
         };
-        const fetchReported = async () => {
-            try {
-                const response = await api.get('/admin/reports');
-                setReportedAds(response.data);
-            } catch (error) {
-                console.error("Şikayet edilen ilanlar getirilemedi:", error);
-                setReportedAds([]);
-            }
-        };
-        fetchPending();
-        fetchReported();
+        fetchData();
     }, []);
+
+    if (isLoading) {
+        return (
+            <main className="max-w-6xl mx-auto px-4 py-8 w-full mt-5 flex justify-center items-center h-64">
+                <div className="text-gray-500 font-bold">Yükleniyor...</div>
+            </main>
+        );
+    }
+
+    if (!isAuthorized) {
+        return (
+            <main className="max-w-6xl mx-auto px-4 py-8 w-full mt-5">
+                <div className="bg-red-50 border border-red-200 rounded-xl p-8 text-center flex flex-col items-center">
+                    <AlertTriangle className="w-16 h-16 text-red-500 mb-4" />
+                    <h1 className="text-2xl font-bold text-red-700 mb-2">Yetkisiz Erişim</h1>
+                    <p className="text-red-600 max-w-md">Bu sayfayı görüntülemek için yönetici yetkilerine sahip olmanız gerekmektedir.</p>
+                    <a href="/" className="mt-8 inline-block bg-red-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-red-700 transition-colors">
+                        Ana Sayfaya Dön
+                    </a>
+                </div>
+            </main>
+        );
+    }
 
     const handleApprove = async (id: string) => {
         try {

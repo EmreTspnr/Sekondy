@@ -31,13 +31,16 @@ const buildSummary = (summary, description) => {
   return '';
 };
 
-const ensureListingOwner = (listing, userId, res) => {
+const ensureListingOwner = (listing, reqUser, res) => {
   if (!listing) {
     res.status(404).json({ mesaj: 'Ilan bulunamadi.' });
     return false;
   }
 
-  if (String(listing.owner) !== String(userId)) {
+  const ownerStr = String(listing.owner?._id || listing.owner);
+  const userStr = String(reqUser.userId);
+
+  if (ownerStr !== userStr && !reqUser.isAdmin) {
     res.status(403).json({ mesaj: 'Bu ilan uzerinde islem yapma yetkiniz yok.' });
     return false;
   }
@@ -50,11 +53,59 @@ const pickEditableFields = (payload) => {
 
   for (const field of EDITABLE_FIELDS) {
     if (payload[field] !== undefined) {
-      updateData[field] = payload[field];
+      if (field === 'price') {
+        const val = parseFloat(String(payload[field]).replace(',', '.'));
+        if (!isNaN(val)) updateData[field] = val;
+      } else {
+        updateData[field] = payload[field];
+      }
     }
   }
 
   return updateData;
+};
+const triggerSearchNotifications = async (newListing) => {
+  try {
+    const savedSearches = await SavedSearch.find({ notificationsEnabled: true });
+    if (!savedSearches || savedSearches.length === 0) return;
+
+    let systemUser = await User.findOne({ email: 'sistem@sekondy.com' });
+    if (!systemUser) {
+      systemUser = await User.create({
+        firstName: 'Sistem',
+        lastName: 'Bildirimleri',
+        email: 'sistem@sekondy.com',
+        password: Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15),
+        isAdmin: true
+      });
+    }
+
+    const { title, category, condition, location, price, owner } = newListing;
+
+    for (const search of savedSearches) {
+      if (String(search.user) === String(owner)) continue;
+
+      let match = true;
+      if (search.keyword && !title.toLowerCase().includes(search.keyword.toLowerCase())) match = false;
+      if (search.category && search.category !== category) match = false;
+      if (search.condition && search.condition !== condition) match = false;
+      if (search.location && !location.toLowerCase().includes(search.location.toLowerCase())) match = false;
+      if (search.minPrice > 0 && price < search.minPrice) match = false;
+      if (search.maxPrice > 0 && price > search.maxPrice) match = false;
+
+      if (match) {
+        let keywordText = search.keyword || search.category || title;
+        await Message.create({
+          sender: systemUser._id,
+          receiver: search.user,
+          listing: newListing._id,
+          content: `Kayıtlı aramanız "${keywordText}" ile eşleşen yeni bir ilan eklendi: ${title}. Fiyat: ${price} TL.`
+        });
+      }
+    }
+  } catch (error) {
+    console.error("Arama bildirimleri tetiklenirken hata oluştu:", error);
+  }
 };
 
 const addListing = async (req, res) => {
@@ -115,7 +166,7 @@ const uploadPhotos = async (req, res) => {
     const { id } = req.params;
     const listing = await Listing.findById(id);
 
-    if (!ensureListingOwner(listing, req.user.userId, res)) {
+    if (!ensureListingOwner(listing, req.user, res)) {
       return;
     }
 
@@ -154,7 +205,7 @@ const updateListing = async (req, res) => {
     const { id } = req.params;
     const listing = await Listing.findById(id);
 
-    if (!ensureListingOwner(listing, req.user.userId, res)) {
+    if (!ensureListingOwner(listing, req.user, res)) {
       return;
     }
 
@@ -212,7 +263,7 @@ const deleteListing = async (req, res) => {
     const { id } = req.params;
     const listing = await Listing.findById(id);
 
-    if (!ensureListingOwner(listing, req.user.userId, res)) {
+    if (!ensureListingOwner(listing, req.user, res)) {
       return;
     }
 

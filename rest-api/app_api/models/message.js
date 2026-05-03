@@ -22,7 +22,11 @@ const messageSchema = new mongoose.Schema({
   isRead: {
     type: Boolean,
     default: false
-  }
+  },
+  deletedBy: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  }]
 }, { timestamps: true });
 
 mongoose.model('Message', messageSchema);

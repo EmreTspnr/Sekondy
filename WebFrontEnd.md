@@ -1,19 +1,18 @@
 # Web Frontend Görev Dağılımı
 
-**Web Frontend Adresi:** [frontend.yazmuh.com](https://frontend.yazmuh.com)
+**Web Frontend Adresi:** [sekondy.com](https://www.sekondy.com/)
 
-Bu dokümanda, web uygulamasının kullanıcı arayüzü (UI) ve kullanıcı deneyimi (UX) görevleri listelenmektedir. Her grup üyesi, kendisine atanan sayfaların tasarımı, implementasyonu ve kullanıcı etkileşimlerinden sorumludur.
+Bu dokümanda, web uygulamasının kullanıcı arayüzü (UI) ve kullanıcı deneyimi (UX) görevleri listelenmektedir. Görevler doğrudan ana [Gereksinim Analizi](Gereksinim-Analizi.md) dokümanında belirlenen maddelere göre bölüşülmüş ve her bir üyenin sorumlulukları kendi özel sayfasında frontend detaylarıyla analiz edilmiştir.
 
 ---
 
 ## Grup Üyelerinin Web Frontend Görevleri
 
 1. [Emre Taşpınar'ın Web Frontend Görevleri](Emre-Taspinar/Emre-Taspinar-Web-Frontend-Gorevleri.md)
-2. [Grup Üyesi 2'nin Web Frontend Görevleri](Grup-Uyesi-2/Grup-Uyesi-2-Frontend-Gorevleri.md)
-3. [Grup Üyesi 3'ün Web Frontend Görevleri](Grup-Uyesi-3/Grup-Uyesi-3-Frontend-Gorevleri.md)
-4. [Grup Üyesi 4'ün Web Frontend Görevleri](Grup-Uyesi-4/Grup-Uyesi-4-Frontend-Gorevleri.md)
-5. [Grup Üyesi 5'in Web Frontend Görevleri](Grup-Uyesi-5/Grup-Uyesi-5-Frontend-Gorevleri.md)
-6. [Grup Üyesi 6'nın Web Frontend Görevleri](Grup-Uyesi-6/Grup-Uyesi-6-Frontend-Gorevleri.md)
+2. [Veysel Emir Hartavi'nin Web Frontend Görevleri](Veysel-Emir-Hartavi/Veysel-Emir-Hartavi-Web-Frontend-Gorevleri.md)
+3. [Sinan Ece'nin Web Frontend Görevleri](Sinan-Ece/Sinan-Ece-Web-Frontend-Gorevleri.md)
+4. [Furkan Sarıbaş'ın Web Frontend Görevleri](Furkan-Saribas/Furkan-Saribas-Web-Frontend-Gorevleri.md)
+5. [Ramize Elif Ermiş'in Web Frontend Görevleri](Ramize-Elif-Ermis/Ramize-Elif-Ermis-Web-Frontend-Gorevleri.md)
 
 ---
 
@@ -30,12 +29,12 @@ Bu dokümanda, web uygulamasının kullanıcı arayüzü (UI) ve kullanıcı den
 - **Touch-Friendly:** Minimum 44x44px touch targets
 
 ### 2. Tasarım Sistemi
-- **CSS Framework:** Bootstrap, Tailwind CSS, Material-UI, veya custom
-- **Renk Paleti:** Tutarlı renk kullanımı (CSS variables)
-- **Tipografi:** Web-safe fonts veya web fonts (Google Fonts)
-- **Spacing:** Tutarlı padding ve margin değerleri (8px grid sistemi)
-- **Iconography:** Icon library (Font Awesome, Material Icons, Heroicons)
-- **Component Library:** Reusable UI components
+- **CSS Framework:** Tailwind CSS v4
+- **Renk Paleti:** Tutarlı renk kullanımı (Tailwind tema token'ları)
+- **Tipografi:** Modern font entegrasyonu (Google Fonts vb.)
+- **Spacing:** Tailwind utility spacing sistemi
+- **Iconography:** Lucide React
+- **Component Library:** Projeye özel oluşturulmuş React bileşenleri
 
 ### 3. Performans Optimizasyonu
 - **Code Splitting:** Route-based ve component-based splitting
@@ -69,35 +68,31 @@ Bu dokümanda, web uygulamasının kullanıcı arayüzü (UI) ve kullanıcı den
 - **Graceful Degradation:** Eski tarayıcılar için fallback
 
 ### 7. State Management
-- **Global State:** Redux, Zustand, Context API (React), Vuex/Pinia (Vue)
-- **Local State:** Component state, hooks
-- **Server State:** React Query, SWR, Apollo Client
-- **Form State:** React Hook Form, Formik, React Final Form
+- **Global State:** Context API (React)
+- **Local State:** Component state, React Hooks (`useState`, `useReducer`)
+- **Server State:** Axios istekleri ve `useEffect` kullanımı ile asenkron kontrol
+- **Form State:** React State kontrollü yapılar (Controlled Components)
 
 ### 8. Routing
-- **Client-Side Routing:** React Router, Vue Router, Angular Router
+- **Client-Side Routing:** React Router DOM v7
 - **Deep Linking:** URL-based navigation
-- **Protected Routes:** Authentication guards
-- **404 Handling:** Custom 404 page
-- **History Management:** Browser history API
+- **Protected Routes:** Authentication guards (Private Route yapısı)
+- **404 Handling:** Custom 404 sayfası
+- **History Management:** `useNavigate` ve `useLocation` hook'ları
 
 ### 9. API Entegrasyonu
-- **HTTP Client:** Axios, Fetch API, ky
-- **Request Interceptors:** Token injection, error handling
-- **Response Interceptors:** Error handling, token refresh
-- **Error Handling:** Centralized error handling
-- **Loading States:** Global loading indicator
+- **HTTP Client:** Axios
+- **Request Interceptors:** Authorization Token injection
+- **Response Interceptors:** Merkezi hata yakalama
+- **Error Handling:** Try-catch blokları ile Centralized error handling
+- **Loading States:** Global/Lokal spinner loading indicatorları
 
-### 10. Testing
-- **Unit Tests:** Jest, Vitest, Mocha
-- **Integration Tests:** React Testing Library, Vue Test Utils
-- **E2E Tests:** Cypress, Playwright, Selenium
-- **Visual Regression:** Percy, Chromatic
-- **Accessibility Tests:** axe-core, Lighthouse
+### 10. Etkileşim ve Animasyonlar
+- **Sayfa Geçişleri:** Framer Motion (`motion`) kullanımı
+- **UI Geri Bildirimi:** Tailwind ile hover, focus, active transition efektleri
 
 ### 11. Build ve Deployment
-- **Build Tool:** Webpack, Vite, Parcel, esbuild
-- **Module Bundler:** ES modules, CommonJS
-- **Environment Variables:** .env files
-- **CI/CD:** GitHub Actions, GitLab CI, Jenkins
-- **Hosting:** Vercel, Netlify, AWS, Azure
+- **Core:** React 19 (TypeScript)
+- **Build Tool:** Vite
+- **Environment Variables:** .env files ile URL bazlı konfigürasyon
+- **Cloud/Hosting Platformu:** Vercel (vercel.json entegrasyonu ile)

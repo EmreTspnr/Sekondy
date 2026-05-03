@@ -1,0 +1,230 @@
+{
+  "info": {
+    "_postman_id": "03c0bc4c-2dce-4aba-a5ef-80343b073e7d",
+    "name": "Furkan Saribas - Postman Video Koleksiyonu",
+    "description": "Kullanici ve hesap yonetimi akisini video sirasina gore test eder. Uygulamadaki gercek endpointler kullanilir: /profile ve /auth/history.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "if (!pm.collectionVariables.get('runId')) {",
+          "  pm.collectionVariables.set('runId', Date.now().toString());",
+          "}"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:9000/v1",
+      "type": "string"
+    },
+    {
+      "key": "runId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "userToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "userId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "00 API Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/",
+        "description": "Video basinda backend ayakta mi hizlica gosterir."
+      },
+      "response": []
+    },
+    {
+      "name": "01 Kullanici Kayit Ol",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/auth/register",
+        "description": "Furkan gereksinimi 1: yeni kullanici olusturur.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"firstName\": \"Furkan\",\n  \"lastName\": \"Video\",\n  \"email\": \"furkan_{{runId}}@test.com\",\n  \"password\": \"123456\",\n  \"phone\": \"5551001000\",\n  \"address\": \"Istanbul\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "02 Kullanici Giris Yap",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/auth/login",
+        "description": "Furkan gereksinimi 2: token ve userId saklanir.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"furkan_{{runId}}@test.com\",\n  \"password\": \"123456\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const json = pm.response.json();",
+              "pm.collectionVariables.set('userToken', json.token);",
+              "pm.collectionVariables.set('userId', json.user.id);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 Profili Goruntule",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/profile",
+        "description": "Furkan gereksinimi 4: mevcut profili getirir.",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{userToken}}",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "04 Profili Guncelle",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/profile",
+        "description": "Furkan gereksinimi 3: profil alanlarini gunceller.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"firstName\": \"Furkan Guncel\",\n  \"lastName\": \"Video\",\n  \"phone\": \"5551001001\",\n  \"address\": \"Ankara\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{userToken}}",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "05 Guncel Profili Tekrar Getir",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/profile",
+        "description": "Guncellemenin ekrana yansidigini gosterir.",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{userToken}}",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "06 Giris Gecmisini Listele",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/auth/history",
+        "description": "Furkan gereksinimi 6: login history kayitlarini gosterir.",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{userToken}}",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "07 Hesabi Sil",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": "{{baseUrl}}/profile",
+        "description": "Furkan gereksinimi 5: kendi hesabini siler.",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{userToken}}",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}

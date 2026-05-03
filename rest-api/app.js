@@ -11,7 +11,14 @@ const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cors());
+app.use(cors({
+  origin: [
+    'https://sekondy.com', 
+    'https://www.sekondy.com', 
+    'http://localhost:3000'
+  ],
+  credentials: true
+}));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/v1', apiRoutes);
 

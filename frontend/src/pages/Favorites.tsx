@@ -21,15 +21,17 @@ export default function Favorites() {
     fetchFavorites();
   }, []);
 
-  // Not: Backend'de /favorites/:id DELETE endpointi yoksa, Favori silme işlemini
-  // ileride bir endpoint ekleyerek revize etmeliyiz. Şu an UI olarak hazırlıyoruz.
   const handleRemoveFavorite = async (e: React.MouseEvent, favId: string) => {
     e.preventDefault();
     e.stopPropagation();
     if(window.confirm('Bu ilanı favorilerinizden çıkarmak istediğinize emin misiniz?')) {
-      alert("Favorilerden çıkarma endpoint'i bağlandığında buradan silinecektir!");
-      // mock UI delete
-      setFavorites(favorites.filter(f => f._id !== favId));
+      try {
+        await api.delete(`/favorites/${favId}`);
+        setFavorites(favorites.filter(f => f._id !== favId));
+      } catch (error) {
+        console.error("Favorilerden silinirken hata oluştu", error);
+        alert("İlan favorilerden çıkarılırken bir hata oluştu.");
+      }
     }
   };
 
