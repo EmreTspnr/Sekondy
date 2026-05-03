@@ -11,6 +11,7 @@ import Auth from './pages/Auth';
 import Profile from './pages/Profile';
 import AdDetail from './pages/AdDetail';
 import PostAd from './pages/PostAd';
+import EditAd from './pages/EditAd';
 import Messages from './pages/Messages';
 import AdminDashboard from './pages/AdminDashboard';
 import MyAds from './pages/MyAds';
@@ -29,6 +30,7 @@ function App() {
             <Route path="/profile" element={<Profile />} />
             <Route path="/ad/:adId" element={<AdDetail />} />
             <Route path="/post-ad" element={<PostAd />} />
+            <Route path="/edit-ad/:adId" element={<EditAd />} />
             <Route path="/messages" element={<Messages />} />
             <Route path="/my-ads" element={<MyAds />} />
             <Route path="/favorites" element={<Favorites />} />

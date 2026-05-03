@@ -1,46 +1,47 @@
-# Ali Tutar'ın REST API Metotları
+# Veysel Emir Hartavi'nin REST API Metotları
 
-**API Test Videosu:** [Link buraya eklenecek](https://example.com)
+**API Test Videosu:** [Video](https://youtu.be/1pRfl8u8cFE)
 
-## 1. Üye Olma
-- **Endpoint:** `POST /auth/register`
+## 1. İlan Şikayet Etme
+- **Endpoint:** `POST /listings/{listingId}/reports`
+- **Path Parameters:** 
+  - `listingId` (string, required) - Şikayet edilecek ilanın ID'si
 - **Request Body:** 
   ```json
   {
-    "email": "kullanici@example.com",
-    "password": "Guvenli123!",
-    "firstName": "Ahmet",
-    "lastName": "Yılmaz"
-  }
-  ```
-- **Response:** `201 Created` - Kullanıcı başarıyla oluşturuldu
-
-## 2. Kullanıcı Bilgilerini Görüntüleme
-- **Endpoint:** `GET /users/{userId}`
-- **Path Parameters:** 
-  - `userId` (string, required) - Kullanıcı ID'si
-- **Authentication:** Bearer Token gerekli
-- **Response:** `200 OK` - Kullanıcı bilgileri başarıyla getirildi
-
-## 3. Kullanıcı Bilgilerini Güncelleme
-- **Endpoint:** `PUT /users/{userId}`
-- **Path Parameters:** 
-  - `userId` (string, required) - Kullanıcı ID'si
-- **Request Body:** 
-  ```json
-  {
-    "firstName": "Ahmet",
-    "lastName": "Yılmaz",
-    "email": "yeniemail@example.com",
-    "phone": "+905551234567"
+    "reason": "Bu ilan sahte resimler ve bilgiler içermektedir."
   }
   ```
 - **Authentication:** Bearer Token gerekli
-- **Response:** `200 OK` - Kullanıcı başarıyla güncellendi
+- **Response:** `201 Created` - İlan başarıyla şikayet edildi
 
-## 4. Kullanıcı Silme
-- **Endpoint:** `DELETE /users/{userId}`
+## 2. İlan Durumunu Onaylama
+- **Endpoint:** `PUT /admin/listings/{listingId}/approve`
 - **Path Parameters:** 
-  - `userId` (string, required) - Kullanıcı ID'si
-- **Authentication:** Bearer Token gerekli (Yönetici yetkisi veya kendi hesabını silme yetkisi)
-- **Response:** `204 No Content` - Kullanıcı başarıyla silindi
+  - `listingId` (string, required) - Onaylanacak ilanın ID'si
+- **Authentication:** Bearer Token gerekli (Yalnızca Yönetici)
+- **Response:** `200 OK` - İlan başarıyla onaylandı (Yayına alındı durumu aktifleşir)
+
+## 3. Kullanıcı Hesabını Askıya Alma
+- **Endpoint:** `PUT /admin/users/{userId}/suspend`
+- **Path Parameters:** 
+  - `userId` (string, required) - Askıya alınacak kullanıcının ID'si
+- **Authentication:** Bearer Token gerekli (Yalnızca Yönetici)
+- **Response:** `200 OK` - Kullanıcı hesabı askıya alındı (Girişi engellendi)
+
+## 4. Uygunsuz İlanı Silme
+- **Endpoint:** `DELETE /admin/listings/{listingId}`
+- **Path Parameters:** 
+  - `listingId` (string, required) - Silinecek ilanın ID'si
+- **Authentication:** Bearer Token gerekli (Yalnızca Yönetici)
+- **Response:** `200 OK` - İlan sistemden tamamen silindi
+
+## 5. Onay Bekleyen İlanları Listeleme
+- **Endpoint:** `GET /admin/listings/pending`
+- **Authentication:** Bearer Token gerekli (Yalnızca Yönetici)
+- **Response:** `200 OK` - Sisteme yeni eklenen ve incelenmeyi (onay) bekleyen ilanlar doldurulur
+
+## 6. Şikayet Edilen İlanları Listeleme
+- **Endpoint:** `GET /admin/listings/reported`
+- **Authentication:** Bearer Token gerekli (Yalnızca Yönetici)
+- **Response:** `200 OK` - Kullanıcılar tarafından şikayet edilen tüm ilanlar şikayet nedenleri ile listelenir

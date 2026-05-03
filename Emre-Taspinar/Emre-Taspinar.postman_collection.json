@@ -1,0 +1,281 @@
+{
+  "info": {
+    "_postman_id": "73fa3225-8073-4eac-b059-b1b124b590d4",
+    "name": "Emre Taspinar - Postman Video Koleksiyonu",
+    "description": "Ilan olusturma ve yonetimi akisini video sirasi ile test eder. Foto yukleme istegi Cloudinary env degerleri ve Postman icinde manuel dosya secimi gerektirir.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "if (!pm.collectionVariables.get('runId')) {",
+          "  pm.collectionVariables.set('runId', Date.now().toString());",
+          "}"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:9000/v1",
+      "type": "string"
+    },
+    {
+      "key": "runId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "sellerToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "sellerId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "listingId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "00 API Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/",
+        "description": "Video basinda backend ayakta mi kontrol eder."
+      },
+      "response": []
+    },
+    {
+      "name": "01 Satici Kayit Ol",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/auth/register",
+        "description": "Emre akisi icin satici kullanici olusturur.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"firstName\": \"Emre\",\n  \"lastName\": \"Satici\",\n  \"email\": \"emre_seller_{{runId}}@test.com\",\n  \"password\": \"123456\",\n  \"phone\": \"5552002000\",\n  \"address\": \"Istanbul\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "02 Satici Giris Yap",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/auth/login",
+        "description": "Satici token bilgisini saklar.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"emre_seller_{{runId}}@test.com\",\n  \"password\": \"123456\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const json = pm.response.json();",
+              "pm.collectionVariables.set('sellerToken', json.token);",
+              "pm.collectionVariables.set('sellerId', json.user.id);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 Yeni Ilan Ekle",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/listings",
+        "description": "Emre gereksinimi 1: yeni ilan olusturur.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Emre Video Listing {{runId}}\",\n  \"price\": 750000,\n  \"category\": \"vasita\",\n  \"listingType\": \"For Sale\",\n  \"condition\": \"ikinci el\",\n  \"description\": \"Video icin olusturulan ornek ilan\",\n  \"location\": \"Istanbul\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{sellerToken}}",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const json = pm.response.json();",
+              "pm.collectionVariables.set('listingId', json._id);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 Kendi Ilanlarini Listele",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/my-listings",
+        "description": "Emre gereksinimi 6: implementasyondaki karsiligi /my-listings endpointidir.",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{sellerToken}}",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "05 Ilan Detayini Goruntule",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/listings/{{listingId}}",
+        "description": "Emre gereksinimi 4: yeni olusturulan ilanin detayini getirir."
+      },
+      "response": []
+    },
+    {
+      "name": "06 Ilani Guncelle",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/listings/{{listingId}}",
+        "description": "Emre gereksinimi 3: fiyat ve aciklamayi gunceller.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"price\": 799999,\n  \"title\": \"Emre Video Listing {{runId}} Guncel\",\n  \"description\": \"Video icin guncellenmis ilan aciklamasi\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{sellerToken}}",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "07 Ilana Fotograf Yukle",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": "{{baseUrl}}/listings/{{listingId}}/photos",
+        "description": "Emre gereksinimi 2: photos alaninda Postman icinden manuel bir dosya sec. Bu istek icin CLOUDINARY_* ortam degiskenleri dolu olmali.",
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "photos",
+              "type": "file",
+              "src": ""
+            }
+          ]
+        },
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{sellerToken}}",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "08 Ilani Sil",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": "{{baseUrl}}/listings/{{listingId}}",
+        "description": "Emre gereksinimi 5: olusturulan ilani siler.",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{sellerToken}}",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
