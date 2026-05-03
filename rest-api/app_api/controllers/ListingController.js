@@ -1,5 +1,10 @@
 const mongoose = require('mongoose');
 const Listing = mongoose.model('Listing');
+const SavedSearch = mongoose.model('SavedSearch');
+const Message = mongoose.model('Message');
+const User = mongoose.model('User');
+const redis = require('../services/redis');
+const rabbitmq = require('../services/rabbitmq');
 
 const EDITABLE_FIELDS = [
   'title',
@@ -90,6 +95,15 @@ const addListing = async (req, res) => {
       photos: []
     });
 
+    triggerSearchNotifications(newListing);
+
+    // RabbitMQ: Publish message to queue
+    rabbitmq.publishToQueue('YeniIlanOnayBekliyor', {
+      listingId: newListing._id,
+      title: newListing.title,
+      owner: newListing.owner,
+      timestamp: new Date()
+    });
     res.status(201).json(newListing);
   } catch (error) {
     res.status(500).json({ mesaj: 'Ilan eklenirken hata olustu.', hata: error.message });
@@ -166,11 +180,22 @@ const updateListing = async (req, res) => {
 const getListingById = async (req, res) => {
   try {
     const { id } = req.params;
+    
+    // Check Redis Cache first
+    const cachedListing = await redis.get(`ad:${id}`);
+    if (cachedListing) {
+      console.log('Serving from Redis Cache:', `ad:${id}`);
+      return res.status(200).json(JSON.parse(cachedListing));
+    }
+
     const listing = await Listing.findById(id).populate('owner', 'firstName lastName phone');
 
     if (!listing) {
       return res.status(404).json({ mesaj: 'Ilan bulunamadi.' });
     }
+
+    // Save to Redis Cache for 1 hour (3600 seconds)
+    await redis.set(`ad:${id}`, JSON.stringify(listing), 'EX', 3600);
 
     res.status(200).json(listing);
   } catch (error) {
