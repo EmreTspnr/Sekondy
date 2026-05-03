@@ -65,14 +65,16 @@ export default function HomeScreen() {
         </ThemedText>
       </ThemedView>
       <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
+        <ThemedText type="subtitle">Sekondy Test Ekranları</ThemedText>
         <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
+          Yeni eklediğimiz profesyonel mobil ekranları test etmek için aşağıdaki bağlantılara tıklayın:
         </ThemedText>
+        <Link href="/add-listing" style={styles.button}>
+          <ThemedText style={styles.buttonText}>İlan Ekleme Ekranına Git</ThemedText>
+        </Link>
+        <Link href="/listing/123" style={styles.button}>
+          <ThemedText style={styles.buttonText}>İlan Detay Ekranına Git</ThemedText>
+        </Link>
       </ThemedView>
     </ParallaxScrollView>
   );
@@ -95,4 +97,16 @@ const styles = StyleSheet.create({
     left: 0,
     position: 'absolute',
   },
+  button: {
+    backgroundColor: '#6366f1',
+    padding: 12,
+    borderRadius: 8,
+    marginTop: 8,
+    alignItems: 'center',
+    textAlign: 'center',
+  },
+  buttonText: {
+    color: '#ffffff',
+    fontWeight: 'bold',
+  }
 });
