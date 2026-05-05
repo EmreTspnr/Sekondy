@@ -1,6 +1,6 @@
 # Ramize Elif Ermiş'in REST API Metotları
 
-**API Test Videosu:** [Link buraya eklenecek](https://example.com)
+**API Test Videosu:** [https://youtu.be/-_OU0Bhpb50]
 
 ## 1. Satıcıya Mesaj Gönderme
 - **Endpoint:** `POST /messages`

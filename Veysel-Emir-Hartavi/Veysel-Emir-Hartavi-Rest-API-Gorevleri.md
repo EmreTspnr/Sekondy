@@ -1,6 +1,6 @@
 # Veysel Emir Hartavi'nin REST API Metotları
 
-**API Test Videosu:** [Link buraya eklenecek](https://example.com)
+**API Test Videosu:** [Video](https://youtu.be/1pRfl8u8cFE)
 
 ## 1. İlan Şikayet Etme
 - **Endpoint:** `POST /listings/{listingId}/reports`
