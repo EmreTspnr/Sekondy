@@ -75,6 +75,14 @@ export default function HomeScreen() {
         <Link href="/listing/123" style={styles.button}>
           <ThemedText style={styles.buttonText}>İlan Detay Ekranına Git</ThemedText>
         </Link>
+        
+        <ThemedText type="subtitle" style={{marginTop: 16}}>Furkan'ın Ekranları</ThemedText>
+        <Link href="/login" style={[styles.button, {backgroundColor: '#10b981'}]}>
+          <ThemedText style={styles.buttonText}>Login (Giriş) Ekranına Git</ThemedText>
+        </Link>
+        <Link href="/register" style={[styles.button, {backgroundColor: '#10b981'}]}>
+          <ThemedText style={styles.buttonText}>Register (Kayıt) Ekranına Git</ThemedText>
+        </Link>
       </ThemedView>
     </ParallaxScrollView>
   );
