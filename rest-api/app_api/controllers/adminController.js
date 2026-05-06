@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+const redis = require('../services/redis');
+const rabbitmq = require('../services/rabbitmq');
 
 const Listing = mongoose.model('Listing');
 const User = mongoose.model('User');
@@ -50,6 +52,19 @@ exports.approveListing = async (req, res) => {
       return res.status(404).json({ mesaj: 'Ilan bulunamadi.' });
     }
 
+    // RabbitMQ: İlan sahibine 'İlanınız Yayında' maili/bildirimi gitmesi için kuyruğa mesaj yolla
+    rabbitmq.publishToQueue('IlanOnaylandi', {
+      adId: listing._id,
+      adTitle: listing.title,
+      ownerId: listing.owner,
+      onaylayanAdmin: req.user.userId, // İşlemi yapan yönetici
+      timestamp: new Date()
+    });
+
+    // Admin bir ilan onayladığında, Redis'teki bekleyen ilanlar listesi eskimiş demektir.
+    // Önbelleği temizleyelim ki bir dahaki sefere güncel veriler çekilsin.
+    await redis.del('admin:pendingAds');
+
     res.status(200).json({ mesaj: 'Ilan basariyla onaylandi.', listing });
   } catch (error) {
     res.status(500).json({ mesaj: 'Ilan onaylanirken hata olustu.', hata: error.message });
@@ -92,7 +107,19 @@ exports.deleteListing = async (req, res) => {
 
 exports.getPendingListings = async (_req, res) => {
   try {
+    // 1. Önce Redis Cache'den kontrol et (Anahtar: admin:pendingAds)
+    const cachedPendingAds = await redis.get('admin:pendingAds');
+    if (cachedPendingAds) {
+      console.log('Onay bekleyen ilanlar Redis üzerinden getirildi.');
+      return res.status(200).json(JSON.parse(cachedPendingAds));
+    }
+
+    // 2. Redis'te yoksa Veritabanından (MongoDB) çek
     const pendingListings = await Listing.find({ status: 'pending' }).sort({ createdAt: -1 });
+
+    // 3. Çekilen bu veriyi 10 dakikalığına (600 saniye) Redis'e kaydet
+    await redis.set('admin:pendingAds', JSON.stringify(pendingListings), 'EX', 600);
+
     res.status(200).json(pendingListings);
   } catch (error) {
     res.status(500).json({ mesaj: 'Onay bekleyen ilanlar getirilemedi.', hata: error.message });
