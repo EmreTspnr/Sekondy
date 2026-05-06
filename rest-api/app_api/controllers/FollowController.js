@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const rabbitmq = require('../services/rabbitmq');
 const Follow = mongoose.model('Follow');
 const User = mongoose.model('User');
 
@@ -8,37 +9,35 @@ const followSeller = async (req, res) => {
     const { userId: sellerId } = req.params;
 
     if (followerId === sellerId) {
-      return res.status(400).json({ mesaj: 'Kullanıcı kendisini takip edemez.' });
+      return res.status(400).json({ mesaj: 'Kullanici kendisini takip edemez.' });
     }
 
     const seller = await User.findById(sellerId);
     if (!seller) {
-      return res.status(404).json({ mesaj: 'Takip edilecek satıcı bulunamadı.' });
+      return res.status(404).json({ mesaj: 'Takip edilecek satici bulunamadi.' });
     }
 
-    const existingFollow = await Follow.findOne({
-      follower: followerId,
-      seller: sellerId
-    });
+    const existingFollow = await Follow.findOne({ follower: followerId, seller: sellerId });
 
     if (existingFollow) {
-      return res.status(400).json({ mesaj: 'Bu satıcı zaten takip ediliyor.' });
+      return res.status(400).json({ mesaj: 'Bu satici zaten takip ediliyor.' });
     }
 
-    const newFollow = await Follow.create({
-      follower: followerId,
-      seller: sellerId
+    const newFollow = await Follow.create({ follower: followerId, seller: sellerId });
+
+    // RabbitMQ: Saticiya "Seni takip eden var" bildirimi icin kuyruga yaz
+    rabbitmq.publishToQueue('YeniTakipci', {
+      sellerId: sellerId,
+      followerId: followerId,
+      timestamp: new Date()
     });
 
     res.status(201).json({
-      mesaj: 'Satıcı başarıyla takip edildi.',
+      mesaj: 'Satici basariyla takip edildi.',
       follow: newFollow
     });
   } catch (error) {
-    res.status(500).json({
-      mesaj: 'Satıcı takip edilirken bir hata oluştu.',
-      hata: error.message
-    });
+    res.status(500).json({ mesaj: 'Satici takip edilirken bir hata olustu.', hata: error.message });
   }
 };
 
@@ -62,11 +61,11 @@ const unfollowSeller = async (req, res) => {
 
     const deleted = await Follow.findOneAndDelete({ follower: followerId, seller: sellerId });
     if (!deleted) {
-      return res.status(404).json({ mesaj: 'Takip kaydı bulunamadı.' });
+      return res.status(404).json({ mesaj: 'Takip kaydi bulunamadi.' });
     }
-    res.status(200).json({ mesaj: 'Takipten çıkıldı.' });
+    res.status(200).json({ mesaj: 'Takipten cikildi.' });
   } catch (error) {
-    res.status(500).json({ mesaj: 'Takipten çıkılırken hata oluştu.', hata: error.message });
+    res.status(500).json({ mesaj: 'Takipten cikilirken hata olustu.', hata: error.message });
   }
 };
 
