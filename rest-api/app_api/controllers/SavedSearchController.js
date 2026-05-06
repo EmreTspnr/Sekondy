@@ -1,35 +1,18 @@
 const mongoose = require('mongoose');
+const rabbitmq = require('../services/rabbitmq');
 const SavedSearch = mongoose.model('SavedSearch');
 
 const parseBooleanInput = (value) => {
-  if (typeof value === 'boolean') {
-    return value;
-  }
-
-  if (value === 'true') {
-    return true;
-  }
-
-  if (value === 'false') {
-    return false;
-  }
-
+  if (typeof value === 'boolean') return value;
+  if (value === 'true') return true;
+  if (value === 'false') return false;
   return undefined;
 };
 
 const createSavedSearch = async (req, res) => {
   try {
     const userId = req.user.userId;
-    const {
-      keyword,
-      query,
-      category,
-      categoryId,
-      condition,
-      location,
-      minPrice,
-      maxPrice
-    } = req.body;
+    const { keyword, query, category, categoryId, condition, location, minPrice, maxPrice } = req.body;
 
     const newSavedSearch = await SavedSearch.create({
       user: userId,
@@ -40,6 +23,15 @@ const createSavedSearch = async (req, res) => {
       minPrice,
       maxPrice,
       notificationsEnabled: false
+    });
+
+    // RabbitMQ: Yeni arama kaydedildiginde bildirim sistemine haber ver
+    rabbitmq.publishToQueue('YeniAramaKaydedildi', {
+      userId: userId,
+      searchId: newSavedSearch._id,
+      keyword: newSavedSearch.keyword,
+      category: newSavedSearch.category,
+      timestamp: new Date()
     });
 
     res.status(201).json({
@@ -63,9 +55,7 @@ const updateSearchNotifications = async (req, res) => {
     );
 
     if (notificationsEnabled === undefined) {
-      return res.status(400).json({
-        mesaj: 'Bildirim tercihi icin gecerli bir boolean deger gonderin.'
-      });
+      return res.status(400).json({ mesaj: 'Bildirim tercihi icin gecerli bir boolean deger gonderin.' });
     }
 
     const updatedSearch = await SavedSearch.findOneAndUpdate(
@@ -95,23 +85,15 @@ const deleteSavedSearch = async (req, res) => {
     const userId = req.user.userId;
     const { searchId } = req.params;
 
-    const deletedSearch = await SavedSearch.findOneAndDelete({
-      _id: searchId,
-      user: userId
-    });
+    const deletedSearch = await SavedSearch.findOneAndDelete({ _id: searchId, user: userId });
 
     if (!deletedSearch) {
       return res.status(404).json({ mesaj: 'Silinecek kayitli arama bulunamadi.' });
     }
 
-    res.status(200).json({
-      mesaj: 'Kayitli arama basariyla silindi.'
-    });
+    res.status(200).json({ mesaj: 'Kayitli arama basariyla silindi.' });
   } catch (error) {
-    res.status(500).json({
-      mesaj: 'Kayitli arama silinirken bir hata olustu.',
-      hata: error.message
-    });
+    res.status(500).json({ mesaj: 'Kayitli arama silinirken bir hata olustu.', hata: error.message });
   }
 };
 
