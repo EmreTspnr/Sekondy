@@ -2,6 +2,8 @@ const mongoose = require('mongoose');
 const User = mongoose.model('User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const redis = require('../services/redis');
+const rabbitmq = require('../services/rabbitmq');
 
 // Geliştirme aşaması için gizli anahtar (İleride .env dosyasına taşınmalı)
 const JWT_SECRET = 'sekondy_super_gizli_anahtar_123';
@@ -35,6 +37,14 @@ const register = async (req, res) => {
       phone,
       address,
       loginHistory: []
+    });
+
+    // RabbitMQ: Hoşgeldin maili vb. işlemler için kuyruğa mesaj gönder
+    rabbitmq.publishToQueue('YeniKullaniciKayit', {
+      userId: newUser._id,
+      email: newUser.email,
+      isim: newUser.firstName,
+      timestamp: new Date()
     });
 
     res.status(201).json({ mesaj: "Kullanıcı başarıyla oluşturuldu.", userId: newUser._id });
@@ -133,12 +143,22 @@ const getProfile = async (req, res) => {
   try {
     const userId = req.user.userId;
     
+    // 1. Önce veriyi Redis Cache'den (Hafızadan) çekmeyi dene
+    const cachedProfile = await redis.get(`profile:${userId}`);
+    if (cachedProfile) {
+      console.log('Profil Redis Cache üzerinden getirildi:', `profile:${userId}`);
+      return res.status(200).json(JSON.parse(cachedProfile));
+    }
+
     // Kullanıcıyı bul ve şifresi hariç tüm bilgilerini getir
     const user = await User.findById(userId).select('-password');
 
     if (!user) {
       return res.status(404).json({ mesaj: "Kullanıcı bulunamadı." });
     }
+
+    // 3. Veritabanından çektiğin bu veriyi 1 saatliğine (3600 sn) Redis'e kaydet
+    await redis.set(`profile:${userId}`, JSON.stringify(user), 'EX', 3600);
 
     res.status(200).json(user);
   } catch (error) {

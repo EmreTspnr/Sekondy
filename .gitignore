@@ -12,3 +12,7 @@ node_modules/
 /dist
 /frontend/dist
 /rest-api/uploads
+
+# Temporary and Documentation Files
+*.pdf
+*.txt
