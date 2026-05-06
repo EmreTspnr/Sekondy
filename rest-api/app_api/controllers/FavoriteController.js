@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+const redis = require('../services/redis');
+const rabbitmq = require('../services/rabbitmq');
 const Favorite = mongoose.model('Favorite');
 const Listing = mongoose.model('Listing');
 
@@ -22,6 +24,18 @@ const addFavorite = async (req, res) => {
     }
 
     const newFavorite = await Favorite.create({ user: userId, listing: listingId });
+
+    // RabbitMQ: Ilan sahibine "ilaniniz favorilere eklendi" bildirimi icin kuyruga yaz
+    rabbitmq.publishToQueue('FavoriyeEklendi', {
+      userId: userId,
+      ilanId: listingId,
+      ilanSahibiId: listingExists.owner,
+      timestamp: new Date()
+    });
+
+    // Favoriler listesi degisti, onbellegi temizle
+    await redis.del(`favorites:${userId}`);
+
     res.status(201).json({ mesaj: 'Ilan favorilere eklendi.', favorite: newFavorite });
   } catch (error) {
     res.status(500).json({ mesaj: 'Favorilere eklenirken hata olustu.', hata: error.message });
@@ -31,9 +45,21 @@ const addFavorite = async (req, res) => {
 const getFavorites = async (req, res) => {
   try {
     const userId = req.user.userId;
+
+    // Redis Cache-Aside: Once onbellekten kontrol et
+    const cacheKey = `favorites:${userId}`;
+    const cached = await redis.get(cacheKey);
+    if (cached) {
+      console.log(`Favoriler Redis'ten getirildi: ${cacheKey}`);
+      return res.status(200).json(JSON.parse(cached));
+    }
+
     const favorites = await Favorite.find({ user: userId })
       .populate('listing')
       .sort({ createdAt: -1 });
+
+    // 5 dakika (300 sn) onbellege al
+    await redis.set(cacheKey, JSON.stringify(favorites), 'EX', 300);
 
     res.status(200).json(favorites);
   } catch (error) {
@@ -50,6 +76,9 @@ const deleteFavorite = async (req, res) => {
     if (!deleted) {
       return res.status(404).json({ mesaj: 'Silinecek favori bulunamadi.' });
     }
+
+    // Favorilerden silince onbellegi temizle
+    await redis.del(`favorites:${userId}`);
 
     res.status(200).json({ mesaj: 'Favorilerden basariyla kaldirildi.' });
   } catch (error) {
