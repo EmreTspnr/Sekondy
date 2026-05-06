@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+const rabbitmq = require('../services/rabbitmq');
+const redis = require('../services/redis');
 const Message = mongoose.model('Message');
 const User = mongoose.model('User');
 const Listing = mongoose.model('Listing');
@@ -36,6 +38,18 @@ const sendMessage = async (req, res) => {
       content
     });
 
+    // RabbitMQ: Aliciya gercek zamanli bildirim gondermek icin kuyruga yaz
+    rabbitmq.publishToQueue('YeniMesaj', {
+      mesajId: newMessage._id,
+      gondererenId: senderId,
+      aliciId: receiverId,
+      icerik: content,
+      timestamp: new Date()
+    });
+
+    // Mesaj gonderilince alicinin mesaj onbellegi eskimis olur, temizle
+    await redis.del(`messages:${receiverId}`);
+
     res.status(201).json({ mesaj: 'Mesaj basariyla gonderildi.', message: newMessage });
   } catch (error) {
     res.status(500).json({ mesaj: 'Mesaj gonderilirken hata olustu.', hata: error.message });
@@ -45,6 +59,15 @@ const sendMessage = async (req, res) => {
 const getMessages = async (req, res) => {
   try {
     const userId = req.user.userId;
+
+    // Redis Cache-Aside: Once onbellekten kontrol et
+    const cacheKey = `messages:${userId}`;
+    const cached = await redis.get(cacheKey);
+    if (cached) {
+      console.log(`Mesajlar Redis'ten getirildi: ${cacheKey}`);
+      return res.status(200).json(JSON.parse(cached));
+    }
+
     const messages = await Message.find({
       $or: [{ receiver: userId }, { sender: userId }],
       deletedBy: { $ne: userId }
@@ -52,7 +75,10 @@ const getMessages = async (req, res) => {
       .populate('sender', 'firstName lastName')
       .populate('receiver', 'firstName lastName')
       .populate('listing', 'title')
-      .sort({ createdAt: 1 }); // Chat sırası için eskiden yeniye
+      .sort({ createdAt: 1 });
+
+    // 2 dakika (120 sn) onbellege al
+    await redis.set(cacheKey, JSON.stringify(messages), 'EX', 120);
 
     res.status(200).json(messages);
   } catch (error) {
@@ -74,6 +100,9 @@ const markAsRead = async (req, res) => {
     if (!message) {
       return res.status(404).json({ mesaj: 'Mesaj bulunamadi veya bu islem icin yetkiniz yok.' });
     }
+
+    // Okundu isaretlenince onbellegi temizle (guncel durum gelmesi icin)
+    await redis.del(`messages:${userId}`);
 
     res.status(200).json({ mesaj: 'Mesaj okundu olarak isaretlendi.', message });
   } catch (error) {
@@ -100,6 +129,9 @@ const deleteMessage = async (req, res) => {
       message.deletedBy.push(userId);
       await message.save();
     }
+
+    // Silme sonrasi onbellegi temizle
+    await redis.del(`messages:${userId}`);
 
     res.status(200).json({ mesaj: 'Mesaj basariyla silindi.' });
   } catch (error) {
