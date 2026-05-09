@@ -1,63 +1,44 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Platform } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, ActivityIndicator, RefreshControl, Dimensions, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import api from '../../services/api';
 
-const EKIPLER = [
-  {
-    isim: 'Emre Taspinar',
-    rol: 'Takim Lideri & Ilan Yonetimi',
-    renk: '#6366f1',
-    ikon: 'code-slash-outline',
-    ekranlar: [
-      { baslik: 'Ilan Ekle', hedef: '/add-listing', ikon: 'add-circle-outline' },
-      { baslik: 'Ilan Detay', hedef: '/listing/123', ikon: 'document-text-outline' },
-    ],
-  },
-  {
-    isim: 'Furkan Saribas',
-    rol: 'Kimlik Dogrulama & Oturum',
-    renk: '#10b981',
-    ikon: 'shield-checkmark-outline',
-    ekranlar: [
-      { baslik: 'Giris Yap', hedef: '/login', ikon: 'log-in-outline' },
-      { baslik: 'Kayit Ol', hedef: '/register', ikon: 'person-add-outline' },
-    ],
-  },
-  {
-    isim: 'Veysel Emir Hartavi',
-    rol: 'Yonetici Paneli & Moderasyon',
-    renk: '#f59e0b',
-    ikon: 'settings-outline',
-    ekranlar: [
-      { baslik: 'Admin Paneli', hedef: '/admin-dashboard', ikon: 'shield-outline' },
-      { baslik: 'Ilan Sikayet', hedef: '/report-ad', ikon: 'flag-outline' },
-    ],
-  },
-  {
-    isim: 'Sinan Ece',
-    rol: 'Kesif & Arama Sistemi',
-    renk: '#06b6d4',
-    ikon: 'search-outline',
-    ekranlar: [
-      { baslik: 'Kategoriler', hedef: '/categories', ikon: 'grid-outline' },
-      { baslik: 'Kayitli Aramalar', hedef: '/saved-searches', ikon: 'bookmark-outline' },
-    ],
-  },
-  {
-    isim: 'Ramize Elif Ermis',
-    rol: 'Mesajlasma & Favoriler',
-    renk: '#ec4899',
-    ikon: 'heart-outline',
-    ekranlar: [
-      { baslik: 'Mesajlar', hedef: '/messages', ikon: 'chatbubbles-outline' },
-      { baslik: 'Favoriler', hedef: '/favorites', ikon: 'heart-outline' },
-    ],
-  },
+const { width } = Dimensions.get('window');
+
+const CATEGORIES = [
+  { id: '1', name: 'Elektronik', icon: 'laptop-outline', color: '#3b82f6' },
+  { id: '2', name: 'Moda', icon: 'shirt-outline', color: '#ec4899' },
+  { id: '3', name: 'Ev & Yaşam', icon: 'home-outline', color: '#f59e0b' },
+  { id: '4', name: 'Araç', icon: 'car-sport-outline', color: '#10b981' },
 ];
 
 export default function HomeScreen() {
   const router = useRouter();
+  const [listings, setListings] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const fetchListings = async () => {
+    try {
+      const response = await api.get('/listings/showcase');
+      setListings(response.data);
+    } catch (error) {
+      console.error('İlanlar çekilirken hata:', error);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchListings();
+  }, []);
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    fetchListings();
+  };
 
   return (
     <View style={styles.container}>
@@ -65,86 +46,88 @@ export default function HomeScreen() {
       <View style={styles.header}>
         <View style={styles.headerTop}>
           <View>
-            <Text style={styles.headerTitle}>Sekondy</Text>
-            <Text style={styles.headerSubtitle}>Ikinci El Alis-Veris Platformu</Text>
+            <Text style={styles.brandName}>Sekondy</Text>
+            <Text style={styles.tagline}>İkinci El Alışveriş Platformu</Text>
           </View>
-          <View style={styles.logoBadge}>
-            <Ionicons name="bag-handle" size={28} color="#ffffff" />
-          </View>
+          <TouchableOpacity style={styles.notificationBtn} onPress={() => router.push('/messages')}>
+            <Ionicons name="notifications-outline" size={24} color="#ffffff" />
+            <View style={styles.badge} />
+          </TouchableOpacity>
         </View>
 
-        {/* Stats */}
-        <View style={styles.statsRow}>
-          <View style={styles.statItem}>
-            <Text style={styles.statNumber}>5</Text>
-            <Text style={styles.statLabel}>Gelistirici</Text>
-          </View>
-          <View style={styles.statDivider} />
-          <View style={styles.statItem}>
-            <Text style={styles.statNumber}>10</Text>
-            <Text style={styles.statLabel}>Ekran</Text>
-          </View>
-          <View style={styles.statDivider} />
-          <View style={styles.statItem}>
-            <Text style={styles.statNumber}>30</Text>
-            <Text style={styles.statLabel}>API Endpoint</Text>
-          </View>
-        </View>
+        {/* Search Bar */}
+        <TouchableOpacity style={styles.searchBar} onPress={() => router.push('/explore')}>
+          <Ionicons name="search" size={20} color="#64748b" />
+          <Text style={styles.searchText}>Marka, ürün veya kategori ara...</Text>
+        </TouchableOpacity>
       </View>
 
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        <Text style={styles.sectionTitle}>Ekip & Moduller</Text>
+      <ScrollView 
+        contentContainerStyle={styles.scrollContent} 
+        showsVerticalScrollIndicator={false}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#6366f1" />}
+      >
+        {/* Categories */}
+        <Text style={[styles.sectionTitle, { marginLeft: 20 }]}>Kategoriler</Text>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.categoriesScroll}>
+          {CATEGORIES.map((cat) => (
+            <TouchableOpacity key={cat.id} style={styles.categoryItem} onPress={() => router.push(`/categories?id=${cat.id}`)}>
+              <View style={[styles.categoryIconWrap, { backgroundColor: cat.color + '15' }]}>
+                <Ionicons name={cat.icon as any} size={28} color={cat.color} />
+              </View>
+              <Text style={styles.categoryName}>{cat.name}</Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
 
-        {EKIPLER.map((uye, index) => (
-          <View key={index} style={styles.card}>
-            {/* Uye Baslik */}
-            <View style={styles.cardHeader}>
-              <View style={[styles.uyeAvatar, { backgroundColor: uye.renk + '20' }]}>  
-                <Ionicons name={uye.ikon as any} size={22} color={uye.renk} />
-              </View>
-              <View style={styles.uyeInfo}>
-                <Text style={styles.uyeIsim}>{uye.isim}</Text>
-                <Text style={styles.uyeRol}>{uye.rol}</Text>
-              </View>
-              <View style={[styles.badge, { backgroundColor: uye.renk + '20' }]}>
-                <Ionicons name="checkmark-circle" size={14} color={uye.renk} />
-                <Text style={[styles.badgeText, { color: uye.renk }]}>Tamam</Text>
-              </View>
-            </View>
-
-            {/* Butonlar */}
-            <View style={styles.buttonRow}>
-              {uye.ekranlar.map((ekran, i) => (
-                <TouchableOpacity
-                  key={i}
-                  style={[styles.screenButton, { borderColor: uye.renk + '40' }]}
-                  onPress={() => router.push(ekran.hedef as any)}
-                  activeOpacity={0.7}
-                >
-                  <View style={[styles.screenIconWrap, { backgroundColor: uye.renk + '15' }]}>
-                    <Ionicons name={ekran.ikon as any} size={20} color={uye.renk} />
-                  </View>
-                  <Text style={styles.screenText}>{ekran.baslik}</Text>
-                  <Ionicons name="chevron-forward" size={16} color="#94a3b8" />
-                </TouchableOpacity>
-              ))}
-            </View>
-          </View>
-        ))}
-
-        {/* Teknoloji Bandi */}
-        <View style={styles.techSection}>
-          <Text style={styles.techTitle}>Kullanilan Teknolojiler</Text>
-          <View style={styles.techRow}>
-            {['Node.js', 'MongoDB', 'Redis', 'RabbitMQ', 'Docker', 'React Native'].map((tech, i) => (
-              <View key={i} style={styles.techChip}>
-                <Text style={styles.techChipText}>{tech}</Text>
-              </View>
-            ))}
-          </View>
+        {/* Featured Listings */}
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>Vitrin İlanları</Text>
+          <TouchableOpacity>
+            <Text style={styles.seeAllText}>Tümünü Gör</Text>
+          </TouchableOpacity>
         </View>
 
-        <View style={{ height: 40 }} />
+        {loading && !refreshing ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="#6366f1" />
+            <Text style={styles.loadingText}>İlanlar yükleniyor...</Text>
+          </View>
+        ) : listings.length === 0 ? (
+          <View style={styles.emptyContainer}>
+            <Ionicons name="bag-remove-outline" size={48} color="#cbd5e1" />
+            <Text style={styles.emptyText}>Henüz vitrin ilanı bulunmuyor.</Text>
+          </View>
+        ) : (
+          <View style={styles.gridContainer}>
+            {listings.map((item: any) => (
+              <TouchableOpacity 
+                key={item._id} 
+                style={styles.productCard}
+                onPress={() => router.push(`/listing/${item._id}`)}
+                activeOpacity={0.8}
+              >
+                <View style={styles.imageContainer}>
+                  <Image 
+                    source={{ uri: item.photos && item.photos.length > 0 ? item.photos[0] : 'https://via.placeholder.com/300?text=Gorsel+Yok' }} 
+                    style={styles.productImage} 
+                  />
+                  <TouchableOpacity style={styles.favoriteBtn}>
+                    <Ionicons name="heart-outline" size={20} color="#64748b" />
+                  </TouchableOpacity>
+                </View>
+                <View style={styles.productInfo}>
+                  <Text style={styles.productPrice}>{item.price?.toLocaleString('tr-TR')} ₺</Text>
+                  <Text style={styles.productTitle} numberOfLines={2}>{item.title}</Text>
+                  <View style={styles.productFooter}>
+                    <Ionicons name="location-outline" size={12} color="#94a3b8" />
+                    <Text style={styles.productLocation} numberOfLines={1}>{item.location}</Text>
+                  </View>
+                </View>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
       </ScrollView>
     </View>
   );
@@ -152,45 +135,46 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f8fafc' },
-
+  
   // Header
-  header: { backgroundColor: '#6366f1', paddingHorizontal: 24, paddingTop: Platform.OS === 'ios' ? 60 : 44, paddingBottom: 24, borderBottomLeftRadius: 28, borderBottomRightRadius: 28 },
-  headerTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 },
-  headerTitle: { fontSize: 28, fontWeight: '800', color: '#ffffff' },
-  headerSubtitle: { fontSize: 14, color: '#c7d2fe', marginTop: 4 },
-  logoBadge: { width: 48, height: 48, borderRadius: 16, backgroundColor: 'rgba(255,255,255,0.2)', alignItems: 'center', justifyContent: 'center' },
-
-  // Stats
-  statsRow: { flexDirection: 'row', backgroundColor: 'rgba(255,255,255,0.15)', borderRadius: 16, padding: 16, alignItems: 'center' },
-  statItem: { flex: 1, alignItems: 'center' },
-  statNumber: { fontSize: 22, fontWeight: '800', color: '#ffffff' },
-  statLabel: { fontSize: 12, color: '#c7d2fe', marginTop: 2 },
-  statDivider: { width: 1, height: 30, backgroundColor: 'rgba(255,255,255,0.2)' },
-
+  header: { backgroundColor: '#6366f1', paddingHorizontal: 20, paddingTop: Platform.OS === 'ios' ? 60 : 44, paddingBottom: 24, borderBottomLeftRadius: 28, borderBottomRightRadius: 28 },
+  headerTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
+  brandName: { fontSize: 28, fontWeight: '800', color: '#ffffff' },
+  tagline: { fontSize: 13, color: '#c7d2fe', marginTop: 2 },
+  notificationBtn: { width: 44, height: 44, borderRadius: 14, backgroundColor: 'rgba(255,255,255,0.2)', alignItems: 'center', justifyContent: 'center' },
+  badge: { position: 'absolute', top: 10, right: 12, width: 10, height: 10, borderRadius: 5, backgroundColor: '#ef4444', borderWidth: 2, borderColor: '#6366f1' },
+  
+  // Search Bar
+  searchBar: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#ffffff', borderRadius: 16, paddingHorizontal: 16, height: 52, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.1, shadowRadius: 12, elevation: 4 },
+  searchText: { flex: 1, fontSize: 15, color: '#94a3b8', marginLeft: 12 },
+  
   // Content
-  scrollContent: { padding: 20 },
-  sectionTitle: { fontSize: 20, fontWeight: '700', color: '#0f172a', marginBottom: 16, marginTop: 4 },
-
-  // Card
-  card: { backgroundColor: '#ffffff', borderRadius: 20, padding: 18, marginBottom: 16, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.06, shadowRadius: 12, elevation: 3 },
-  cardHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 14 },
-  uyeAvatar: { width: 44, height: 44, borderRadius: 14, alignItems: 'center', justifyContent: 'center', marginRight: 12 },
-  uyeInfo: { flex: 1 },
-  uyeIsim: { fontSize: 16, fontWeight: '700', color: '#0f172a' },
-  uyeRol: { fontSize: 13, color: '#64748b', marginTop: 2 },
-  badge: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 20 },
-  badgeText: { fontSize: 12, fontWeight: '600', marginLeft: 4 },
-
-  // Buttons
-  buttonRow: { gap: 8 },
-  screenButton: { flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderRadius: 14, padding: 12 },
-  screenIconWrap: { width: 36, height: 36, borderRadius: 10, alignItems: 'center', justifyContent: 'center', marginRight: 12 },
-  screenText: { flex: 1, fontSize: 15, fontWeight: '600', color: '#0f172a' },
-
-  // Tech
-  techSection: { marginTop: 8, backgroundColor: '#ffffff', borderRadius: 20, padding: 18, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.06, shadowRadius: 12, elevation: 3 },
-  techTitle: { fontSize: 16, fontWeight: '700', color: '#0f172a', marginBottom: 12 },
-  techRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  techChip: { backgroundColor: '#f1f5f9', paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20 },
-  techChipText: { fontSize: 13, fontWeight: '600', color: '#475569' },
+  scrollContent: { paddingBottom: 30 },
+  sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginHorizontal: 20, marginTop: 24, marginBottom: 16 },
+  sectionTitle: { fontSize: 18, fontWeight: '800', color: '#0f172a', marginTop: 24, marginBottom: 16 },
+  seeAllText: { fontSize: 14, fontWeight: '600', color: '#6366f1' },
+  
+  // Categories
+  categoriesScroll: { paddingHorizontal: 16, paddingBottom: 8 },
+  categoryItem: { alignItems: 'center', marginHorizontal: 6, width: 80 },
+  categoryIconWrap: { width: 64, height: 64, borderRadius: 24, alignItems: 'center', justifyContent: 'center', marginBottom: 8 },
+  categoryName: { fontSize: 12, fontWeight: '600', color: '#475569', textAlign: 'center' },
+  
+  // Grid
+  gridContainer: { flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 16, justifyContent: 'space-between' },
+  productCard: { width: (width - 48) / 2, backgroundColor: '#ffffff', borderRadius: 20, marginBottom: 16, overflow: 'hidden', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.05, shadowRadius: 10, elevation: 3 },
+  imageContainer: { width: '100%', height: 160, backgroundColor: '#f1f5f9', position: 'relative' },
+  productImage: { width: '100%', height: '100%', resizeMode: 'cover' },
+  favoriteBtn: { position: 'absolute', top: 12, right: 12, width: 34, height: 34, borderRadius: 17, backgroundColor: 'rgba(255,255,255,0.95)', alignItems: 'center', justifyContent: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 2 },
+  productInfo: { padding: 14 },
+  productPrice: { fontSize: 17, fontWeight: '800', color: '#6366f1', marginBottom: 6 },
+  productTitle: { fontSize: 13, fontWeight: '600', color: '#334155', lineHeight: 18, height: 36 },
+  productFooter: { flexDirection: 'row', alignItems: 'center', marginTop: 10 },
+  productLocation: { fontSize: 11, color: '#94a3b8', marginLeft: 4, flex: 1 },
+  
+  // States
+  loadingContainer: { padding: 40, alignItems: 'center' },
+  loadingText: { marginTop: 12, fontSize: 14, color: '#64748b' },
+  emptyContainer: { padding: 40, alignItems: 'center' },
+  emptyText: { marginTop: 12, fontSize: 14, color: '#94a3b8', textAlign: 'center' }
 });
