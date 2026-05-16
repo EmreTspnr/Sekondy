@@ -10,7 +10,7 @@
 
 
 
-| ![Görsel 1](tmp/D.U.A.Y.E.N.jpg) |![Görsel 2](tmp/lesAgabey.png)|![Görsel 3](tmp/SekondyBiziKurtarabilirMi.png)|![Görsel 4](tmp/gittiGideli(DUAYEN).png)|
+| ![Görsel 1](tmp/D.U.A.Y.E.N.jpg) |![Görsel 2](tmp/lesAgabey.png)|![Görsel 3](tmp/SekondyBiziKurtarabilirMi.png)|![Görsel 4](tmp/gittiGideli(DUAYEN).png)|![Görsel 5](tmp/SivasDunyaninEnGuzelSehridir.png)|
 
 
 
