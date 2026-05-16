@@ -1,8 +1,8 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// Fiziksel cihaz testi ve emülatör için bilgisayarın yerel IP adresi ve doğru port
-const API_URL = 'http://192.168.1.29:9000/v1';
+// İnternetteki canlı sunucuya bağlanır (Eski veriler ve üretim ortamı)
+const API_URL = 'https://api.sekondy.com/v1';
 
 const api = axios.create({
   baseURL: API_URL,

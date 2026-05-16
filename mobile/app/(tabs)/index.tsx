@@ -184,6 +184,9 @@ export default function HomeScreen() {
               <TouchableOpacity style={styles.menuItem} onPress={() => navigateMenu('/profile')}>
                 <Text style={styles.menuText}>PROFİL</Text>
               </TouchableOpacity>
+              <TouchableOpacity style={styles.menuItem} onPress={() => navigateMenu('/admin-dashboard')}>
+                <Text style={[styles.menuText, { color: '#D4AF37' }]}>YÖNETİCİ PANELİ</Text>
+              </TouchableOpacity>
               <TouchableOpacity style={[styles.menuItem, { borderBottomWidth: 0, marginTop: 20 }]} onPress={handleLogout}>
                 <Text style={[styles.menuText, { color: '#ef4444' }]}>ÇIKIŞ YAP</Text>
               </TouchableOpacity>
