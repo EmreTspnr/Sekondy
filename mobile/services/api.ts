@@ -1,7 +1,8 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const API_URL = 'https://api.sekondy.com/v1';
+// Fiziksel cihaz testi ve emülatör için bilgisayarın yerel IP adresi
+const API_URL = 'http://192.168.1.29:5000/api';
 
 const api = axios.create({
   baseURL: API_URL,
