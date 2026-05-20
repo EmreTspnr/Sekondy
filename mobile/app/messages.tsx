@@ -6,17 +6,53 @@ import api from '../services/api';
 
 export default function MessagesScreen() {
   const router = useRouter();
-  const [mesajlar, setMesajlar] = useState<any[]>([]);
+  const [chats, setChats] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchMessages();
+    fetchUserAndMessages();
   }, []);
 
-  const fetchMessages = async () => {
+  const fetchUserAndMessages = async () => {
     try {
-      const response = await api.get('/messages');
-      setMesajlar(response.data);
+      const response = await api.get('/profile');
+      setCurrentUserId(response.data._id);
+      
+      const msgResponse = await api.get('/messages');
+      const allMessages = msgResponse.data;
+      
+      // Mesajları kişilere göre grupla
+      const chatMap = new Map<string, { partner: any, messages: any[], unreadCount: number }>();
+      
+      allMessages.forEach((msg: any) => {
+        let partner = null;
+        if (msg.sender?._id === response.data._id) {
+          partner = msg.receiver;
+        } else {
+          partner = msg.sender;
+        }
+        
+        if (partner && partner._id) {
+          if (!chatMap.has(partner._id)) {
+            chatMap.set(partner._id, { partner, messages: [], unreadCount: 0 });
+          }
+          const chat = chatMap.get(partner._id)!;
+          chat.messages.push(msg);
+          
+          if (!msg.isRead && msg.receiver?._id === response.data._id) {
+            chat.unreadCount += 1;
+          }
+        }
+      });
+      
+      const chatList = Array.from(chatMap.values()).sort((a, b) => {
+        const lastA = a.messages[a.messages.length - 1];
+        const lastB = b.messages[b.messages.length - 1];
+        return new Date(lastB?.createdAt || 0).getTime() - new Date(lastA?.createdAt || 0).getTime();
+      });
+      
+      setChats(chatList);
     } catch (error) {
       console.error(error);
       Alert.alert('Hata', 'Mesajlar yüklenemedi. Lütfen giriş yaptığınızdan emin olun.');
@@ -25,24 +61,16 @@ export default function MessagesScreen() {
     }
   };
 
-  const handleRead = async (id: string) => {
-    // Mark as read locally first for fast UI response
-    setMesajlar(mesajlar.map(m => m._id === id ? { ...m, isRead: true } : m));
-    try {
-      await api.put(`/messages/${id}/read`);
-    } catch (error) {
-      console.error(error);
-    }
+  const handleChatSelect = (partnerId: string) => {
+    router.push(`/chat/${partnerId}`);
   };
 
-  const handleDelete = async (id: string) => {
-    try {
-      await api.delete(`/messages/${id}`);
-      setMesajlar(mesajlar.filter(m => m._id !== id));
-    } catch (error) {
-      console.error(error);
-      Alert.alert('Hata', 'Mesaj silinemedi.');
-    }
+  const handleDelete = async (partnerId: string) => {
+    Alert.alert(
+      'Bilgi',
+      'Mesajları toplu silmek için lütfen web sürümünü kullanın.',
+      [{ text: 'Tamam' }]
+    );
   };
 
   const formatDate = (dateString: string) => {
@@ -63,35 +91,41 @@ export default function MessagesScreen() {
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {loading ? (
           <ActivityIndicator size="large" color="#D4AF37" style={{ marginTop: 40 }} />
-        ) : mesajlar.length === 0 ? (
+        ) : chats.length === 0 ? (
           <View style={styles.emptyContainer}>
             <Ionicons name="chatbubbles-outline" size={60} color="#cbd5e1" />
             <Text style={styles.emptyText}>Henüz hiç mesajınız yok.</Text>
           </View>
         ) : (
-          mesajlar.map(item => {
-            const senderName = item.sender?.firstName ? `${item.sender.firstName} ${item.sender.lastName || ''}` : 'Bilinmeyen Kullanıcı';
+          chats.map(chat => {
+            const partnerName = chat.partner?.firstName ? `${chat.partner.firstName} ${chat.partner.lastName || ''}` : 'Bilinmeyen Kullanıcı';
+            const lastMsg = chat.messages[chat.messages.length - 1];
+            
             return (
               <TouchableOpacity
-                key={item._id}
-                style={[styles.card, !item.isRead && styles.cardUnread]}
-                onPress={() => handleRead(item._id)}
+                key={chat.partner._id}
+                style={[styles.card, chat.unreadCount > 0 && styles.cardUnread]}
+                onPress={() => handleChatSelect(chat.partner._id)}
               >
                 <View style={styles.avatarContainer}>
-                  <Text style={styles.avatarText}>{senderName.charAt(0)}</Text>
+                  <Text style={styles.avatarText}>{partnerName.charAt(0)}</Text>
                 </View>
                 <View style={styles.cardContent}>
                   <View style={styles.cardTop}>
-                    <Text style={[styles.isim, !item.isRead && styles.isimUnread]}>{senderName}</Text>
-                    <Text style={styles.tarih}>{formatDate(item.createdAt)}</Text>
+                    <Text style={[styles.isim, chat.unreadCount > 0 && styles.isimUnread]}>{partnerName}</Text>
+                    <Text style={styles.tarih}>{formatDate(lastMsg.createdAt)}</Text>
                   </View>
-                  <Text style={[styles.mesajOnizleme, !item.isRead && styles.mesajUnread]} numberOfLines={1}>
-                    {item.content}
+                  <Text style={[styles.mesajOnizleme, chat.unreadCount > 0 && styles.mesajUnread]} numberOfLines={1}>
+                    {lastMsg.sender?._id === currentUserId ? 'Siz: ' : ''}{lastMsg.content}
                   </Text>
                 </View>
-                {!item.isRead && <View style={styles.unreadDot} />}
+                {chat.unreadCount > 0 && (
+                  <View style={styles.unreadBadge}>
+                    <Text style={styles.unreadBadgeText}>{chat.unreadCount}</Text>
+                  </View>
+                )}
                 
-                <TouchableOpacity onPress={() => handleDelete(item._id)} style={styles.deleteButton}>
+                <TouchableOpacity onPress={() => handleDelete(chat.partner._id)} style={styles.deleteButton}>
                   <Ionicons name="trash-outline" size={16} color="#ef4444" />
                 </TouchableOpacity>
               </TouchableOpacity>
@@ -120,7 +154,8 @@ const styles = StyleSheet.create({
   tarih: { fontSize: 12, color: '#94a3b8' },
   mesajOnizleme: { fontSize: 14, color: '#64748b' },
   mesajUnread: { color: '#1a1a1a', fontWeight: '600' },
-  unreadDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: '#D4AF37', marginLeft: 8 },
+  unreadBadge: { width: 22, height: 22, borderRadius: 11, backgroundColor: '#D4AF37', alignItems: 'center', justifyContent: 'center', marginLeft: 8 },
+  unreadBadgeText: { color: '#fff', fontSize: 10, fontWeight: 'bold' },
   deleteButton: { padding: 8, marginLeft: 4 },
   emptyContainer: { alignItems: 'center', marginTop: 80 },
   emptyText: { color: '#94a3b8', fontSize: 16, marginTop: 16 },
