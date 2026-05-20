@@ -222,6 +222,9 @@ const updateListing = async (req, res) => {
     listing.set(updateData);
     await listing.save();
 
+    // Redis önbelleğini temizle (Kullanıcı eski ilanı görmesin)
+    await redis.del(`ad:${id}`);
+
     res.status(200).json(listing);
   } catch (error) {
     res.status(500).json({ mesaj: 'Ilan guncellenemedi.', hata: error.message });
@@ -268,6 +271,10 @@ const deleteListing = async (req, res) => {
     }
 
     await listing.deleteOne();
+
+    // Redis önbelleğini temizle (Silinen ilan görünmesin)
+    await redis.del(`ad:${id}`);
+
     res.status(200).json({ mesaj: 'Ilan basariyla sistemden kaldirildi.' });
   } catch (error) {
     res.status(500).json({ mesaj: 'Ilan silinemedi.', hata: error.message });

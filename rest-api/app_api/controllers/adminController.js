@@ -99,6 +99,13 @@ exports.deleteListing = async (req, res) => {
       return res.status(404).json({ mesaj: 'Ilan bulunamadi.' });
     }
 
+    // Redis önbelleklerini temizle (Silinen ilan artık görünmesin)
+    await redis.del(`ad:${listingId}`);
+    await redis.del('showcase:listings');
+    if (deletedListing.category) {
+      await redis.del(`category:${deletedListing.category}`);
+    }
+
     res.status(200).json({ mesaj: 'Ilan sistemden tamamen silindi.' });
   } catch (error) {
     res.status(500).json({ mesaj: 'Ilan silinirken hata olustu.', hata: error.message });

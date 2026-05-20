@@ -56,17 +56,21 @@ export default function HomeScreen() {
   const fetchAds = async () => {
     if (search.trim()) return;
     setLoading(true);
+    console.log('[DEBUG] fetchAds başladı');
     try {
       let endpoint = '/ads/showcase';
       if (category !== 'Tümü') {
         endpoint = `/ads/category/${category}`;
       }
+      console.log(`[DEBUG] api.get isteği atılıyor: ${endpoint}`);
       const response = await api.get(endpoint);
+      console.log('[DEBUG] api.get cevabı geldi!', response.data?.length);
       setAds(response.data.length ? response.data : []);
-    } catch (error) {
-      console.error("İlanlar gelmedi:", error);
+    } catch (error: any) {
+      console.error("[DEBUG] İlanlar gelmedi hatası:", error?.message || error);
       setAds([]);
     } finally {
+      console.log('[DEBUG] fetchAds finally bloğu çalıştı, loading false yapılıyor');
       setLoading(false);
     }
   };

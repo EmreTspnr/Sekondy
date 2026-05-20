@@ -32,6 +32,21 @@ export default function ProfileScreen() {
     }
   };
 
+  const handleDeleteAccount = () => {
+    Alert.alert('Emin misin?', 'Hesabını sildiğin zaman geri dönüşü yoktur. Tüm ilanların, mesajların ve favorilerin silinecektir.', [
+      { text: 'İptal', style: 'cancel' },
+      { text: 'Hesabımı Sil', style: 'destructive', onPress: async () => {
+          try {
+            await api.delete('/profile');
+            await AsyncStorage.removeItem('token');
+            router.replace('/login');
+          } catch (e) {
+            Alert.alert('Hata', 'Hesap silinirken bir hata oluştu.');
+          }
+      } }
+    ]);
+  };
+
   return (
     <View style={styles.container}>
       {/* Header */}
@@ -49,7 +64,7 @@ export default function ProfileScreen() {
             <View style={styles.avatarWrap}>
               <Ionicons name="person" size={40} color="#9ca3af" />
             </View>
-            <Text style={styles.nameText}>{profile.name}</Text>
+            <Text style={styles.nameText}>{profile.firstName} {profile.lastName}</Text>
             <Text style={styles.emailText}>{profile.email}</Text>
           </View>
         ) : (
@@ -59,27 +74,49 @@ export default function ProfileScreen() {
         )}
 
         <View style={styles.menuGroup}>
+          <TouchableOpacity style={styles.menuItem} onPress={() => router.push('/edit-profile')}>
+            <Ionicons name="person-outline" size={20} color="#1a1a1a" />
+            <Text style={styles.menuText}>Profili Düzenle</Text>
+            <Ionicons name="chevron-forward" size={20} color="#9ca3af" />
+          </TouchableOpacity>
           <TouchableOpacity style={styles.menuItem} onPress={() => router.push('/my-ads')}>
             <Ionicons name="list" size={20} color="#1a1a1a" />
             <Text style={styles.menuText}>İlanlarım</Text>
             <Ionicons name="chevron-forward" size={20} color="#9ca3af" />
           </TouchableOpacity>
           <TouchableOpacity style={styles.menuItem} onPress={() => router.push('/favorites')}>
-            <Ionicons name="heart" size={20} color="#1a1a1a" />
+            <Ionicons name="heart-outline" size={20} color="#1a1a1a" />
             <Text style={styles.menuText}>Favorilerim</Text>
             <Ionicons name="chevron-forward" size={20} color="#9ca3af" />
           </TouchableOpacity>
           <TouchableOpacity style={styles.menuItem} onPress={() => router.push('/saved-searches')}>
-            <Ionicons name="bookmark" size={20} color="#1a1a1a" />
+            <Ionicons name="bookmark-outline" size={20} color="#1a1a1a" />
             <Text style={styles.menuText}>Kayıtlı Aramalar</Text>
+            <Ionicons name="chevron-forward" size={20} color="#9ca3af" />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.menuItem} onPress={() => router.push('/followed-sellers')}>
+            <Ionicons name="people-outline" size={20} color="#1a1a1a" />
+            <Text style={styles.menuText}>Takip Edilen Satıcılar</Text>
+            <Ionicons name="chevron-forward" size={20} color="#9ca3af" />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.menuItem} onPress={() => router.push('/login-history')}>
+            <Ionicons name="time-outline" size={20} color="#1a1a1a" />
+            <Text style={styles.menuText}>Giriş Geçmişi</Text>
             <Ionicons name="chevron-forward" size={20} color="#9ca3af" />
           </TouchableOpacity>
         </View>
 
         <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
-          <Ionicons name="log-out-outline" size={20} color="#ef4444" />
-          <Text style={styles.logoutText}>ÇIKIŞ YAP</Text>
+          <Ionicons name="log-out-outline" size={20} color="#1a1a1a" />
+          <Text style={[styles.logoutText, { color: '#1a1a1a' }]}>ÇIKIŞ YAP</Text>
         </TouchableOpacity>
+
+        <View style={styles.dangerZone}>
+          <TouchableOpacity style={styles.deleteAccountBtn} onPress={handleDeleteAccount}>
+            <Ionicons name="trash-outline" size={20} color="#ef4444" />
+            <Text style={styles.deleteAccountText}>HESABIMI TAMAMEN SİL</Text>
+          </TouchableOpacity>
+        </View>
         
       </ScrollView>
     </View>
@@ -101,6 +138,9 @@ const styles = StyleSheet.create({
   menuItem: { flexDirection: 'row', alignItems: 'center', padding: 16, borderBottomWidth: 1, borderBottomColor: '#f3f4f6' },
   menuText: { flex: 1, fontSize: 15, fontWeight: '600', color: '#374151', marginLeft: 12 },
   
-  logoutBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: '#fee2e2', borderRadius: 12, padding: 16 },
-  logoutText: { color: '#ef4444', fontSize: 14, fontWeight: '800', marginLeft: 8, letterSpacing: 1 }
+  logoutBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f3f4f6', borderRadius: 12, padding: 16 },
+  logoutText: { fontSize: 14, fontWeight: '800', marginLeft: 8, letterSpacing: 1 },
+  dangerZone: { marginTop: 24, paddingBottom: 40 },
+  deleteAccountBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: '#fef2f2', borderWidth: 1, borderColor: '#fca5a5', borderRadius: 12, padding: 16 },
+  deleteAccountText: { color: '#ef4444', fontSize: 14, fontWeight: '800', marginLeft: 8, letterSpacing: 1 }
 });
