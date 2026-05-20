@@ -12,10 +12,9 @@ import {
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import axios from 'axios';
+import api from '../../services/api';
 
-const { width } = Dimensions.get('window');
-const API_URL = 'http://10.0.2.2:5000/api'; 
+const { width } = Dimensions.get('window'); 
 
 export default function ListingDetailScreen() {
   const { id } = useLocalSearchParams();
@@ -24,32 +23,13 @@ export default function ListingDetailScreen() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // API isteği simülasyonu veya gerçek istek:
-    // Bu istek yapıldığında sunucu tarafında (backend) yazdığımız Redis kodu çalışacak!
     const fetchListingDetail = async () => {
       try {
-        // Gerçek API isteği: 
-        // const response = await axios.get(`${API_URL}/ads/${id}`);
-        // setListing(response.data);
-        
-        // Simülasyon verisi (UI tasarımı için):
-        setTimeout(() => {
-          setListing({
-            _id: id,
-            title: 'MacBook Pro M2 16GB RAM 512GB SSD',
-            price: '38.500',
-            category: 'Elektronik',
-            condition: 'İkinci El',
-            location: 'Beşiktaş, İstanbul',
-            description: 'Cihaz sadece 3 ay kullanılmış olup sıfırdan farksızdır. Kutusu, faturası ve orijinal adaptörü mevcuttur. Herhangi bir çiziği veya sorunu yoktur. Acil nakit ihtiyacından satılıktır.',
-            owner: { firstName: 'Emre', lastName: 'Taşpınar' },
-            photos: ['https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=1000&q=80'],
-            createdAt: new Date().toISOString()
-          });
-          setLoading(false);
-        }, 1000);
+        const response = await api.get(`/ads/${id}`);
+        setListing(response.data);
       } catch (error) {
         console.error("İlan getirilirken hata:", error);
+      } finally {
         setLoading(false);
       }
     };
