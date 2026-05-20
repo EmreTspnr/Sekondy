@@ -47,8 +47,9 @@ const sendMessage = async (req, res) => {
       timestamp: new Date()
     });
 
-    // Mesaj gonderilince alicinin mesaj onbellegi eskimis olur, temizle
+    // Mesaj gonderilince hem alicinin hem de gonderenin mesaj onbellegi eskimis olur, temizle
     await redis.del(`messages:${receiverId}`);
+    await redis.del(`messages:${senderId}`);
 
     res.status(201).json({ mesaj: 'Mesaj basariyla gonderildi.', message: newMessage });
   } catch (error) {

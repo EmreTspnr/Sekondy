@@ -79,15 +79,33 @@ export default function ChatScreen() {
   const handleSend = async () => {
     if (!newMessage.trim()) return;
 
+    const messageText = newMessage.trim();
+    
+    // Optimistic UI Update (Anında ekranda göster)
+    const tempMsg = {
+      _id: Math.random().toString(),
+      sender: { _id: currentUserId },
+      receiver: { _id: partnerId },
+      content: messageText,
+      createdAt: new Date().toISOString(),
+      isRead: false
+    };
+    
+    setMessages(prev => [...prev, tempMsg]);
+    setNewMessage('');
+
     try {
       await api.post('/messages', {
         receiverId: partnerId,
-        content: newMessage.trim()
+        content: messageText
       });
-      setNewMessage('');
+      // Arka planda gerçek veriyi çek
       fetchData();
-    } catch (error) {
-      console.error('Mesaj gönderilemedi', error);
+    } catch (error: any) {
+      // Hata olursa mesajı sil ve uyarı ver
+      setMessages(prev => prev.filter(m => m._id !== tempMsg._id));
+      console.error('Mesaj gönderilemedi', error.response?.data || error);
+      Alert.alert('Hata', 'Mesaj gönderilemedi: ' + (error.response?.data?.mesaj || error.message));
     }
   };
 
