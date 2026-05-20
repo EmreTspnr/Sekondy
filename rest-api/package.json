@@ -5,7 +5,8 @@
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
-    "test": "node test/api-fixes.test.js"
+    "test": "node test/api-fixes.test.js",
+    "worker": "node worker.js"
   },
   "keywords": [],
   "author": "",

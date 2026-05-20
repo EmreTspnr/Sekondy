@@ -49,6 +49,21 @@ services:
       - rabbitmq
     restart: unless-stopped
 
+  # 5. RabbitMQ Worker Service
+  worker:
+    build: 
+      context: ./rest-api
+      dockerfile: Dockerfile
+    container_name: sekondy-worker
+    command: npm run worker
+    environment:
+      - MONGODB_URI=mongodb://mongodb:27017/sekondy
+      - REDIS_URL=redis://redis:6379
+      - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672
+    depends_on:
+      - rabbitmq
+    restart: unless-stopped
+
   # 5. Expo/React Native is typically run locally during dev, 
   # but if a web-build or mock-service is needed, it goes here.
   # For mobile development, Expo Go runs on your physical device, 

@@ -5,8 +5,8 @@ const jwt = require('jsonwebtoken');
 const redis = require('../services/redis');
 const rabbitmq = require('../services/rabbitmq');
 
-// Geliştirme aşaması için gizli anahtar (İleride .env dosyasına taşınmalı)
-const JWT_SECRET = 'sekondy_super_gizli_anahtar_123';
+// JWT gizli anahtarı: Önce .env'den oku, yoksa varsayılan değeri kullan
+const JWT_SECRET = process.env.JWT_SECRET || 'sekondy_super_gizli_anahtar_123';
 
 // 1. Görev: Kullanıcı Kayıt Olma
 const register = async (req, res) => {
@@ -132,6 +132,9 @@ const updateProfile = async (req, res) => {
       return res.status(404).json({ mesaj: "Güncellenecek kullanıcı bulunamadı." });
     }
 
+    // Profil güncellendi, Redis önbelleğini temizle
+    await redis.del(`profile:${userId}`);
+
     res.status(200).json({ mesaj: "Profiliniz başarıyla güncellendi.", user: updatedUser });
   } catch (error) {
     res.status(500).json({ mesaj: "Profil güncellenirken bir hata oluştu.", hata: error.message });
@@ -177,6 +180,9 @@ const deleteProfile = async (req, res) => {
     if (!deletedUser) {
       return res.status(404).json({ mesaj: "Silinecek kullanıcı bulunamadı." });
     }
+
+    // Silinen kullanıcının Redis önbelleğini temizle
+    await redis.del(`profile:${userId}`);
 
     res.status(200).json({ mesaj: "Hesabınız sistemden başarıyla silindi." });
   } catch (error) {

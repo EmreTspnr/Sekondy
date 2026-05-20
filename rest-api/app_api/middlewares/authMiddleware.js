@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 
-// AuthController'da kullandığımız gizli anahtarın aynısı
-const JWT_SECRET = 'sekondy_super_gizli_anahtar_123';
+// JWT gizli anahtarı: Önce .env'den oku, yoksa varsayılan değeri kullan
+const JWT_SECRET = process.env.JWT_SECRET || 'sekondy_super_gizli_anahtar_123';
 
 const verifyToken = (req, res, next) => {
   // İstek başlıklarından (headers) Authorization kısmını alıyoruz

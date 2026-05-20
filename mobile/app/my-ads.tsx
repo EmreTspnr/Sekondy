@@ -20,10 +20,26 @@ export default function MyAdsScreen() {
       const response = await api.get('/my-ads');
       setAds(response.data);
     } catch (error) {
-      console.error('İlanlar alınamadı', error);
+      console.error(error);
+      Alert.alert('Hata', 'İlanlarınız alınamadı.');
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleDelete = (id: string) => {
+    Alert.alert('İlanı Sil', 'Bu ilanı silmek istediğinize emin misiniz?', [
+      { text: 'İptal', style: 'cancel' },
+      { text: 'Sil', style: 'destructive', onPress: async () => {
+          try {
+            await api.delete(`/listings/${id}`);
+            setAds(prevAds => prevAds.filter(ad => ad._id !== id));
+            Alert.alert('Başarılı', 'İlan silindi.');
+          } catch (e) {
+            Alert.alert('Hata', 'İlan silinirken bir hata oluştu.');
+          }
+      }}
+    ]);
   };
 
   return (
@@ -57,6 +73,24 @@ export default function MyAdsScreen() {
                   <View style={styles.priceTag}>
                     <Text style={styles.priceText}>{ad.price?.toLocaleString('tr-TR')} ₺</Text>
                   </View>
+                  <TouchableOpacity 
+                    style={styles.editBtn} 
+                    onPress={(e) => {
+                      e.stopPropagation();
+                      router.push(`/edit-listing/${ad._id}`);
+                    }}
+                  >
+                    <Ionicons name="pencil" size={16} color="#fff" />
+                  </TouchableOpacity>
+                  <TouchableOpacity 
+                    style={styles.deleteBtn} 
+                    onPress={(e) => {
+                      e.stopPropagation();
+                      handleDelete(ad._id);
+                    }}
+                  >
+                    <Ionicons name="trash" size={16} color="#fff" />
+                  </TouchableOpacity>
                 </View>
                 <View style={styles.productInfo}>
                   <Text style={styles.productTitle} numberOfLines={2}>{ad.title}</Text>
@@ -86,6 +120,8 @@ const styles = StyleSheet.create({
   productImg: { width: '100%', height: '100%', resizeMode: 'cover' },
   priceTag: { position: 'absolute', bottom: 10, left: 10, backgroundColor: 'rgba(26,26,26,0.85)', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8 },
   priceText: { color: '#D4AF37', fontWeight: '800', fontSize: 13 },
+  editBtn: { position: 'absolute', top: 10, right: 48, backgroundColor: 'rgba(26,26,26,0.85)', width: 32, height: 32, borderRadius: 16, alignItems: 'center', justifyContent: 'center' },
+  deleteBtn: { position: 'absolute', top: 10, right: 10, backgroundColor: 'rgba(239,68,68,0.85)', width: 32, height: 32, borderRadius: 16, alignItems: 'center', justifyContent: 'center' },
   productInfo: { padding: 12 },
   productTitle: { fontSize: 13, fontWeight: '700', color: '#111827', height: 36 },
   productFooter: { flexDirection: 'row', alignItems: 'center', marginTop: 8 },
