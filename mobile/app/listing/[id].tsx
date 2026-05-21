@@ -79,7 +79,7 @@ export default function ListingDetailScreen() {
         { text: 'İptal', style: 'cancel' },
         { 
           text: 'Gönder', 
-          onPress: async (reason) => {
+          onPress: async (reason?: string) => {
             if (!reason) return;
             try {
               await api.post('/reports', { listingId: listing._id, reason });
