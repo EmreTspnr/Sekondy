@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, TextInput, Alert, Dimensions, Platform, ActivityIndicator, Modal } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import { useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from '../../services/api';
 
@@ -19,10 +20,23 @@ export default function HomeScreen() {
   const [searchHistory, setSearchHistory] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [menuVisible, setMenuVisible] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
     loadHistory();
+    checkLoginStatus();
   }, []);
+
+  const checkLoginStatus = async () => {
+    const token = await AsyncStorage.getItem('token');
+    setIsLoggedIn(!!token);
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      checkLoginStatus();
+    }, [])
+  );
 
   const loadHistory = async () => {
     try {
@@ -53,7 +67,7 @@ export default function HomeScreen() {
     }
   };
 
-  const fetchAds = async () => {
+  const fetchAds = useCallback(async () => {
     if (search.trim()) return;
     setLoading(true);
     console.log('[DEBUG] fetchAds başladı');
@@ -73,11 +87,13 @@ export default function HomeScreen() {
       console.log('[DEBUG] fetchAds finally bloğu çalıştı, loading false yapılıyor');
       setLoading(false);
     }
-  };
-
-  useEffect(() => {
-    fetchAds();
   }, [category, search]);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchAds();
+    }, [fetchAds])
+  );
 
   const handleSearch = async (term?: string) => {
     const q = (term || search).trim();
@@ -145,7 +161,9 @@ export default function HomeScreen() {
           <Ionicons name="call" size={12} color="#D4AF37" />
           <Text style={styles.topBarText}>+90 555 123 4567</Text>
           <Ionicons name="mail" size={12} color="#D4AF37" style={{ marginLeft: 15 }} />
-          <Text style={styles.topBarText}>ikinci.el.krallariii@gmail.com</Text>
+          <Text style={styles.topBarText}>
+            {isLoggedIn ? 'ikinci.el.krallariii@gmail.com' : 'Giriş Yapılmadı'}
+          </Text>
         </View>
       </View>
 
@@ -191,9 +209,16 @@ export default function HomeScreen() {
               <TouchableOpacity style={styles.menuItem} onPress={() => navigateMenu('/admin-dashboard')}>
                 <Text style={[styles.menuText, { color: '#D4AF37' }]}>YÖNETİCİ PANELİ</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={[styles.menuItem, { borderBottomWidth: 0, marginTop: 20 }]} onPress={handleLogout}>
-                <Text style={[styles.menuText, { color: '#ef4444' }]}>ÇIKIŞ YAP</Text>
-              </TouchableOpacity>
+              
+              {isLoggedIn ? (
+                <TouchableOpacity style={[styles.menuItem, { borderBottomWidth: 0, marginTop: 20 }]} onPress={handleLogout}>
+                  <Text style={[styles.menuText, { color: '#ef4444' }]}>ÇIKIŞ YAP</Text>
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity style={[styles.menuItem, { borderBottomWidth: 0, marginTop: 20 }]} onPress={() => navigateMenu('/login')}>
+                  <Text style={[styles.menuText, { color: '#10b981' }]}>GİRİŞ YAP</Text>
+                </TouchableOpacity>
+              )}
             </View>
           </View>
         </View>
@@ -287,10 +312,15 @@ export default function HomeScreen() {
           </View>
           
           {(search.trim() !== '' || category !== 'Tümü') && (
-            <TouchableOpacity style={styles.saveSearchBtn} onPress={handleSaveSearch}>
-              <Ionicons name="bookmark" size={16} color="#D4AF37" />
-              <Text style={styles.saveSearchText}>Kaydet</Text>
-            </TouchableOpacity>
+            <View style={{ alignItems: 'flex-end' }}>
+              <TouchableOpacity style={styles.saveSearchBtn} onPress={handleSaveSearch}>
+                <Ionicons name="bookmark" size={16} color="#D4AF37" />
+                <Text style={styles.saveSearchText}>Aramayı Kaydet</Text>
+              </TouchableOpacity>
+              <Text style={{ fontSize: 10, color: '#9ca3af', marginTop: 2, marginRight: 2 }}>
+                Yeni ilanlarda bildirim al
+              </Text>
+            </View>
           )}
         </View>
 

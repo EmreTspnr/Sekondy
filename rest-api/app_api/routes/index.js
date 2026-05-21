@@ -74,11 +74,13 @@ router.get('/ads/:id', ctrlListings.getListingById);
 router.post('/favorites', verifyToken, ctrlFavorite.addFavorite);
 router.get('/favorites', verifyToken, ctrlFavorite.getFavorites);
 router.delete('/favorites/:id', verifyToken, ctrlFavorite.deleteFavorite);
+router.delete('/favorites/listing/:listingId', verifyToken, ctrlFavorite.deleteFavoriteByListing);
 
 router.post('/messages', verifyToken, ctrlMessage.sendMessage);
 router.get('/messages', verifyToken, ctrlMessage.getMessages);
 router.put('/messages/:messageId/read', verifyToken, ctrlMessage.markAsRead);
 router.delete('/messages/:messageId', verifyToken, ctrlMessage.deleteMessage);
+router.delete('/messages/partner/:partnerId', verifyToken, ctrlMessage.deleteConversation);
 
 router.use('/', adminRoutes);
 
