@@ -1,52 +1,53 @@
-# Mobil Backend (REST API Bağlantısı) Görev Dağılımı
+# Mobil Backend (REST API Bağlantısı) ve Entegrasyon Yapısı
 
-**REST API Adresi:** [api.yazmuh.com](https://api.yazmuh.com)
-
-Bu dokümanda, mobil uygulamanın REST API ile iletişimini sağlayan backend entegrasyon görevleri listelenmektedir. Her grup üyesi, kendisine atanan API endpoint'lerinin mobil uygulamadan çağrılması ve yönetilmesinden sorumludur.
+Bu dokümanda, Sekondy mobil uygulamasının (React Native) arka plandaki Node.js REST API ile olan iletişim mimarisi, uç noktaları ve bağlantı prensipleri detaylandırılmıştır.
 
 ---
 
-## Grup Üyelerinin Mobil Backend Görevleri
+## 1. HTTP Client ve Axios Yapılandırması
 
-1. [Emre Taşpınar'ın Mobil Backend Görevleri](Emre-Taspinar/Emre-Taspinar-Mobil-Backend-Gorevleri.md)
-2. [Furkan Sarıbaş'ın Mobil Backend Görevleri](Grup-Uyesi-2/Grup-Uyesi-2-Mobil-Backend-Gorevleri.md)
-3. [Veysel Emir Hartavi'nin Mobil Backend Görevleri](Grup-Uyesi-3/Grup-Uyesi-3-Mobil-Backend-Gorevleri.md)
-4. [Sinan Ece'nin Mobil Backend Görevleri](Grup-Uyesi-4/Grup-Uyesi-4-Mobil-Backend-Gorevleri.md)
-5. [Ramize elif Ermiş'in Mobil Backend Görevleri](Grup-Uyesi-5/Grup-Uyesi-5-Mobil-Backend-Gorevleri.md)
----
+Mobil uygulama, backend ile iletişim için özelleştirilmiş bir `Axios` nesnesi kullanır (`services/api.ts`).
 
-## Genel Mobil Backend Prensipleri
+- **Base URL:** Mobil cihazda yerel geliştirmeyi desteklemek için IP bazlı bir URL (örn: `http://192.168.1.X:3000/api/v1`) kullanılmaktadır. Canlı ortama çıkıldığında (production) ana URL'e dönüşecektir.
+- **Interceptor Mimarisi:** 
+  - **Request (İstek):** Uygulama her API isteği yaptığında `AsyncStorage` içinde kayıtlı olan JWT token'ı arar. Bulursa `Authorization: Bearer <token>` başlığını otomatik olarak tüm isteklere ekler. Böylece sayfalarda manuel token gönderme işlemi ortadan kaldırılmıştır.
 
-### 1. HTTP Client Yapılandırması
-- **Base URL:** `https://api.yazmuh.com/v1`
-- **Timeout:** Request timeout 30 saniye, connect timeout 10 saniye
-- **Headers:** 
-  - `Content-Type: application/json`
-  - `Authorization: Bearer {token}` (gerekli endpoint'lerde)
+## 2. Temel API Uç Noktaları (Endpoints)
 
-### 2. Authentication Yönetimi
-- JWT token'ları secure storage'da saklama
-- Token refresh mekanizması implementasyonu
-- Otomatik token yenileme (401 durumunda)
-- Logout durumunda token temizleme
+Mobil uygulama aşağıdaki endpoint gruplarını yoğun olarak kullanmaktadır:
 
-### 3. Error Handling
-- Network hataları (timeout, connection error)
-- HTTP status kodlarına göre uygun mesajlar gösterme
-- Retry mekanizması (network hatalarında)
-- Offline durum yönetimi
+### Authentication (Kimlik Doğrulama)
+- `POST /auth/register`: Yeni üye kaydı.
+- `POST /auth/login`: Sisteme giriş yapma ve JWT token alma.
+- `POST /auth/push-token`: Mobil cihazın (iOS/Android) bildirim alabilmesi için üretilen "Expo Push Token"ı kullanıcının veritabanı profiline kaydeder.
 
-### 4. Caching Stratejisi
-- GET istekleri için response caching
-- Cache invalidation (PUT/DELETE sonrası)
-- Offline-first yaklaşımı (mümkün olduğunda)
+### İlanlar (Listings / Ads)
+- `GET /ads`: Vitrin için ilanları getirir (kategori ve arama sorguları içerir).
+- `GET /ads/:id`: Tekil ilan detayını çeker.
+- `POST /ads`: Yeni ilan ekler. (Resim yüklemelerinde `multipart/form-data` kullanılarak fotoğraf dosyaları gönderilir).
+- `PUT /ads/:id` & `DELETE /ads/:id`: Kullanıcının kendi ilanını güncellemesi/silmesi.
 
-### 5. Loading States
-- Request başlangıcında loading indicator
-- Başarılı/başarısız durum bildirimleri
-- Optimistic updates (kullanıcı deneyimi için)
+### Etkileşimler (Favoriler, Aramalar, Takip)
+- `GET`, `POST`, `DELETE /favorites`: Favori ilan yönetimi.
+- `GET`, `POST`, `DELETE /saved-searches`: Kayıtlı aramaların eklenip listelenmesi. (Push notification ayarlamaları `PUT /saved-searches/:id/notifications` üzerinden yapılır).
+- `GET`, `POST`, `DELETE /follows`: Belirli bir satıcıyı takip etme ve takibi bırakma.
 
-### 6. Logging ve Debugging
-- API request/response logging (development modunda)
-- Error logging ve crash reporting
-- Network interceptor kullanımı
+### Sohbet (Mesajlaşma)
+- `GET /messages`: Kullanıcının tüm mesajlaştığı kişileri ve sohbetleri gruplayarak getirir.
+- `GET /messages/partner/:id`: Belirli bir kişiyle olan mesaj geçmişini getirir.
+- `POST /messages`: Yeni bir mesaj gönderir. (Gönderildiğinde karşı tarafa anında "Push Notification" tetiklenir).
+
+### Yönetici (Admin)
+- `GET /admin/ads/pending`: Onay bekleyen ilanların listesini çeker. (Aşağı çekerek yenileme ile Redis önbelleğinden bağımsız güncel veri alınır).
+- `GET /admin/reports`: Şikayet edilen ilanların listesi.
+- `PUT /admin/ads/:id/approve` & `DELETE /admin/ads/:id/reject`: İlan onaylama/reddetme mekanizması.
+
+## 3. Push Notification (Bildirim) Altyapısı
+
+Sistem, anlık bildirim göndermek için Node.js'in çekirdek `https` kütüphanesini kullanarak `exp.host/--/api/v2/push/send` Expo uç noktasına doğrudan istek atar. 
+- Sunucuda herhangi bir "fetch" bağımlılığına (`node-fetch` veya `axios`) ihtiyaç duyulmaz. (Server 500 hatalarını engeller).
+- Bir kullanıcıya **mesaj gönderildiğinde** veya **kayıtlı aramasına uyan bir ilan düştüğünde**, backend bu kişinin `expoPushToken` değerini okur ve telefonuna doğrudan donanımsal (titreşimli) bildirim fırlatır.
+
+## 4. Caching ve State Senkronizasyonu
+- Mobil uygulamada sayfa geçişleri sırasında veri bayatlamasını engellemek için, ekranlara her odaklanıldığında (`useFocusEffect` kancası) veya listeler "aşağı çekildiğinde" (`RefreshControl`) backend'e tekrar istek atılır.
+- Backend, ağır liste sorgularını (vitrin vb.) 10 dakika boyunca Redis'te (`redis.get`, `redis.set`) tutar. Ancak yeni bir ilan onaylandığında veya şikayet edildiğinde sistem otomatik olarak `redis.del()` ile cache'i temizler ki mobil uygulamadaki adminler ve kullanıcılar her daim anlık veriyi görebilsin.

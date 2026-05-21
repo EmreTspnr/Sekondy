@@ -1,66 +1,44 @@
-# Mobil Frontend Görev Dağılımı
+# Mobil Frontend Görev Dağılımı ve Mimari Yapısı (Sekondy)
 
-Bu dokümanda, mobil uygulamanın kullanıcı arayüzü (UI) ve kullanıcı deneyimi (UX) görevleri listelenmektedir. Her grup üyesi, kendisine atanan ekranların tasarımı, implementasyonu ve kullanıcı etkileşimlerinden sorumludur.
-
----
-
-## Grup Üyelerinin Mobil Frontend Görevleri
-
-1. [Emre Taşpınar'ın Mobil Frontend Görevleri](Emre-Taspinar/Emre-Taspinar-Mobil-Frontend-Gorevleri.md)
-2. [Grup Üyesi 2'nin Mobil Frontend Görevleri](Grup-Uyesi-2/Grup-Uyesi-2-Mobil-Frontend-Gorevleri.md)
-3. [Grup Üyesi 3'ün Mobil Frontend Görevleri](Grup-Uyesi-3/Grup-Uyesi-3-Mobil-Frontend-Gorevleri.md)
-4. [Grup Üyesi 4'ün Mobil Frontend Görevleri](Grup-Uyesi-4/Grup-Uyesi-4-Mobil-Frontend-Gorevleri.md)
-5. [Grup Üyesi 5'in Mobil Frontend Görevleri](Grup-Uyesi-5/Grup-Uyesi-5-Mobil-Frontend-Gorevleri.md)
-6. [Grup Üyesi 6'nın Mobil Frontend Görevleri](Grup-Uyesi-6/Grup-Uyesi-6-Mobil-Frontend-Gorevleri.md)
+Bu dokümanda, Sekondy mobil uygulamasının kullanıcı arayüzü (UI), kullanıcı deneyimi (UX) mimarisi ve Expo altyapısı ile tasarlanmış ekranları detaylandırılmaktadır. Uygulama **React Native**, **Expo** ve **Expo Router** (File-based Routing) kullanılarak geliştirilmiştir.
 
 ---
 
-## Genel Mobil Frontend Prensipleri
+## 1. Uygulama İçi Sayfalar ve Ekranlar (Screens)
 
-### 1. Tasarım Sistemi
-- **Renk Paleti:** Tutarlı renk kullanımı (primary, secondary, error, success)
-- **Tipografi:** Okunabilir font boyutları ve ağırlıkları
-- **Spacing:** Tutarlı padding ve margin değerleri (8dp/8pt grid sistemi)
-- **Iconography:** Standart icon seti kullanımı (Material Icons/SF Symbols)
+- **Vitrin (Ana Ekran) `(tabs)/index.tsx`:** Kullanıcıların tüm ilanları kategoriye göre filtreleyip gördüğü, arama yapabildiği ve aramaları kaydedebildiği ana ekran. Pull-to-refresh (Aşağı çekerek yenileme) mevcuttur.
+- **İlan Detay `listing/[id].tsx`:** İlanın fotoğrafları (slider), başlığı, fiyatı, satıcı bilgileri ve iletişim/favori butonlarının bulunduğu detay sayfası.
+- **İlan Ekle/Düzenle `add-listing.tsx` & `edit-listing/[id].tsx`:** FormData ile çoklu fotoğraf yüklenebilen, zorunlu alan doğrulaması (validation) içeren ilan yönetim sayfaları.
+- **Mesajlar `(tabs)/messages.tsx` & `chat/[id].tsx`:** Kullanıcıların birbirleriyle mesajlaştığı, okunmamış bildirim sayılarının göründüğü sohbet arayüzü.
+- **Profil `(tabs)/profile.tsx`:** Kullanıcının hesap istatistiklerini görebildiği, hesabını silebildiği ve çıkış yapabildiği ekran.
+- **İlanlarım `(tabs)/my-ads.tsx`:** Kullanıcının kendi ilanlarını görüp silebildiği/düzenleyebildiği liste ekranı.
+- **Favoriler `(tabs)/favorites.tsx`:** Favoriye alınan ilanların tutulduğu ve hızlıca silinebildiği sayfa.
+- **Kayıtlı Aramalar `saved-searches.tsx`:** İstenilen arama filtrelerinin kaydedilip, yeni ilan düşmesi durumunda anında haberdar olmak için bildirim (push) ayarlarının yönetildiği ekran.
+- **Takip Edilen Satıcılar `followed-sellers.tsx`:** Kullanıcının ilgilendiği satıcıların listesi.
+- **Yönetici Paneli `admin-dashboard.tsx`:** Sadece `isAdmin: true` olan kullanıcıların erişebildiği, ilanları onaylama ve şikayetleri değerlendirme sayfası.
 
-### 2. Responsive Tasarım
-- Farklı ekran boyutlarına uyum (phone, tablet)
-- Landscape ve portrait mod desteği
-- Safe area desteği (notch, status bar)
+---
 
-### 3. Kullanıcı Deneyimi (UX)
-- **Loading States:** Skeleton screens, progress indicators
-- **Error Handling:** Kullanıcı dostu hata mesajları
-- **Empty States:** Boş durumlar için bilgilendirici mesajlar
-- **Feedback:** Kullanıcı aksiyonlarına anında geri bildirim (toast, snackbar)
+## 2. Genel Mobil Frontend Prensipleri & UI/UX
 
-### 4. Erişilebilirlik (Accessibility)
-- Content descriptions ve labels
-- Touch target boyutları (min 44x44dp/pt)
-- Screen reader desteği
-- Yüksek kontrast modu desteği
-- Font scaling desteği
+### 1. Tasarım Sistemi & UI
+- **Renk Paleti:** Marka rengi olarak Altın/Hardal (`#D4AF37`), Dark mod için Koyu Gri/Siyah (`#1a1a1a`), hata ve uyarılar için kırmızı (`#ef4444`) renkleri kullanılmıştır.
+- **Typography & İkonlar:** Expo `@expo/vector-icons` üzerinden `Ionicons` ikon seti ile zenginleştirilmiş, kullanıcı dostu arayüz.
+- **Spacing:** Minimum 16-20px padding yapıları kullanılarak temiz bir form/card görünümü sunulmuştur.
 
-### 5. Performans
-- Lazy loading (liste görünümleri için)
-- Image optimization ve caching
-- Smooth animations (60 FPS hedefi)
-- Memory management
+### 2. Kullanıcı Deneyimi (UX) Özellikleri
+- **Pull-to-Refresh (Aşağı Çekerek Yenileme):** Uygulamadaki tüm liste ekranları (Vitrin, Mesajlar, İlanlarım vb.) `RefreshControl` bileşeni ile donatılmıştır. Kullanıcı ekranı kaydırarak güncel veriyi anında çekebilir.
+- **Loading States:** Veri çekerken `ActivityIndicator` (spinner) ile kullanıcıya yüklenme durumları gösterilir.
+- **Error Handling & Feedback:** Başarılı/Başarısız tüm işlemlerde (İlan eklendi, hata oluştu vb.) yerel `Alert` mekanizması ile geri bildirim verilir.
+- **Real-Time Etkileşimler:** `useFocusEffect` (React Navigation) kullanılarak sayfalar her açıldığında verilerin otomatik güncellenmesi sağlanmıştır.
 
-### 6. Navigasyon
-- Tutarlı navigation pattern (bottom navigation, drawer, tabs)
-- Deep linking desteği
-- Back button handling
-- Navigation state yönetimi
+### 3. Navigasyon ve Routing
+- **Expo Router:** Tüm sayfalar `app/` dizini altında dosya isimlerine göre (file-based routing) yönlendirilir. Klasik React Navigation yapısından çok daha modülerdir.
+- **Bottom Tabs:** Uygulamanın alt tarafında sabit duran sekmeli navigasyon mevcuttur. Sekme geçişleri çok hızlı ve stabildir.
+- **Hamburger Menu:** Modallar ve Sliderlar kullanılarak sağ üstten açılan dinamik menüler oluşturulmuştur (Giriş yapılmışsa Çıkış Yap, Yönetici ise Admin Paneli gibi dinamik linkler içerir).
 
-### 7. Form Yönetimi
-- Real-time validation
-- Error mesajları alan altında gösterilmesi
-- Keyboard handling (dismiss, next field focus)
-- Form state persistence (opsiyonel)
-
-### 8. Platform Özellikleri
-- **Android:** Material Design 3 guidelines
-- **iOS:** Human Interface Guidelines
-- Platform-specific UI patterns kullanımı
-- Native feel sağlanması
+### 4. Push Notifications (Telefon Bildirimleri)
+- Uygulama, `expo-notifications` kütüphanesi entegrasyonuna sahiptir.
+- Cihazdan otomatik izin isteyerek **Push Token** üretir.
+- Gelen mesajlar veya kayıtlı aramalara düşen yeni ilanlar direkt donanımsal telefon bildirimi (titreşimli) olarak kullanıcıya ulaştırılır.
+- *Not: Expo SDK 53 itibarıyla bildirim testi için Expo Go yerine Development Build (EAS) gereklidir.*
