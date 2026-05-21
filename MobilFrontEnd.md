@@ -1,4 +1,14 @@
-# Mobil Frontend Görev Dağılımı ve Mimari Yapısı (Sekondy)
+# Mobil Frontend Görev Dalımı ve Mimari Yapısı (Sekondy)
+
+## Grup Üyelerinin Mobil Frontend Görevleri
+
+1. [Emre Taşpınar'ın Mobil Frontend Görevleri](Emre-Taspinar/Emre-Taspinar-Mobil-Frontend-Gorevleri.md)
+2. [Furkan Sarıbaş'ın Mobil Frontend Görevleri](Furkan-Saribas/Furkan-Saribas-Mobil-Frontend-Gorevleri.md)
+3. [Veysel Emir Hartavi'nin Mobil Frontend Görevleri](Veysel-Emir-Hartavi/Veysel-Emir-Hartavi-Mobil-Frontend-Gorevleri.md)
+4. [Sinan Ece'nin Mobil Frontend Görevleri](Sinan-Ece/Sinan-Ece-Mobil-Frontend-Gorevleri.md)
+5. [Ramize Elif Ermiş'in Mobil Frontend Görevleri](Ramize-Elif-Ermis/Ramize-Elif-Ermis-Mobil-Frontend-Gorevleri.md)
+
+---
 
 Bu dokümanda, Sekondy mobil uygulamasının kullanıcı arayüzü (UI), kullanıcı deneyimi (UX) mimarisi ve Expo altyapısı ile tasarlanmış ekranları detaylandırılmaktadır. Uygulama **React Native**, **Expo** ve **Expo Router** (File-based Routing) kullanılarak geliştirilmiştir.
 

@@ -65,6 +65,12 @@ const pickEditableFields = (payload) => {
 
   return updateData;
 };
+
+const toLowerTR = (str) => {
+  if (!str) return '';
+  return str.replace(/İ/g, 'i').replace(/I/g, 'ı').toLowerCase();
+};
+
 const triggerSearchNotifications = async (newListing) => {
   try {
     const savedSearches = await SavedSearch.find({ notificationsEnabled: true });
@@ -87,12 +93,43 @@ const triggerSearchNotifications = async (newListing) => {
       if (String(search.user) === String(owner)) continue;
 
       let match = true;
-      if (search.keyword && !title.toLowerCase().includes(search.keyword.toLowerCase())) match = false;
-      if (search.category && search.category !== category) match = false;
-      if (search.condition && search.condition !== condition) match = false;
-      if (search.location && !location.toLowerCase().includes(search.location.toLowerCase())) match = false;
-      if (search.minPrice > 0 && price < search.minPrice) match = false;
-      if (search.maxPrice > 0 && price > search.maxPrice) match = false;
+      let failReason = '';
+
+      if (search.keyword) {
+        const titleLower = toLowerTR(title);
+        const keywordLower = toLowerTR(search.keyword);
+        if (!titleLower.includes(keywordLower)) {
+          match = false;
+          failReason = 'keyword_mismatch';
+        }
+      }
+      
+      if (match && search.category && search.category !== category) {
+        match = false;
+        failReason = 'category_mismatch';
+      }
+      
+      if (match && search.condition && search.condition !== condition) {
+        match = false;
+        failReason = 'condition_mismatch';
+      }
+      
+      if (match && search.location && !toLowerTR(location).includes(toLowerTR(search.location))) {
+        match = false;
+        failReason = 'location_mismatch';
+      }
+      
+      if (match && search.minPrice > 0 && price < search.minPrice) {
+        match = false;
+        failReason = 'min_price_mismatch';
+      }
+      
+      if (match && search.maxPrice > 0 && price > search.maxPrice) {
+        match = false;
+        failReason = 'max_price_mismatch';
+      }
+
+      console.log(`[DEBUG PUSH] Check ad '${title}' for user '${search.user}'. Keyword: '${search.keyword}', AdCat: '${category}', SearchCat: '${search.category}'. Match: ${match} ${!match ? '(' + failReason + ')' : ''}`);
 
       if (match) {
         let keywordText = search.keyword || search.category || title;
@@ -154,7 +191,7 @@ const addListing = async (req, res) => {
       photos: []
     });
 
-    triggerSearchNotifications(newListing);
+    // triggerSearchNotifications(newListing); // Bunu admin onayına taşıdık
 
     // Redis önbelleğini temizle (Admin anında görsün)
     await redis.del('admin:pendingAds');
@@ -302,5 +339,6 @@ module.exports = {
   getMyListings,
   updateListing,
   getListingById,
-  deleteListing
+  deleteListing,
+  triggerSearchNotifications
 };

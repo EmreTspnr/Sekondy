@@ -1,20 +1,37 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, ScrollView, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
+import api from '../services/api';
 
 export default function ReportAdScreen() {
     const router = useRouter();
+    const { id } = useLocalSearchParams();
     const [reason, setReason] = useState('');
+    const [loading, setLoading] = useState(false);
 
-    const handleReport = () => {
+    const handleReport = async () => {
         if (!reason.trim()) {
             Alert.alert('Hata', 'Lütfen şikayet nedeninizi belirtin.');
             return;
         }
-        // API entegrasyonu
-        Alert.alert('Teşekkürler', 'Şikayetiniz yöneticilere iletildi. İncelenecektir.');
-        router.back();
+
+        if (!id) {
+            Alert.alert('Hata', 'İlan bulunamadı.');
+            return;
+        }
+
+        setLoading(true);
+        try {
+            await api.post(`/listings/${id}/reports`, { reason });
+            Alert.alert('Teşekkürler', 'Şikayetiniz yöneticilere iletildi. İncelenecektir.');
+            router.back();
+        } catch (error) {
+            console.error(error);
+            Alert.alert('Hata', 'Şikayet gönderilirken bir sorun oluştu. Giriş yaptığınızdan emin olun.');
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -46,9 +63,9 @@ export default function ReportAdScreen() {
                     />
                 </View>
 
-                <TouchableOpacity style={styles.reportButton} onPress={handleReport}>
+                <TouchableOpacity style={styles.reportButton} onPress={handleReport} disabled={loading}>
                     <Ionicons name="flag-outline" size={20} color="#ffffff" style={{ marginRight: 8 }} />
-                    <Text style={styles.reportButtonText}>Şikayeti Gönder</Text>
+                    <Text style={styles.reportButtonText}>{loading ? 'Gönderiliyor...' : 'Şikayeti Gönder'}</Text>
                 </TouchableOpacity>
             </ScrollView>
         </KeyboardAvoidingView>

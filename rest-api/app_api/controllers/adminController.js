@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const redis = require('../services/redis');
 const rabbitmq = require('../services/rabbitmq');
+const { triggerSearchNotifications } = require('./ListingController');
 
 const Listing = mongoose.model('Listing');
 const User = mongoose.model('User');
@@ -51,6 +52,9 @@ exports.approveListing = async (req, res) => {
     if (!listing) {
       return res.status(404).json({ mesaj: 'Ilan bulunamadi.' });
     }
+
+    // İlan onaylandığında kayıtlı aramalarla eşleşen kullanıcılara bildirim gönder
+    triggerSearchNotifications(listing);
 
     // RabbitMQ: İlan sahibine 'İlanınız Yayında' maili/bildirimi gitmesi için kuyruğa mesaj yolla
     rabbitmq.publishToQueue('IlanOnaylandi', {

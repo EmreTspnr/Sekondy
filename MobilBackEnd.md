@@ -4,6 +4,16 @@ Bu dokümanda, Sekondy mobil uygulamasının (React Native) arka plandaki Node.j
 
 ---
 
+## Grup Üyelerinin Mobil Backend Görevleri
+
+1. [Emre Taşpınar'ın Mobil Backend Görevleri](Emre-Taspinar/Emre-Taspinar-Mobil-Backend-Gorevleri.md)
+2. [Furkan Sarıbaş'ın Mobil Backend Görevleri](Furkan-Saribas/Furkan-Saribas-Mobil-Backend-Gorevleri.md)
+3. [Veysel Emir Hartavi'nin Mobil Backend Görevleri](Veysel-Emir-Hartavi/Veysel-Emir-Hartavi-Mobil-Backend-Gorevleri.md)
+4. [Sinan Ece'nin Mobil Backend Görevleri](Sinan-Ece/Sinan-Ece-Mobil-Backend-Gorevleri.md)
+5. [Ramize Elif Ermiş'in Mobil Backend Görevleri](Ramize-Elif-Ermis/Ramize-Elif-Ermis-Mobil-Backend-Gorevleri.md)
+
+---
+
 ## 1. HTTP Client ve Axios Yapılandırması
 
 Mobil uygulama, backend ile iletişim için özelleştirilmiş bir `Axios` nesnesi kullanır (`services/api.ts`).
