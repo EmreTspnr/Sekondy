@@ -99,7 +99,8 @@ if (user.isSuspended) {
         id: user._id,
         firstName: user.firstName,
         lastName: user.lastName,
-        email: user.email
+        email: user.email,
+        isAdmin: user.isAdmin
       }
     });
 

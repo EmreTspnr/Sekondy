@@ -64,6 +64,8 @@ exports.approveListing = async (req, res) => {
     // Admin bir ilan onayladığında, Redis'teki bekleyen ilanlar listesi eskimiş demektir.
     // Önbelleği temizleyelim ki bir dahaki sefere güncel veriler çekilsin.
     await redis.del('admin:pendingAds');
+    await redis.del('showcase:listings');
+    if (listing.category) await redis.del(`category:${listing.category}`);
 
     res.status(200).json({ mesaj: 'Ilan basariyla onaylandi.', listing });
   } catch (error) {
