@@ -22,6 +22,7 @@ export default function ListingDetailScreen() {
   const router = useRouter();
   const [listing, setListing] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [isFavorite, setIsFavorite] = useState(false);
 
   useEffect(() => {
     const fetchListingDetail = async () => {
@@ -40,9 +41,11 @@ export default function ListingDetailScreen() {
 
   const handleFavorite = async () => {
     try {
+      setIsFavorite(true);
       await api.post('/favorites', { listingId: listing._id });
       Alert.alert('Başarılı', 'İlan favorilerinize eklendi!');
     } catch (error) {
+      setIsFavorite(false);
       Alert.alert('Bilgi', 'İlan zaten favorilerinizde veya giriş yapmadınız.');
     }
   };
@@ -127,7 +130,7 @@ export default function ListingDetailScreen() {
             <Ionicons name="arrow-back" size={24} color="#1e293b" />
           </TouchableOpacity>
           <TouchableOpacity style={styles.floatingFavButton} onPress={handleFavorite}>
-            <Ionicons name="heart-outline" size={24} color="#1e293b" />
+            <Ionicons name={isFavorite ? "heart" : "heart-outline"} size={24} color={isFavorite ? "#ef4444" : "#1e293b"} />
           </TouchableOpacity>
         </View>
 
@@ -209,16 +212,6 @@ export default function ListingDetailScreen() {
         </View>
       </ScrollView>
 
-      {/* Sabit Alt Bar (Sadece Ara ve Hemen Al kaldı) */}
-      <View style={styles.bottomBar}>
-        <TouchableOpacity style={styles.callButton}>
-          <Ionicons name="call" size={22} color="#1a1a1a" />
-          <Text style={styles.callButtonText}>Ara</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.buyButton}>
-          <Text style={styles.buyButtonText}>Hemen Al</Text>
-        </TouchableOpacity>
-      </View>
     </View>
   );
 }
@@ -262,12 +255,6 @@ const styles = StyleSheet.create({
 
   reportButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: 24, paddingVertical: 8 },
   reportButtonText: { color: '#94a3b8', fontWeight: '600', fontSize: 14, marginLeft: 6 },
-
-  bottomBar: { position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: '#ffffff', flexDirection: 'row', padding: 20, paddingBottom: Platform.OS === 'ios' ? 34 : 20, borderTopWidth: 1, borderTopColor: '#f1f5f9', shadowColor: '#000', shadowOffset: { width: 0, height: -4 }, shadowOpacity: 0.05, shadowRadius: 10, elevation: 10 },
-  callButton: { flex: 1, backgroundColor: '#f1f5f9', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', borderRadius: 16, height: 56, marginRight: 12 },
-  callButtonText: { color: '#1a1a1a', fontSize: 16, fontWeight: '800', marginLeft: 8 },
-  buyButton: { flex: 2, backgroundColor: '#1a1a1a', alignItems: 'center', justifyContent: 'center', borderRadius: 16, height: 56 },
-  buyButtonText: { color: '#ffffff', fontSize: 16, fontWeight: '800' },
   
   backButton: { marginTop: 20, paddingHorizontal: 20, paddingVertical: 10, backgroundColor: '#e2e8f0', borderRadius: 8 },
   backButtonText: { fontWeight: '600', color: '#475569' }

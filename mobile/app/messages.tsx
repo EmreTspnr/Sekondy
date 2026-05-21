@@ -67,9 +67,19 @@ export default function MessagesScreen() {
 
   const handleDelete = async (partnerId: string) => {
     Alert.alert(
-      'Bilgi',
-      'Mesajları toplu silmek için lütfen web sürümünü kullanın.',
-      [{ text: 'Tamam' }]
+      'Sohbeti Sil',
+      'Bu sohbeti silmek istediğinize emin misiniz?',
+      [
+        { text: 'İptal', style: 'cancel' },
+        { text: 'Sil', style: 'destructive', onPress: async () => {
+          try {
+            await api.delete(`/messages/${partnerId}`);
+            setChats(chats.filter(c => c.partner._id !== partnerId));
+          } catch (error) {
+            Alert.alert('Hata', 'Sohbet silinemedi.');
+          }
+        }}
+      ]
     );
   };
 

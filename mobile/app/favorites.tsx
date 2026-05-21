@@ -84,7 +84,7 @@ export default function FavoritesScreen() {
                 </View>
                 <TouchableOpacity
                   style={styles.kaldir}
-                  onPress={() => handleKaldir(listing._id, listing.title)}
+                  onPress={() => handleKaldir(favori._id, listing.title)}
                 >
                   <Ionicons name="heart" size={24} color="#ef4444" />
                 </TouchableOpacity>

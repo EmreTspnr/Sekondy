@@ -27,13 +27,13 @@ export default function SavedSearchesScreen() {
 
     const toggleBildirim = async (id: string, currentStatus: boolean) => {
         // Optimistic update
-        setSearches(searches.map(s => s._id === id ? { ...s, isNotificationEnabled: !currentStatus } : s));
+        setSearches(searches.map(s => s._id === id ? { ...s, notificationsEnabled: !currentStatus } : s));
         try {
-            await api.put(`/saved-searches/${id}/notifications`, { isEnabled: !currentStatus });
+            await api.put(`/saved-searches/${id}/notifications`, { notificationsEnabled: !currentStatus });
         } catch (error) {
             console.error(error);
             // Revert on failure
-            setSearches(searches.map(s => s._id === id ? { ...s, isNotificationEnabled: currentStatus } : s));
+            setSearches(searches.map(s => s._id === id ? { ...s, notificationsEnabled: currentStatus } : s));
             Alert.alert('Hata', 'Bildirim ayarı güncellenemedi.');
         }
     };
@@ -93,10 +93,10 @@ export default function SavedSearchesScreen() {
                             </View>
                             <View style={styles.cardRight}>
                                 <Switch
-                                    value={search.isNotificationEnabled}
-                                    onValueChange={() => toggleBildirim(search._id, search.isNotificationEnabled)}
+                                    value={search.notificationsEnabled}
+                                    onValueChange={() => toggleBildirim(search._id, search.notificationsEnabled)}
                                     trackColor={{ false: '#e2e8f0', true: '#fdfbd4' }}
-                                    thumbColor={search.isNotificationEnabled ? '#D4AF37' : '#94a3b8'}
+                                    thumbColor={search.notificationsEnabled ? '#D4AF37' : '#94a3b8'}
                                 />
                                 <TouchableOpacity onPress={() => handleSil(search._id, search.query)} style={styles.deleteButton}>
                                     <Ionicons name="trash-outline" size={18} color="#ef4444" />
