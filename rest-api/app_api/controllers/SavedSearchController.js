@@ -22,7 +22,7 @@ const createSavedSearch = async (req, res) => {
       location,
       minPrice,
       maxPrice,
-      notificationsEnabled: false
+      notificationsEnabled: true
     });
 
     // RabbitMQ: Yeni arama kaydedildiginde bildirim sistemine haber ver
