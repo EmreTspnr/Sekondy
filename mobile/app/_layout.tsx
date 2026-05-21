@@ -4,12 +4,14 @@ import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { usePushNotifications } from '../hooks/usePushNotifications';
 
 export const unstable_settings = {
   anchor: '(tabs)',
 };
 
 export default function RootLayout() {
+  usePushNotifications();
   const colorScheme = useColorScheme();
 
   return (

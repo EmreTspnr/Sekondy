@@ -13,7 +13,8 @@ const userSchema = new mongoose.Schema({
     ipAddress: String,
     device: String,
     date: { type: Date, default: Date.now }
-  }]
+  }],
+  expoPushToken: { type: String }
 }, { timestamps: true });
 
 mongoose.model('User', userSchema);

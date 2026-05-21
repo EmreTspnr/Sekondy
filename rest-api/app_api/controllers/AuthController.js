@@ -212,6 +212,25 @@ const getLoginHistory = async (req, res) => {
   }
 };
 
+// 7. Görev: Expo Push Token Kaydetme
+const savePushToken = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const { token } = req.body;
+    
+    if (!token) {
+      return res.status(400).json({ mesaj: "Push token gerekli." });
+    }
+
+    await User.findByIdAndUpdate(userId, { expoPushToken: token });
+    await redis.del(`profile:${userId}`);
+    
+    res.status(200).json({ mesaj: "Push token kaydedildi." });
+  } catch (error) {
+    res.status(500).json({ mesaj: "Token kaydedilirken hata oluştu.", hata: error.message });
+  }
+};
+
 // DOSYANIN EN ALTINDAKİ EXPORT KISMINI ŞÖYLE GÜNCELLEMELİSİN:
 module.exports = {
   register,
@@ -219,5 +238,6 @@ module.exports = {
   updateProfile,
   getProfile,
   deleteProfile,
-  getLoginHistory
+  getLoginHistory,
+  savePushToken
 };

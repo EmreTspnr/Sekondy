@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Platform, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Platform, ActivityIndicator, Alert, RefreshControl } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import api from '../services/api';
@@ -8,6 +8,7 @@ export default function FollowedSellersScreen() {
   const router = useRouter();
   const [sellers, setSellers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     fetchSellers();
@@ -21,8 +22,14 @@ export default function FollowedSellersScreen() {
       console.error('Takip edilenler alınamadı', error);
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   };
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    fetchSellers();
+  }, []);
 
   const handleUnfollow = async (sellerId: string) => {
     Alert.alert('Emin misin?', 'Bu satıcıyı takipten çıkmak istediğine emin misin?', [
@@ -48,7 +55,11 @@ export default function FollowedSellersScreen() {
         <View style={{ width: 40 }} />
       </View>
 
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
+      <ScrollView 
+        showsVerticalScrollIndicator={false} 
+        contentContainerStyle={styles.content}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#D4AF37" />}
+      >
         {loading ? (
           <ActivityIndicator size="large" color="#1a1a1a" style={{ marginTop: 40 }} />
         ) : sellers.length === 0 ? (

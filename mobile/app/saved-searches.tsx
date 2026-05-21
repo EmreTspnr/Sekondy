@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Switch, Alert, Platform, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Switch, Alert, Platform, ActivityIndicator, RefreshControl } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import api from '../services/api';
@@ -8,6 +8,7 @@ export default function SavedSearchesScreen() {
     const router = useRouter();
     const [searches, setSearches] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
 
     useEffect(() => {
         fetchSearches();
@@ -22,8 +23,14 @@ export default function SavedSearchesScreen() {
             Alert.alert('Hata', 'Kayıtlı aramalar yüklenemedi.');
         } finally {
             setLoading(false);
+            setRefreshing(false);
         }
     };
+
+    const onRefresh = React.useCallback(() => {
+        setRefreshing(true);
+        fetchSearches();
+    }, []);
 
     const toggleBildirim = async (id: string, currentStatus: boolean) => {
         // Optimistic update
@@ -71,7 +78,10 @@ export default function SavedSearchesScreen() {
                 <View style={styles.backButton} />
             </View>
 
-            <ScrollView contentContainerStyle={styles.scrollContent}>
+            <ScrollView 
+                contentContainerStyle={styles.scrollContent}
+                refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#D4AF37" />}
+            >
                 {loading ? (
                     <ActivityIndicator size="large" color="#D4AF37" style={{ marginTop: 40 }} />
                 ) : searches.length === 0 ? (
