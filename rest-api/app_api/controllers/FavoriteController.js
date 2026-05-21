@@ -86,8 +86,28 @@ const deleteFavorite = async (req, res) => {
   }
 };
 
+const deleteFavoriteByListing = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const { listingId } = req.params;
+
+    const deleted = await Favorite.findOneAndDelete({ listing: listingId, user: userId });
+    if (!deleted) {
+      return res.status(404).json({ mesaj: 'Silinecek favori bulunamadi.' });
+    }
+
+    // Favorilerden silince onbellegi temizle
+    await redis.del(`favorites:${userId}`);
+
+    res.status(200).json({ mesaj: 'Favorilerden basariyla kaldirildi.' });
+  } catch (error) {
+    res.status(500).json({ mesaj: 'Favori silinirken hata olustu.', hata: error.message });
+  }
+};
+
 module.exports = {
   addFavorite,
   getFavorites,
-  deleteFavorite
+  deleteFavorite,
+  deleteFavoriteByListing
 };

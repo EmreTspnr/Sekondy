@@ -140,9 +140,43 @@ const deleteMessage = async (req, res) => {
   }
 };
 
+const deleteConversation = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const { partnerId } = req.params;
+
+    const messages = await Message.find({
+      $or: [
+        { sender: userId, receiver: partnerId },
+        { sender: partnerId, receiver: userId }
+      ]
+    });
+
+    if (!messages || messages.length === 0) {
+      return res.status(404).json({ mesaj: 'Silinecek sohbet bulunamadi.' });
+    }
+
+    // Her mesaj icin deletedBy listesine kullaniciyi ekle
+    for (let msg of messages) {
+      if (!msg.deletedBy.includes(userId)) {
+        msg.deletedBy.push(userId);
+        await msg.save();
+      }
+    }
+
+    // Onbellegi temizle
+    await redis.del(`messages:${userId}`);
+
+    res.status(200).json({ mesaj: 'Sohbet basariyla silindi.' });
+  } catch (error) {
+    res.status(500).json({ mesaj: 'Sohbet silinirken hata olustu.', hata: error.message });
+  }
+};
+
 module.exports = {
   sendMessage,
   getMessages,
   markAsRead,
-  deleteMessage
+  deleteMessage,
+  deleteConversation
 };

@@ -73,7 +73,7 @@ export default function MessagesScreen() {
         { text: 'İptal', style: 'cancel' },
         { text: 'Sil', style: 'destructive', onPress: async () => {
           try {
-            await api.delete(`/messages/${partnerId}`);
+            await api.delete(`/messages/partner/${partnerId}`);
             setChats(chats.filter(c => c.partner._id !== partnerId));
           } catch (error) {
             Alert.alert('Hata', 'Sohbet silinemedi.');

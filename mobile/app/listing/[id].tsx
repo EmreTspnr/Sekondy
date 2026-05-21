@@ -12,6 +12,7 @@ import {
   Alert
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useFocusEffect } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import api from '../../services/api';
 
@@ -24,29 +25,49 @@ export default function ListingDetailScreen() {
   const [loading, setLoading] = useState(true);
   const [isFavorite, setIsFavorite] = useState(false);
 
-  useEffect(() => {
-    const fetchListingDetail = async () => {
-      try {
-        const response = await api.get(`/ads/${id}`);
-        setListing(response.data);
-      } catch (error) {
-        console.error("İlan getirilirken hata:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  useFocusEffect(
+    React.useCallback(() => {
+      const fetchFavoriteStatus = async () => {
+        try {
+          const response = await api.get('/favorites');
+          const isFav = response.data.some((f: any) => f.listing._id === id);
+          setIsFavorite(isFav);
+        } catch (error) {
+          console.error("Favori durumu getirilemedi:", error);
+        }
+      };
+      
+      const fetchListingDetail = async () => {
+        try {
+          const response = await api.get(`/ads/${id}`);
+          setListing(response.data);
+        } catch (error) {
+          console.error("İlan getirilirken hata:", error);
+        } finally {
+          setLoading(false);
+        }
+      };
 
-    fetchListingDetail();
-  }, [id]);
+      fetchListingDetail();
+      fetchFavoriteStatus();
+    }, [id])
+  );
 
   const handleFavorite = async () => {
     try {
-      setIsFavorite(true);
-      await api.post('/favorites', { listingId: listing._id });
-      Alert.alert('Başarılı', 'İlan favorilerinize eklendi!');
+      if (isFavorite) {
+        setIsFavorite(false);
+        await api.delete(`/favorites/listing/${id}`);
+        Alert.alert('Başarılı', 'İlan favorilerinizden çıkarıldı!');
+      } else {
+        setIsFavorite(true);
+        await api.post('/favorites', { listingId: listing._id });
+        Alert.alert('Başarılı', 'İlan favorilerinize eklendi!');
+      }
     } catch (error) {
-      setIsFavorite(false);
-      Alert.alert('Bilgi', 'İlan zaten favorilerinizde veya giriş yapmadınız.');
+      // Geri al
+      setIsFavorite(!isFavorite);
+      Alert.alert('Hata', 'İşlem sırasında bir hata oluştu veya giriş yapmadınız.');
     }
   };
 
@@ -72,26 +93,8 @@ export default function ListingDetailScreen() {
   };
 
   const handleReport = () => {
-    Alert.prompt(
-      'İlanı Şikayet Et',
-      'Lütfen şikayet nedeninizi kısaca yazın:',
-      [
-        { text: 'İptal', style: 'cancel' },
-        { 
-          text: 'Gönder', 
-          onPress: async (reason?: string) => {
-            if (!reason) return;
-            try {
-              await api.post('/reports', { listingId: listing._id, reason });
-              Alert.alert('Teşekkürler', 'Şikayetiniz yöneticilere iletildi.');
-            } catch (error) {
-              Alert.alert('Hata', 'Şikayet gönderilemedi.');
-            }
-          } 
-        }
-      ],
-      'plain-text'
-    );
+    if (!listing) return;
+    router.push({ pathname: '/report-ad', params: { id: listing._id } });
   };
 
   if (loading) {

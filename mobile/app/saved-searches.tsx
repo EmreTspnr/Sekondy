@@ -87,18 +87,21 @@ export default function SavedSearchesScreen() {
                                     <Ionicons name="search" size={20} color="#D4AF37" />
                                 </View>
                                 <View>
-                                    <Text style={styles.keyword}>{search.query}</Text>
+                                    <Text style={styles.keyword}>{search.keyword || 'Tüm İlanlar'}</Text>
                                     {search.category && <Text style={styles.category}>{search.category}</Text>}
                                 </View>
                             </View>
                             <View style={styles.cardRight}>
-                                <Switch
-                                    value={search.notificationsEnabled}
-                                    onValueChange={() => toggleBildirim(search._id, search.notificationsEnabled)}
-                                    trackColor={{ false: '#e2e8f0', true: '#fdfbd4' }}
-                                    thumbColor={search.notificationsEnabled ? '#D4AF37' : '#94a3b8'}
-                                />
-                                <TouchableOpacity onPress={() => handleSil(search._id, search.query)} style={styles.deleteButton}>
+                                <View style={{ alignItems: 'center', marginRight: 15 }}>
+                                    <Switch
+                                        value={search.notificationsEnabled}
+                                        onValueChange={() => toggleBildirim(search._id, search.notificationsEnabled)}
+                                        trackColor={{ false: '#e2e8f0', true: '#fdfbd4' }}
+                                        thumbColor={search.notificationsEnabled ? '#D4AF37' : '#94a3b8'}
+                                    />
+                                    <Text style={{ fontSize: 10, color: '#94a3b8', marginTop: 4 }}>Bildirimler</Text>
+                                </View>
+                                <TouchableOpacity onPress={() => handleSil(search._id, search.keyword)} style={styles.deleteButton}>
                                     <Ionicons name="trash-outline" size={18} color="#ef4444" />
                                 </TouchableOpacity>
                             </View>
