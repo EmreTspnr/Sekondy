@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Platform, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import { useFocusEffect } from '@react-navigation/native';
 import api from '../services/api';
 
 export default function MessagesScreen() {
@@ -10,9 +11,11 @@ export default function MessagesScreen() {
   const [loading, setLoading] = useState(true);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchUserAndMessages();
-  }, []);
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchUserAndMessages();
+    }, [])
+  );
 
   const fetchUserAndMessages = async () => {
     try {

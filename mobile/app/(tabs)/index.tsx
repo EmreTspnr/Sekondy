@@ -21,6 +21,7 @@ export default function HomeScreen() {
   const [loading, setLoading] = useState(false);
   const [menuVisible, setMenuVisible] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     loadHistory();
@@ -29,7 +30,9 @@ export default function HomeScreen() {
 
   const checkLoginStatus = async () => {
     const token = await AsyncStorage.getItem('token');
+    const adminStatus = await AsyncStorage.getItem('isAdmin');
     setIsLoggedIn(!!token);
+    setIsAdmin(adminStatus === 'true');
   };
 
   useFocusEffect(
@@ -139,7 +142,10 @@ export default function HomeScreen() {
   const handleLogout = async () => {
     try {
       await AsyncStorage.removeItem('token');
+      await AsyncStorage.removeItem('isAdmin');
       setMenuVisible(false);
+      setIsLoggedIn(false);
+      setIsAdmin(false);
       router.push('/login');
     } catch (e) {
       console.error(e);
@@ -206,9 +212,12 @@ export default function HomeScreen() {
               <TouchableOpacity style={styles.menuItem} onPress={() => navigateMenu('/profile')}>
                 <Text style={styles.menuText}>PROFİL</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.menuItem} onPress={() => navigateMenu('/admin-dashboard')}>
-                <Text style={[styles.menuText, { color: '#D4AF37' }]}>YÖNETİCİ PANELİ</Text>
-              </TouchableOpacity>
+              
+              {isAdmin && (
+                <TouchableOpacity style={styles.menuItem} onPress={() => navigateMenu('/admin-dashboard')}>
+                  <Text style={[styles.menuText, { color: '#D4AF37' }]}>YÖNETİCİ PANELİ</Text>
+                </TouchableOpacity>
+              )}
               
               {isLoggedIn ? (
                 <TouchableOpacity style={[styles.menuItem, { borderBottomWidth: 0, marginTop: 20 }]} onPress={handleLogout}>

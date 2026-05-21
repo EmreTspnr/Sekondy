@@ -21,6 +21,7 @@ export default function LoginScreen() {
     try {
       const res = await api.post('/auth/login', { email: email.trim().toLowerCase(), password });
       await AsyncStorage.setItem('token', res.data.token);
+      await AsyncStorage.setItem('isAdmin', String(res.data.user.isAdmin));
       router.replace('/(tabs)');
     } catch (err) {
       console.error(err);

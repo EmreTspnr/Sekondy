@@ -224,6 +224,8 @@ const updateListing = async (req, res) => {
 
     // Redis önbelleğini temizle (Kullanıcı eski ilanı görmesin)
     await redis.del(`ad:${id}`);
+    await redis.del('showcase:listings');
+    if (listing.category) await redis.del(`category:${listing.category}`);
 
     res.status(200).json(listing);
   } catch (error) {
@@ -274,6 +276,8 @@ const deleteListing = async (req, res) => {
 
     // Redis önbelleğini temizle (Silinen ilan görünmesin)
     await redis.del(`ad:${id}`);
+    await redis.del('showcase:listings');
+    if (listing.category) await redis.del(`category:${listing.category}`);
 
     res.status(200).json({ mesaj: 'Ilan basariyla sistemden kaldirildi.' });
   } catch (error) {

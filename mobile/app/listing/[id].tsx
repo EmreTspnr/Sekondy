@@ -29,11 +29,18 @@ export default function ListingDetailScreen() {
     React.useCallback(() => {
       const fetchFavoriteStatus = async () => {
         try {
+          // Check if token exists before trying to fetch favorites
+          const AsyncStorage = require('@react-native-async-storage/async-storage').default;
+          const token = await AsyncStorage.getItem('token');
+          if (!token) return;
+
           const response = await api.get('/favorites');
-          const isFav = response.data.some((f: any) => f.listing._id === id);
+          const isFav = response.data.some((f: any) => f.listing && f.listing._id === id);
           setIsFavorite(isFav);
-        } catch (error) {
-          console.error("Favori durumu getirilemedi:", error);
+        } catch (error: any) {
+          if (error.response?.status !== 403) {
+            console.error("Favori durumu getirilemedi:", error);
+          }
         }
       };
       
@@ -41,8 +48,13 @@ export default function ListingDetailScreen() {
         try {
           const response = await api.get(`/ads/${id}`);
           setListing(response.data);
-        } catch (error) {
-          console.error("İlan getirilirken hata:", error);
+        } catch (error: any) {
+          if (error.response?.status === 404) {
+             Alert.alert('Hata', 'İlan bulunamadı veya yayından kaldırılmış olabilir.');
+             router.back();
+          } else {
+             console.error("İlan getirilirken hata:", error);
+          }
         } finally {
           setLoading(false);
         }
