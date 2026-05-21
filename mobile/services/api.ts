@@ -1,5 +1,7 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { router } from 'expo-router';
+import { Alert } from 'react-native';
 
 // İnternetteki canlı sunucuya bağlanır (Eğer .env tanımlanmadıysa)
 // Yerel test için proje dizinine .env dosyası açıp EXPO_PUBLIC_API_URL=http://<pc-ip>:5000/v1 yazabilirsiniz
@@ -31,6 +33,26 @@ api.interceptors.request.use(
   },
   (error) => {
     console.error('[DEBUG API] Interceptor hatası:', error);
+    return Promise.reject(error);
+  }
+);
+
+// Gelen yanıtlarda 401 yetkisiz erişim hatası varsa oturumu temizle
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    if (error.response && error.response.status === 401) {
+      console.log('[DEBUG API] 401 Unauthorized yakalandı, oturum kapatılıyor...');
+      await AsyncStorage.removeItem('token');
+      await AsyncStorage.removeItem('isAdmin');
+      
+      // Kullanıcıyı login ekranına yönlendir
+      if (router) {
+        router.replace('/login');
+      }
+      
+      Alert.alert('Oturum Süresi Doldu', 'Güvenliğiniz için lütfen tekrar giriş yapın.');
+    }
     return Promise.reject(error);
   }
 );
