@@ -17,7 +17,7 @@
 - Sunumun yapısının kısaca açıklanması
 
 **Örnek Konuşma:**
-> "Merhaba, ben [Grup Lideri İsmi]. [Grup Adı] ekibi olarak [Proje Adı] projesini geliştirdik. Bu proje [kısa proje açıklaması]. Bugün sizlere projemizi ve ekibimizin çalışmalarını sunacağız. Her ekip üyesi kendini tanıtacak ve sorumlu olduğu gereksinimleri gösterecek."
+> "Merhaba, ben Veysel Emir Hartavi. Sekondy ekibi olarak geliştirdiğimiz ikinci el alım-satım projemizi bugün sizlere sunacağız. Projemiz React Native ile geliştirilmiş mobil uygulama ve Node.js tabanlı REST API'den oluşmaktadır. Bugün projemizin temel işlevlerini ve ekibimizin geliştirdiği servisleri göstereceğiz. Her ekip üyesi kendini tanıtacak ve sorumlu olduğu API ve arayüz entegrasyonlarını canlı olarak test edecektir."
 
 ---
 
@@ -42,43 +42,94 @@ Her ekip üyesi için aşağıdaki yapı takip edilecektir:
 
 ---
 
-### 3. Ekip Üyeleri Sunum Sırası
+### 4. Ekip Üyeleri Sunum Sırası
 
-#### Ali Tutar
+#### 1. Furkan Sarıbaş
 **Kişisel Tanıtım:**
-- İsim: Ali Tutar
+- İsim: Furkan Sarıbaş
+- Sorumlu Olduğu Alan: Kimlik Doğrulama ve Profil Yönetimi (Auth & Profile)
 
-**Gereksinimler:**
+**Gereksinimler (API & Mobil Entegrasyon):**
 1. **Üye Olma**
    - API Metodu: `POST /auth/register`
-   - Demo: Kullanıcı kayıt işleminin gösterilmesi
-
-2. **Profil Görüntüleme**
-   - API Metodu: `GET /users/{userId}`
-   - Demo: Kullanıcı profil bilgilerinin görüntülenmesi
-
-3. **Profil Güncelleme**
-   - API Metodu: `PUT /users/{userId}`
-   - Demo: Profil bilgilerinin güncellenmesi
-
-4. **Hesap Silme**
-   - API Metodu: `DELETE /users/{userId}`
-   - Demo: Hesap silme işleminin gösterilmesi
+   - Demo: Kullanıcı kayıt formunun doldurulup backend'e gönderilmesi
+2. **Giriş Yapma**
+   - API Metodu: `POST /auth/login`
+   - Demo: Başarılı giriş ve JWT Token'ın (AsyncStorage) cihaza kaydedilmesi
+3. **Cihaz Bildirim Kaydı**
+   - API Metodu: `POST /auth/push-token`
+   - Demo: Expo Push Token oluşturulup veritabanına işlenmesi
 
 ---
 
-#### Veli Yılmaz
+#### 2. Emre Taşpınar
 **Kişisel Tanıtım:**
-- İsim: Veli Yılmaz
-- Rol: [Rol belirtilecek]
+- İsim: Emre Taşpınar
+- Sorumlu Olduğu Alan: İlan Yönetimi ve Vitrin (Ad Management)
 
-**Gereksinimler:**
-- [Gereksinim 1]
-- [Gereksinim 2]
-- [Gereksinim 3]
-- [Gereksinim 4]
+**Gereksinimler (API & Mobil Entegrasyon):**
+1. **İlan Ekleme ve Fotoğraf Yükleme**
+   - API Metodu: `POST /ads` ve `POST /ads/:id/photos`
+   - Demo: Yeni bir ilanın formData ile fotoğraflarıyla birlikte yüklenmesi
+2. **Vitrin Listeleme (Tüm İlanlar)**
+   - API Metodu: `GET /ads`
+   - Demo: Onaylanmış tüm ilanların kategorilere göre çekilip anasayfada gösterilmesi
+3. **İlan Detayı**
+   - API Metodu: `GET /ads/:id`
+   - Demo: Bir ilanın detay sayfasına girilip tüm bilgilerin ve resimlerin getirilmesi
 
 ---
+
+#### 3. Veysel Emir Hartavi (Grup Lideri)
+**Kişisel Tanıtım:**
+- İsim: Veysel Emir Hartavi
+- Sorumlu Olduğu Alan: Etkileşimler (Favoriler ve Kayıtlı Aramalar)
+
+**Gereksinimler (API & Mobil Entegrasyon):**
+1. **Favorilere Ekleme ve Çıkarma**
+   - API Metodu: `POST /favorites` ve `DELETE /favorites`
+   - Demo: Bir ilanın favorilere eklenmesi ve favorilerim ekranında (`GET /favorites`) listelenmesi
+2. **Aramayı Kaydetme**
+   - API Metodu: `POST /saved-searches`
+   - Demo: Bir anahtar kelimenin aranıp kaydedilmesi ve listelenmesi
+3. **Kayıtlı Arama Bildirimleri**
+   - Push Notification Testi: Kayıtlı aramaya uyan ilan girildiğinde bildirimin (Push Notification) gelmesi
+
+---
+
+#### 4. Sinan Ece
+**Kişisel Tanıtım:**
+- İsim: Sinan Ece
+- Sorumlu Olduğu Alan: Gerçek Zamanlı Mesajlaşma (Messaging)
+
+**Gereksinimler (API & Mobil Entegrasyon):**
+1. **Sohbet Başlatma ve Mesaj Gönderme**
+   - API Metodu: `POST /messages`
+   - Demo: Bir ilan sahibiyle sohbet başlatılması ve mesaj iletilmesi
+2. **Gelen Kutusu (Sohbetleri Listeleme)**
+   - API Metodu: `GET /messages`
+   - Demo: Kullanıcının daha önce mesajlaştığı kişilerin listelenmesi
+3. **Mesaj Geçmişi**
+   - API Metodu: `GET /messages/partner/:id`
+   - Demo: Belirli bir sohbete girilip önceki mesajların balonlar halinde gösterilmesi
+
+---
+
+#### 5. Ramize Elif Ermiş
+**Kişisel Tanıtım:**
+- İsim: Ramize Elif Ermiş
+- Sorumlu Olduğu Alan: Yönetim ve Şikayet Paneli (Admin & Reports)
+
+**Gereksinimler (API & Mobil Entegrasyon):**
+1. **İlan Şikayet Etme**
+   - API Metodu: `POST /listings/:id/reports`
+   - Demo: Mobil uygulamadan bir ilanın şikayet edilmesi
+2. **Admin: İlan Onaylama / Reddetme**
+   - API Metodu: `PUT /admin/ads/:id/approve`
+   - Demo: Bekleyen (pending) bir ilanın admin paneli üzerinden onaylanması
+3. **Admin: Şikayetleri Görüntüleme**
+   - API Metodu: `GET /admin/reports`
+   - Demo: Şikayet edilen ilanların admin tarafından incelenmesi
 
 ### 4. Grup Lideri - Kapanış Konuşması (1 dakika)
 
@@ -87,7 +138,7 @@ Her ekip üyesi için aşağıdaki yapı takip edilecektir:
 - Projenin başarıyla tamamlandığının vurgulanması
 
 **Örnek Konuşma:**
-> "Bugün sizlere [Proje Adı] projemizi sunduk. Tüm ekip üyelerimiz sorumlu oldukları gereksinimleri başarıyla tamamladılar ve çalışır durumda gösterdiler. Projemiz [kısa özet]. Teşekkürler!"
+> "Bugün sizlere Sekondy projemizi sunduk. Tüm ekip üyelerimiz sorumlu oldukları REST API servislerini ve bunların mobil uygulamadaki arayüz entegrasyonlarını başarıyla tamamladılar. Projemiz baştan uca çalışan, push bildirimleri ve yetkilendirmesi olan güvenli bir 2. el ticaret platformu haline gelmiştir. Dinlediğiniz için teşekkürler!"
 
 ---
 
