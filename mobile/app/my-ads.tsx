@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, ActivityIndicator, Dimensions, Platform, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, ActivityIndicator, Dimensions, Platform, Alert, RefreshControl } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import api from '../services/api';
@@ -10,6 +10,7 @@ export default function MyAdsScreen() {
   const router = useRouter();
   const [ads, setAds] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     fetchMyAds();
@@ -24,8 +25,14 @@ export default function MyAdsScreen() {
       Alert.alert('Hata', 'İlanlarınız alınamadı.');
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   };
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    fetchMyAds();
+  }, []);
 
   const handleDelete = (id: string) => {
     Alert.alert('İlanı Sil', 'Bu ilanı silmek istediğinize emin misiniz?', [
@@ -53,7 +60,10 @@ export default function MyAdsScreen() {
         <View style={{ width: 40 }} />
       </View>
 
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView 
+        showsVerticalScrollIndicator={false}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#D4AF37" />}
+      >
         {loading ? (
           <ActivityIndicator size="large" color="#D4AF37" style={{ marginTop: 40 }} />
         ) : ads.length === 0 ? (

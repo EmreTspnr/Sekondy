@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Platform, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Platform, ActivityIndicator, RefreshControl } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useFocusEffect } from '@react-navigation/native';
@@ -11,6 +11,7 @@ export default function AdminDashboardScreen() {
   const [pendingAds, setPendingAds] = useState<any[]>([]);
   const [reportedAds, setReportedAds] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -26,8 +27,14 @@ export default function AdminDashboardScreen() {
       Alert.alert('Hata', 'Veriler yüklenemedi. Admin yetkiniz olduğundan emin olun.');
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   }, []);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    fetchData();
+  }, [fetchData]);
 
   useFocusEffect(
     useCallback(() => {
@@ -130,7 +137,7 @@ export default function AdminDashboardScreen() {
       <View style={styles.tabContainer}>
         <TouchableOpacity 
           style={[styles.tab, activeTab === 'pending' && styles.activeTab]} 
-          onPress={() => setActiveTab('pending')}
+          onPress={() => { setActiveTab('pending'); fetchData(); }}
         >
           <Ionicons name="alert-circle-outline" size={18} color={activeTab === 'pending' ? '#1a1a1a' : '#64748b'} />
           <Text style={[styles.tabText, activeTab === 'pending' && styles.activeTabText]}>Onay Bekleyenler ({pendingAds.length})</Text>
@@ -138,14 +145,17 @@ export default function AdminDashboardScreen() {
 
         <TouchableOpacity 
           style={[styles.tab, activeTab === 'reported' && styles.activeTab]} 
-          onPress={() => setActiveTab('reported')}
+          onPress={() => { setActiveTab('reported'); fetchData(); }}
         >
           <Ionicons name="flag-outline" size={18} color={activeTab === 'reported' ? '#1a1a1a' : '#64748b'} />
           <Text style={[styles.tabText, activeTab === 'reported' && styles.activeTabText]}>Şikayet Edilenler ({reportedAds.length})</Text>
         </TouchableOpacity>
       </View>
 
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <ScrollView 
+        contentContainerStyle={styles.scrollContent}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#D4AF37" />}
+      >
         {loading ? (
           <ActivityIndicator size="large" color="#D4AF37" style={{ marginTop: 40 }} />
         ) : activeTab === 'pending' ? (

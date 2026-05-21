@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Platform, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Platform, ActivityIndicator, RefreshControl } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import api from '../services/api';
@@ -8,6 +8,7 @@ export default function FavoritesScreen() {
   const router = useRouter();
   const [favoriler, setFavoriler] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     fetchFavorites();
@@ -22,8 +23,14 @@ export default function FavoritesScreen() {
       Alert.alert('Hata', 'Favoriler yüklenemedi. Lütfen giriş yaptığınızdan emin olun.');
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   };
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    fetchFavorites();
+  }, []);
 
   const handleKaldir = (id: string, baslik: string) => {
     Alert.alert(
@@ -58,7 +65,10 @@ export default function FavoritesScreen() {
         <View style={styles.backButton} />
       </View>
 
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <ScrollView 
+        contentContainerStyle={styles.scrollContent}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#D4AF37" />}
+      >
         {loading ? (
           <ActivityIndicator size="large" color="#D4AF37" style={{ marginTop: 40 }} />
         ) : favoriler.length === 0 ? (

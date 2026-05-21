@@ -41,6 +41,7 @@ router.put('/profile', verifyToken, ctrlAuth.updateProfile);
 router.get('/profile', verifyToken, ctrlAuth.getProfile);
 router.delete('/profile', verifyToken, ctrlAuth.deleteProfile);
 router.get('/auth/history', verifyToken, ctrlAuth.getLoginHistory);
+router.post('/auth/push-token', verifyToken, ctrlAuth.savePushToken);
 
 
 router.post('/listings', verifyToken, ctrlListings.addListing);

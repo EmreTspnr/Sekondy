@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const rabbitmq = require('../services/rabbitmq');
 const redis = require('../services/redis');
+const { sendPushNotification } = require('../services/pushNotification');
 const Message = mongoose.model('Message');
 const User = mongoose.model('User');
 const Listing = mongoose.model('Listing');
@@ -46,6 +47,13 @@ const sendMessage = async (req, res) => {
       icerik: content,
       timestamp: new Date()
     });
+
+    // Real Push Notification
+    if (receiver.expoPushToken) {
+      const sender = await User.findById(senderId);
+      const title = sender ? `${sender.firstName} ${sender.lastName}` : 'Yeni Mesaj';
+      await sendPushNotification(receiver.expoPushToken, title, content, { type: 'message', messageId: newMessage._id });
+    }
 
     // Mesaj gonderilince hem alicinin hem de gonderenin mesaj onbellegi eskimis olur, temizle
     await redis.del(`messages:${receiverId}`);

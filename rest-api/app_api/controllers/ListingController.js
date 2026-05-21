@@ -5,6 +5,7 @@ const Message = mongoose.model('Message');
 const User = mongoose.model('User');
 const redis = require('../services/redis');
 const rabbitmq = require('../services/rabbitmq');
+const { sendPushNotification } = require('../services/pushNotification');
 
 const EDITABLE_FIELDS = [
   'title',
@@ -95,12 +96,19 @@ const triggerSearchNotifications = async (newListing) => {
 
       if (match) {
         let keywordText = search.keyword || search.category || title;
+        const msgContent = `Kayıtlı aramanız "${keywordText}" ile eşleşen yeni bir ilan eklendi: ${title}. Fiyat: ${price} TL.`;
         await Message.create({
           sender: systemUser._id,
           receiver: search.user,
           listing: newListing._id,
-          content: `Kayıtlı aramanız "${keywordText}" ile eşleşen yeni bir ilan eklendi: ${title}. Fiyat: ${price} TL.`
+          content: msgContent
         });
+
+        // Push notification
+        const receiverUser = await User.findById(search.user);
+        if (receiverUser && receiverUser.expoPushToken) {
+          await sendPushNotification(receiverUser.expoPushToken, 'Yeni İlan Bildirimi', msgContent, { type: 'listing', listingId: newListing._id });
+        }
       }
     }
   } catch (error) {
@@ -147,6 +155,9 @@ const addListing = async (req, res) => {
     });
 
     triggerSearchNotifications(newListing);
+
+    // Redis önbelleğini temizle (Admin anında görsün)
+    await redis.del('admin:pendingAds');
 
     // RabbitMQ: Publish message to queue
     rabbitmq.publishToQueue('YeniIlanOnayBekliyor', {
