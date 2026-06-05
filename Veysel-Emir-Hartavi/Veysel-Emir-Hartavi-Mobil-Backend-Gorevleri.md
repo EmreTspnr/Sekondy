@@ -1,62 +1,26 @@
-# Ali Tutar'ın Mobil Backend Görevleri
-**Mobil Front-end ile Back-end Bağlanmış Test Videosu:** [Link buraya eklenecek](https://example.com)
+# Veysel Emir Hartavi'nin Mobil Backend Görevleri
+**Mobil Front-end ile Back-end Bağlanmış Test Videosu:** [Link buraya eklenecek]
 
-## 1. Üye Olma (Kayıt) Servisi
-- **API Endpoint:** `POST /auth/register`
-- **Görev:** Mobil uygulamada kullanıcı kayıt işlemini gerçekleştiren servis entegrasyonu
-- **İşlevler:**
-  - Kullanıcı bilgilerini (email, password, firstName, lastName) toplama
-  - Form validasyonu (email formatı, şifre güvenliği kontrolü)
-  - API'ye POST isteği gönderme
-  - Başarılı kayıt durumunda kullanıcıyı giriş ekranına yönlendirme
-  - Hata durumlarını yakalama ve kullanıcıya gösterilmesi (409 Conflict, 400 Bad Request)
-- **Teknik Detaylar:**
-  - HTTP Client kullanımı (Retrofit/OkHttp - Android, URLSession/Alamofire - iOS)
-  - Request/Response model sınıfları oluşturma
-  - Error handling ve retry mekanizması
-  - Loading state yönetimi
+## 1. İlan Şikayet Etme
+- **API Endpoint:** `POST /listings/:listingId/reports`
+- **Görev:** Yanıltıcı ilanın `Report` koleksiyonuna rapor eden kişiyle (populate) beraber eklenmesi.
 
-## 2. Kullanıcı Bilgilerini Görüntüleme Servisi
-- **API Endpoint:** `GET /users/{userId}`
-- **Görev:** Kullanıcı profil bilgilerini API'den çekip mobil uygulamada gösterme
-- **İşlevler:**
-  - JWT token ile kimlik doğrulama
-  - Kullanıcı ID'sini kullanarak profil bilgilerini getirme
-  - Gelen veriyi parse edip UI'da gösterme
-  - Token süresi dolmuşsa refresh token ile yenileme
-  - Offline durumda cache'den veri gösterme
-- **Teknik Detaylar:**
-  - Authentication header ekleme (Bearer Token)
-  - Response caching stratejisi
-  - Token refresh mekanizması
-  - Error handling (401 Unauthorized, 403 Forbidden, 404 Not Found)
+## 2. İlan Durumunu Onaylama
+- **API Endpoint:** `PUT /admin/ads/:listingId/approve`
+- **Görev:** İlanı `pending` halinden `approved` haline geçirmek. Ekstra İşlev: Arama Bildirimlerini (Push Notification) onay anında tetiklemek.
 
-## 3. Kullanıcı Bilgilerini Güncelleme Servisi
-- **API Endpoint:** `PUT /users/{userId}`
-- **Görev:** Kullanıcı profil bilgilerini güncelleme işlemini gerçekleştirme
-- **İşlevler:**
-  - Profil düzenleme ekranından gelen verileri toplama
-  - Form validasyonu (email formatı, telefon formatı vb.)
-  - API'ye PUT isteği gönderme
-  - Başarılı güncelleme sonrası cache'i güncelleme
-  - Optimistic UI update (kullanıcı deneyimini iyileştirme)
-- **Teknik Detaylar:**
-  - Request body oluşturma (firstName, lastName, email, phone)
-  - Partial update desteği (yalnızca değişen alanları gönderme)
-  - Conflict resolution (eşzamanlı güncelleme durumları)
-  - Error handling ve kullanıcı bildirimleri
+## 3. Kullanıcı Hesabını Askıya Alma
+- **API Endpoint:** `PUT /admin/users/:userId/suspend`
+- **Görev:** Yöneticinin, platformu kötüye kullanan bir kullanıcının yetkilerini kısıtlaması. (Yetki middleware kurguları).
 
-## 4. Kullanıcı Silme Servisi
-- **API Endpoint:** `DELETE /users/{userId}`
-- **Görev:** Kullanıcı hesabını silme işlemini gerçekleştirme
-- **İşlevler:**
-  - Kullanıcıya silme işlemi için onay dialog'u gösterme
-  - API'ye DELETE isteği gönderme
-  - Başarılı silme sonrası local storage ve cache'i temizleme
-  - Kullanıcıyı login ekranına yönlendirme
-  - Token'ı geçersiz kılma
-- **Teknik Detaylar:**
-  - Destructive action için confirmation dialog
-  - Local data cleanup (SharedPreferences/UserDefaults, cache, database)
-  - Logout işlemi entegrasyonu
-  - Error handling (401, 403, 404)
+## 4. Uygunsuz İlanı Silme / Reddetme
+- **API Endpoint:** `DELETE /admin/ads/:listingId` veya `/reject`
+- **Görev:** Yönetici yetkisi kullanılarak kural ihlali yapan ilanın kalıcı olarak temizlenmesi veya reddedilmesi.
+
+## 5. Onay Bekleyen İlanları Listeleme
+- **API Endpoint:** `GET /admin/ads/pending`
+- **Görev:** Sadece yöneticilerin erişebildiği bu serviste henüz yayına girmemiş yeni ilanların getirilmesi. Redis önbelleğinin temizlenmesi (`redis.del('admin:pendingAds')`).
+
+## 6. Şikayet Edilen İlanları Listeleme
+- **API Endpoint:** `GET /admin/reports`
+- **Görev:** İhbar edilmiş ilanların, sebepleriyle birlikte liste halinde admin paneline gönderilmesi.
