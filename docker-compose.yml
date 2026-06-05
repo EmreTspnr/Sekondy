@@ -68,6 +68,20 @@ services:
   # but if a web-build or mock-service is needed, it goes here.
   # For mobile development, Expo Go runs on your physical device, 
   # connecting to the local IP of the backend API.
+  # 6. Jenkins Service (CI/CD)
+  jenkins:
+    image: jenkins/jenkins:lts
+    container_name: sekondy-jenkins
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    volumes:
+      - jenkins_data:/var/jenkins_home
+      # Jenkins'in Docker komutlarını çalıştırabilmesi için docker.sock bağlanır
+      - /var/run/docker.sock:/var/run/docker.sock
+    user: root # Docker socket'e erişim yetkisi için
+    restart: unless-stopped
 
 volumes:
   mongodb_data:
+  jenkins_data:
